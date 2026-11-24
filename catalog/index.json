@@ -1,19 +1,19 @@
 {
- "version": "2026-11-24T1637",
- "updated": "2026-11-24T16:37Z",
+ "version": "2026-11-24T1714",
+ "updated": "2026-11-24T17:14Z",
  "categories": [
   {
    "id": "cpu",
    "name": "Processors (CPUs)",
    "group": "hardware",
    "description": "Desktop, laptop and server processors, from early chips to the newest releases.",
-   "count": 1618,
+   "count": 1166,
    "makers": 30,
    "years": [
     1971,
     2025
    ],
-   "bytes": 704579,
+   "bytes": 500106,
    "file": "cpu.json"
   },
   {
@@ -21,13 +21,13 @@
    "name": "Graphics cards (GPUs)",
    "group": "hardware",
    "description": "Every graphics chip since 1986 with full specifications, plus retail cards from MSI, Asus, Gigabyte, Sapphire and the other board partners.",
-   "count": 9460,
+   "count": 9371,
    "makers": 46,
    "years": [
     1986,
     2025
    ],
-   "bytes": 5246727,
+   "bytes": 5309105,
    "file": "gpu.json"
   },
   {
@@ -35,10 +35,10 @@
    "name": "Motherboards",
    "group": "hardware",
    "description": "Motherboards for every socket and form factor.",
-   "count": 4973,
+   "count": 4972,
    "makers": 17,
    "years": null,
-   "bytes": 1129357,
+   "bytes": 1129527,
    "file": "motherboard.json"
   },
   {
@@ -46,10 +46,10 @@
    "name": "Memory (RAM)",
    "group": "hardware",
    "description": "Desktop memory kits, DDR to DDR5.",
-   "count": 13553,
+   "count": 12158,
    "makers": 54,
    "years": null,
-   "bytes": 3213583,
+   "bytes": 3187210,
    "file": "memory.json"
   },
   {
@@ -57,10 +57,10 @@
    "name": "SSDs",
    "group": "hardware",
    "description": "Solid state drives: NVMe, SATA, M.2 and more.",
-   "count": 4677,
+   "count": 4226,
    "makers": 93,
    "years": null,
-   "bytes": 827411,
+   "bytes": 786834,
    "file": "ssd.json"
   },
   {
@@ -68,10 +68,10 @@
    "name": "Hard drives (HDD)",
    "group": "hardware",
    "description": "Spinning hard drives for desktops, NAS and servers.",
-   "count": 1784,
+   "count": 1436,
    "makers": 14,
    "years": null,
-   "bytes": 340599,
+   "bytes": 293224,
    "file": "hdd.json"
   },
   {
@@ -79,10 +79,10 @@
    "name": "Power supplies (PSU)",
    "group": "hardware",
    "description": "ATX, SFX and other power supplies.",
-   "count": 3438,
+   "count": 3364,
    "makers": 106,
    "years": null,
-   "bytes": 595915,
+   "bytes": 602212,
    "file": "power-supply.json"
   },
   {
@@ -90,10 +90,10 @@
    "name": "AIO water coolers",
    "group": "hardware",
    "description": "All-in-one liquid CPU coolers, by radiator size.",
-   "count": 1293,
+   "count": 1284,
    "makers": 70,
    "years": null,
-   "bytes": 227958,
+   "bytes": 233137,
    "file": "aio.json"
   },
   {
@@ -101,10 +101,10 @@
    "name": "CPU coolers",
    "group": "hardware",
    "description": "Air coolers and all-in-one liquid coolers.",
-   "count": 2851,
+   "count": 2825,
    "makers": 107,
    "years": null,
-   "bytes": 490649,
+   "bytes": 495396,
    "file": "cpu-cooler.json"
   },
   {
@@ -112,10 +112,10 @@
    "name": "Cases",
    "group": "hardware",
    "description": "PC cases from mini-ITX to full tower.",
-   "count": 6626,
+   "count": 6428,
    "makers": 160,
    "years": null,
-   "bytes": 1286232,
+   "bytes": 1287425,
    "file": "case.json"
   },
   {
@@ -123,10 +123,10 @@
    "name": "Case fans",
    "group": "hardware",
    "description": "Case and radiator fans.",
-   "count": 2744,
+   "count": 2537,
    "makers": 99,
    "years": null,
-   "bytes": 521707,
+   "bytes": 505503,
    "file": "case-fan.json"
   },
   {
@@ -137,7 +137,7 @@
    "count": 54,
    "makers": 16,
    "years": null,
-   "bytes": 8799,
+   "bytes": 8815,
    "file": "fan-controller.json"
   },
   {
@@ -145,10 +145,10 @@
    "name": "Thermal paste",
    "group": "hardware",
    "description": "Thermal compounds.",
-   "count": 210,
+   "count": 203,
    "makers": 44,
    "years": null,
-   "bytes": 23385,
+   "bytes": 23382,
    "file": "thermal-paste.json"
   },
   {
@@ -156,10 +156,10 @@
    "name": "Sound cards",
    "group": "hardware",
    "description": "Internal sound cards.",
-   "count": 77,
+   "count": 76,
    "makers": 15,
    "years": null,
-   "bytes": 15365,
+   "bytes": 15201,
    "file": "sound-card.json"
   },
   {
@@ -178,10 +178,10 @@
    "name": "Wi-Fi cards",
    "group": "hardware",
    "description": "Wireless network adapters.",
-   "count": 376,
+   "count": 364,
    "makers": 43,
    "years": null,
-   "bytes": 52857,
+   "bytes": 51329,
    "file": "wifi-card.json"
   },
   {
@@ -211,10 +211,10 @@
    "name": "UPS (battery backup)",
    "group": "hardware",
    "description": "Uninterruptible power supplies.",
-   "count": 702,
+   "count": 701,
    "makers": 13,
    "years": null,
-   "bytes": 87168,
+   "bytes": 87117,
    "file": "ups.json"
   },
   {
@@ -222,10 +222,10 @@
    "name": "Operating systems",
    "group": "hardware",
    "description": "Retail and OEM operating system editions.",
-   "count": 62,
+   "count": 50,
    "makers": 1,
    "years": null,
-   "bytes": 10724,
+   "bytes": 8828,
    "file": "os.json"
   },
   {
@@ -233,10 +233,10 @@
    "name": "Monitors",
    "group": "peripherals",
    "description": "Gaming, office and professional monitors.",
-   "count": 5074,
+   "count": 4928,
    "makers": 72,
    "years": null,
-   "bytes": 1181412,
+   "bytes": 1149105,
    "file": "monitor.json"
   },
   {
@@ -244,10 +244,10 @@
    "name": "Keyboards",
    "group": "peripherals",
    "description": "Mechanical, membrane, wired and wireless keyboards.",
-   "count": 4310,
+   "count": 3711,
    "makers": 194,
    "years": null,
-   "bytes": 916566,
+   "bytes": 824256,
    "file": "keyboard.json"
   },
   {
@@ -255,10 +255,10 @@
    "name": "Mice",
    "group": "peripherals",
    "description": "Gaming and office mice.",
-   "count": 2806,
+   "count": 2738,
    "makers": 159,
    "years": null,
-   "bytes": 579539,
+   "bytes": 578394,
    "file": "mouse.json"
   },
   {
@@ -266,10 +266,10 @@
    "name": "Headphones & headsets",
    "group": "peripherals",
    "description": "Headphones, headsets and earbuds.",
-   "count": 2946,
+   "count": 2894,
    "makers": 154,
    "years": null,
-   "bytes": 663774,
+   "bytes": 660401,
    "file": "headphones.json"
   },
   {
@@ -277,10 +277,10 @@
    "name": "Speakers",
    "group": "peripherals",
    "description": "Desktop speakers and sound bars.",
-   "count": 302,
+   "count": 301,
    "makers": 45,
    "years": null,
-   "bytes": 50436,
+   "bytes": 50706,
    "file": "speakers.json"
   },
   {
@@ -288,10 +288,10 @@
    "name": "Webcams",
    "group": "peripherals",
    "description": "Webcams and streaming cameras.",
-   "count": 78,
+   "count": 71,
    "makers": 17,
    "years": null,
-   "bytes": 16246,
+   "bytes": 14853,
    "file": "webcam.json"
   },
   {
@@ -299,10 +299,10 @@
    "name": "External storage",
    "group": "peripherals",
    "description": "Portable and desktop external drives.",
-   "count": 690,
+   "count": 625,
    "makers": 34,
    "years": null,
-   "bytes": 123327,
+   "bytes": 121157,
    "file": "external-storage.json"
   },
   {
@@ -316,7 +316,7 @@
     2013,
     2026
    ],
-   "bytes": 14776,
+   "bytes": 14923,
    "file": "vr-headset.json"
   },
   {
@@ -330,7 +330,7 @@
     2012,
     2025
    ],
-   "bytes": 16835,
+   "bytes": 16827,
    "file": "chipset.json"
   },
   {
@@ -372,7 +372,7 @@
     1966,
     2024
    ],
-   "bytes": 6392,
+   "bytes": 6453,
    "file": "microphone.json"
   },
   {
@@ -386,7 +386,7 @@
     2010,
     2023
    ],
-   "bytes": 5366,
+   "bytes": 5340,
    "file": "controller.json"
   },
   {
@@ -400,7 +400,7 @@
     2017,
     2022
    ],
-   "bytes": 3289,
+   "bytes": 3196,
    "file": "mousepad.json"
   },
   {
@@ -414,7 +414,7 @@
     2018,
     2023
    ],
-   "bytes": 4313,
+   "bytes": 4286,
    "file": "printer.json"
   },
   {
@@ -428,7 +428,7 @@
     2019,
     2024
    ],
-   "bytes": 4167,
+   "bytes": 4143,
    "file": "router.json"
   },
   {
@@ -442,7 +442,7 @@
     2017,
     2022
    ],
-   "bytes": 3050,
+   "bytes": 3070,
    "file": "drawing-tablet.json"
   },
   {
@@ -456,7 +456,7 @@
     2018,
     2023
    ],
-   "bytes": 3379,
+   "bytes": 3398,
    "file": "streaming.json"
   }
  ]
