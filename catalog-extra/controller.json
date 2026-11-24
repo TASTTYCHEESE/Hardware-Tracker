@@ -161,7 +161,7 @@
    "connection": "USB (wired)",
    "power": "USB",
    "features": "XInput / DirectInput switch",
-   "launch_price_usd": 19.99,
+   "launch_price_usd": 24.99,
    "id": "logitech-f310"
   },
   {
@@ -221,7 +221,6 @@
    "connection": "USB",
    "power": "USB",
    "features": "Hall-effect sensors (H.E.A.R.T), 16 buttons on the stick",
-   "launch_price_usd": 119.99,
    "id": "thrustmaster-t-16000m-fcs-hotas"
   },
   {

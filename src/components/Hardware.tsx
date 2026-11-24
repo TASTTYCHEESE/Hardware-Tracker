@@ -2,6 +2,7 @@ import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState
 import { api } from '../lib/platform';
 import type { AppData } from '../lib/useData';
 import { familyOf } from '../lib/family';
+import { StickyTable } from './Common';
 import {
   fmtBytes,
   formatValue,
@@ -432,7 +433,8 @@ function CategoryView({
 
           <div className={selected ? 'hw-split open' : 'hw-split'}>
             <div className="hw-list">
-              <table className="ptable hw-table">
+              <StickyTable top="var(--hw-sticky, 0px)">
+<table className="ptable hw-table">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -474,6 +476,7 @@ function CategoryView({
                   ))}
                 </tbody>
               </table>
+              </StickyTable>
               {filtered.length > limit && (
                 <button className="btn ghost hw-more" onClick={() => setLimit((l) => l + PAGE * 2)}>
                   Show more ({(filtered.length - limit).toLocaleString()} left)

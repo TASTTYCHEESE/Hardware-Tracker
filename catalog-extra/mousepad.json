@@ -75,7 +75,6 @@
    "base": "Rubber",
    "edges": "Plain",
    "feel": "Balanced",
-   "launch_price_usd": 29.99,
    "id": "steelseries-qck-heavy-large"
   },
   {
@@ -99,7 +98,7 @@
    "base": "Rubber",
    "edges": "Plain",
    "feel": "Balanced",
-   "launch_price_usd": 39.99,
+   "launch_price_usd": 29.99,
    "id": "logitech-g640"
   },
   {
@@ -130,14 +129,14 @@
   {
    "name": "Razer Gigantus V2 (Large)",
    "maker": "Razer",
-   "year": 2021,
+   "year": 2020,
    "surface": "Cloth",
    "size_mm": "450 × 400",
    "thickness_mm": 3,
    "base": "Rubber",
    "edges": "Plain",
    "feel": "Balanced",
-   "launch_price_usd": 19.99,
+   "launch_price_usd": 14.99,
    "id": "razer-gigantus-v2-large"
   },
   {
@@ -162,7 +161,6 @@
    "base": "Rubber",
    "edges": "Stitched",
    "feel": "Balanced",
-   "launch_price_usd": 29.99,
    "id": "corsair-mm300-extended"
   },
   {
@@ -174,19 +172,17 @@
    "base": "Rubber",
    "edges": "Plain",
    "feel": "Control",
-   "launch_price_usd": 39.99,
    "id": "zowie-g-sr"
   },
   {
-   "name": "Artisan FX Zero (L)",
+   "name": "Artisan FX Zero (XL)",
    "maker": "Artisan",
    "surface": "Cloth",
    "size_mm": "490 × 420",
    "thickness_mm": 4,
-   "base": "Poron foam",
    "edges": "Stitched",
    "feel": "Balanced",
-   "id": "artisan-fx-zero-l"
+   "id": "artisan-fx-zero-xl"
   }
  ]
 }

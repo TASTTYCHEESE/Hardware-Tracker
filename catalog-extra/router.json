@@ -72,7 +72,7 @@
   {
    "name": "ASUS RT-AX88U Pro",
    "maker": "ASUS",
-   "year": 2022,
+   "year": 2023,
    "type": "Router",
    "wifi": "Wi-Fi 6",
    "speed_class": "AX6000",
@@ -80,7 +80,7 @@
    "fastest_port": "2.5 Gb/s (×2)",
    "lan_ports": 4,
    "mesh": "AiMesh",
-   "launch_price_usd": 299.99,
+   "launch_price_usd": 349.99,
    "id": "asus-rt-ax88u-pro"
   },
   {
@@ -122,13 +122,12 @@
    "fastest_port": "1 Gb/s",
    "lan_ports": 4,
    "mesh": "OneMesh",
-   "launch_price_usd": 129.99,
    "id": "tp-link-archer-ax55"
   },
   {
    "name": "TP-Link Archer AX73",
    "maker": "TP-Link",
-   "year": 2020,
+   "year": 2021,
    "type": "Router",
    "wifi": "Wi-Fi 6",
    "speed_class": "AX5400",
@@ -136,7 +135,7 @@
    "fastest_port": "1 Gb/s",
    "lan_ports": 4,
    "mesh": "OneMesh",
-   "launch_price_usd": 169.99,
+   "launch_price_usd": 199.99,
    "id": "tp-link-archer-ax73"
   },
   {
@@ -164,7 +163,6 @@
    "fastest_port": "1 Gb/s",
    "lan_ports": "3 per unit",
    "mesh": "Yes",
-   "launch_price_usd": 279.99,
    "id": "tp-link-deco-x55-3-pack"
   },
   {
@@ -189,7 +187,7 @@
    "wifi": "Wi-Fi 7",
    "speed_class": "BE19000",
    "bands": "2.4 + 5 + 6 GHz",
-   "fastest_port": "10 Gb/s",
+   "fastest_port": "10 Gb/s (×2: WAN + LAN)",
    "lan_ports": 4,
    "mesh": "No",
    "launch_price_usd": 699.99,
@@ -203,7 +201,7 @@
    "wifi": "Wi-Fi 6",
    "speed_class": "AX6000",
    "bands": "2.4 + 5 + 5 GHz (dedicated backhaul)",
-   "fastest_port": "2.5 Gb/s",
+   "fastest_port": "2.5 Gb/s (WAN only)",
    "lan_ports": "4 per unit",
    "mesh": "Yes",
    "launch_price_usd": 699.99,

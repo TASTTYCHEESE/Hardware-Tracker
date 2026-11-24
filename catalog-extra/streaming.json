@@ -61,7 +61,7 @@
    "type": "Stream controller",
    "key_specs": "6 customizable LCD keys",
    "connection": "USB",
-   "launch_price_usd": 79.99,
+   "launch_price_usd": 99.99,
    "id": "elgato-stream-deck-mini"
   },
   {
@@ -149,7 +149,7 @@
    "maker": "Rode",
    "year": 2022,
    "type": "Podcast / streaming console",
-   "key_specs": "4 XLR combo inputs, 9 faders, effects, recording to microSD",
+   "key_specs": "4 XLR combo inputs, 6 physical + 3 virtual faders, effects, records to microSD",
    "connection": "USB-C, Bluetooth",
    "launch_price_usd": 699,
    "id": "rode-rodecaster-pro-ii"

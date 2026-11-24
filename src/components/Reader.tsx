@@ -2,6 +2,7 @@ import { createElement, useEffect, useState } from 'react';
 import { Readability } from '@mozilla/readability';
 import DOMPurify from 'dompurify';
 import { api } from '../lib/platform';
+import { langName, looksEnglish, originalUrl, translateHtml, translatedPage } from '../lib/translate';
 
 type Mode = 'reader' | 'web';
 interface Parsed {
@@ -12,16 +13,25 @@ interface Parsed {
 }
 
 /** In-app article viewer: a clean "Reader" view, the full web page, or hand-off to the browser. */
-export function Reader({ url, onClose, onNavigate }: { url: string; onClose: () => void; onNavigate: (u: string) => void }) {
+export function Reader({ url: rawUrl, onClose, onNavigate, translate = true }: { url: string; onClose: () => void; onNavigate: (u: string) => void; translate?: boolean }) {
+  // Translation-proxy links are read from the original site and translated here.
+  const url = originalUrl(rawUrl);
+  const wantTranslate = translate || url !== rawUrl;
   const [mode, setMode] = useState<Mode>('reader');
   const [parsed, setParsed] = useState<Parsed | null>(null);
   const [state, setState] = useState<'loading' | 'ok' | 'failed'>('loading');
+  const [foreign, setForeign] = useState(false);
+  const [tr, setTr] = useState<{ title: string; html: string; lang: string } | 'working' | null>(null);
+  const [showOrig, setShowOrig] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setState('loading');
     setParsed(null);
     setMode('reader');
+    setForeign(false);
+    setTr(null);
+    setShowOrig(false);
     (async () => {
       try {
         const html = await api.fetchText(url);
@@ -36,7 +46,25 @@ export function Reader({ url, onClose, onNavigate }: { url: string; onClose: () 
           setParsed({ title: article.title ?? '', byline: article.byline, site: article.siteName, html: clean });
           setState('ok');
         }
+        // Not in English: translate the whole article (names that can't be translated stay as they are).
+        const sample = `${article.title ?? ''} ${(article.textContent ?? '').slice(0, 4000)}`;
+        if (wantTranslate && !looksEnglish(sample)) {
+          if (!cancelled) {
+            setForeign(true);
+            setTr('working');
+          }
+          // The title goes along with the article in the same requests.
+          const head = document.createElement('h1');
+          head.textContent = article.title ?? '';
+          const h = await translateHtml(`<header data-hwt-title>${head.outerHTML}</header>${clean}`);
+          const d = new DOMParser().parseFromString(`<div>${h.html}</div>`, 'text/html');
+          const th = d.querySelector('[data-hwt-title]');
+          const title = th?.textContent?.trim() || article.title || '';
+          th?.remove();
+          if (!cancelled) setTr(h.lang && h.lang !== 'en' ? { title, html: d.body.firstElementChild?.innerHTML ?? h.html, lang: h.lang } : null);
+        }
       } catch {
+        if (!cancelled && wantTranslate && url !== rawUrl) setForeign(true);
         // Paywalls, heavy JS sites etc.: show the real page instead.
         if (!cancelled) {
           setState('failed');
@@ -47,7 +75,11 @@ export function Reader({ url, onClose, onNavigate }: { url: string; onClose: () 
     return () => {
       cancelled = true;
     };
-  }, [url]);
+  }, [url, wantTranslate, rawUrl]);
+
+  const translated = tr && tr !== 'working' && !showOrig ? tr : null;
+  // The web page and the browser get Google's translated copy when the article isn't in English.
+  const pageUrl = foreign && !showOrig ? translatedPage(url) : url;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -77,7 +109,7 @@ export function Reader({ url, onClose, onNavigate }: { url: string; onClose: () 
             Web page
           </button>
         </div>
-        <button className="btn small ghost" onClick={() => window.open(url, '_blank')} title="Open in your normal browser">
+        <button className="btn small ghost" onClick={() => window.open(pageUrl, '_blank')} title="Open in your normal browser">
           Open in browser ↗
         </button>
       </div>
@@ -98,9 +130,18 @@ export function Reader({ url, onClose, onNavigate }: { url: string; onClose: () 
               }}
             >
               {parsed.site && <div className="muted small">{parsed.site}</div>}
-              <h1>{parsed.title}</h1>
+              {tr === 'working' && <div className="reader-tr muted small">Translating to English…</div>}
+              {tr && tr !== 'working' && (
+                <div className="reader-tr muted small">
+                  {showOrig ? `Original (${langName(tr.lang)})` : `Translated from ${langName(tr.lang)}`} ·{' '}
+                  <button className="link small" onClick={() => setShowOrig(!showOrig)}>
+                    {showOrig ? 'Show in English' : 'Show original'}
+                  </button>
+                </div>
+              )}
+              <h1>{translated ? translated.title : parsed.title}</h1>
               {parsed.byline && <div className="muted small">{parsed.byline}</div>}
-              <div dangerouslySetInnerHTML={{ __html: parsed.html }} />
+              <div dangerouslySetInnerHTML={{ __html: translated ? translated.html : parsed.html }} />
             </article>
           )}
         </div>
@@ -108,12 +149,12 @@ export function Reader({ url, onClose, onNavigate }: { url: string; onClose: () 
 
       {mode === 'web' &&
         (api.platform === 'desktop' ? (
-          createElement('webview', { src: url, partition: 'persist:reader', className: 'reader-web' })
+          createElement('webview', { src: pageUrl, partition: 'persist:reader', className: 'reader-web' })
         ) : (
           <div className="reader-scroll">
             <p className="muted reader-msg">
               This page can't be shown here.{' '}
-              <a href={url} target="_blank" rel="noreferrer">
+              <a href={pageUrl} target="_blank" rel="noreferrer">
                 Open it in a new tab
               </a>
               .

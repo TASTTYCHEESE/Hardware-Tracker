@@ -321,7 +321,7 @@ textarea {
 .hw-count { margin-bottom: 10px; }
 .hw-split { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
 .hw-split.open { grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); }
-.hw-list { min-width: 0; overflow-x: auto; }
+.hw-list { min-width: 0; }
 .hw-table { width: 100%; }
 .hw-table th, .hw-table td { padding: 9px 14px; }
 .hw-table td.hw-name { min-width: 220px; white-space: normal; }
@@ -362,7 +362,7 @@ textarea {
 .p-stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 14px; }
 .p-stats > div { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; display: flex; flex-direction: column; min-width: 92px; }
 .p-stats b { font-size: 18px; font-variant-numeric: tabular-nums; }
-.ptable-wrap { overflow-x: auto; border-radius: 12px; }
+.ptable-wrap { border-radius: 12px; }
 .ptable td .small, .ptable td.small { font-size: 12px; }
 .ptable-wrap .ptable th, .ptable-wrap .ptable td { padding: 10px 10px; }
 .ptable-wrap .ptable th:first-child, .ptable-wrap .ptable td:first-child { padding-left: 16px; min-width: 150px; }
@@ -441,3 +441,15 @@ textarea {
 .buy-tools { margin: 4px 0 8px; gap: 12px; align-items: center; }
 .buy-btns { display: inline-flex; gap: 4px; align-items: flex-start; }
 .buy-btns .fav { font-size: 18px; }
+
+/* Wide tables: sticky top scroll bar and sticky column headers (StickyTable) */
+.st-wrap { overflow-x: clip; min-width: 0; }
+.st-bar { position: sticky; top: var(--st-top, 0px); z-index: 7; height: 16px; overflow-x: auto; overflow-y: hidden; background: var(--bg); }
+.st-bar::-webkit-scrollbar { height: 12px; }
+.st-bar::-webkit-scrollbar-track { background: var(--panel); border-radius: 6px; }
+.st-bar::-webkit-scrollbar-thumb { background: #3a4a5c; border-radius: 6px; border: 2px solid var(--panel); }
+.st-bar::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+.st-inner { width: max-content; min-width: 100%; }
+.st-inner > .ptable { overflow: clip; }
+.st-inner thead th { position: sticky; top: calc(var(--st-top, 0px) + var(--st-bar, 0px)); z-index: 6; box-shadow: 0 1px 0 var(--line); }
+.reader-tr { margin: 6px 0 2px; padding: 6px 10px; background: var(--panel-2); border-radius: 8px; display: inline-block; }

@@ -241,7 +241,7 @@ export default function App() {
         </div>
       </nav>
       <main className="main">
-        {reading && <Reader url={reading} onClose={() => setReading(null)} onNavigate={setReading} />}
+        {reading && <Reader url={reading} onClose={() => setReading(null)} onNavigate={setReading} translate={data.settings.translateNews !== false} />}
         {tabs.length > 0 && (
           <div className="topbar">
             <div className="seg">

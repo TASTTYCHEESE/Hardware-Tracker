@@ -63,7 +63,7 @@
    "capsule": "Dynamic",
    "polar_patterns": "Cardioid",
    "frequency_response": "50 Hz – 20 kHz",
-   "weight_g": 764,
+   "weight_g": 765,
    "launch_price_usd": 399,
    "notes": "Needs a lot of preamp gain",
    "id": "shure-sm7b"
@@ -76,7 +76,7 @@
    "capsule": "Dynamic (built-in preamp, +18/+28 dB)",
    "polar_patterns": "Cardioid",
    "frequency_response": "50 Hz – 20 kHz",
-   "weight_g": 794,
+   "weight_g": 837,
    "launch_price_usd": 499,
    "notes": "Preamp needs 48 V phantom power",
    "id": "shure-sm7db"
@@ -103,7 +103,7 @@
    "polar_patterns": "Cardioid",
    "frequency_response": "50 Hz – 16 kHz",
    "sample_rate": "24-bit / 48 kHz",
-   "weight_g": 550,
+   "weight_g": 574,
    "launch_price_usd": 279,
    "notes": "Touch panel with LED ring",
    "id": "shure-mv7-plus"
@@ -170,7 +170,7 @@
    "sample_rate": "16-bit / 48 kHz",
    "weight_g": 710,
    "launch_price_usd": 139,
-   "notes": "Tap-to-mute, built-in shock mount",
+   "notes": "Tap-to-mute, built-in shock mount. Weight includes stand and cable (mic alone 254 g)",
    "id": "hyperx-quadcast"
   },
   {
@@ -182,9 +182,9 @@
    "polar_patterns": "Cardioid, omni, figure-8, stereo",
    "frequency_response": "20 Hz – 20 kHz",
    "sample_rate": "16-bit / 48 kHz",
-   "weight_g": 710,
+   "weight_g": 254,
    "launch_price_usd": 159,
-   "notes": "RGB lighting",
+   "notes": "RGB lighting. Weight is the mic alone",
    "id": "hyperx-quadcast-s"
   },
   {
@@ -218,11 +218,11 @@
   {
    "name": "Rode PodMic",
    "maker": "Rode",
-   "year": 2019,
+   "year": 2018,
    "connection": "XLR",
    "capsule": "Dynamic",
    "polar_patterns": "Cardioid",
-   "frequency_response": "20 Hz – 20 kHz",
+   "frequency_response": "50 Hz – 13 kHz",
    "weight_g": 937,
    "launch_price_usd": 99,
    "id": "rode-podmic"
@@ -243,14 +243,14 @@
   {
    "name": "Rode NT1 5th Generation",
    "maker": "Rode",
-   "year": 2021,
+   "year": 2023,
    "connection": "USB-C + XLR",
    "capsule": "Condenser",
    "polar_patterns": "Cardioid",
    "frequency_response": "20 Hz – 20 kHz",
    "sample_rate": "32-bit float / 192 kHz",
    "weight_g": 308,
-   "launch_price_usd": 259,
+   "launch_price_usd": 249,
    "id": "rode-nt1-5th-generation"
   },
   {
@@ -271,7 +271,7 @@
    "capsule": "Condenser",
    "polar_patterns": "Cardioid",
    "frequency_response": "20 Hz – 20 kHz",
-   "sample_rate": "16-bit / 48 kHz",
+   "sample_rate": "16-bit / 44.1–48 kHz",
    "weight_g": 386,
    "launch_price_usd": 149,
    "id": "audio-technica-at2020usb-plus"
@@ -310,8 +310,7 @@
    "polar_patterns": "Cardioid",
    "frequency_response": "50 Hz – 15 kHz",
    "sample_rate": "16-bit / 48 kHz",
-   "weight_g": 263,
-   "launch_price_usd": 69,
+   "weight_g": 320,
    "id": "samson-q2u"
   }
  ]

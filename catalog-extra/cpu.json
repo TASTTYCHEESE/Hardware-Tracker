@@ -11,7 +11,7 @@
    "process": "10 µm",
    "socket": "16-pin DIP",
    "microarchitecture": "MCS-4",
-   "transistors": "2,300",
+   "transistors": "2,250",
    "notes": "First commercial single-chip microprocessor"
   },
   {
@@ -37,7 +37,7 @@
    "cores": 1,
    "process": "6 µm",
    "socket": "40-pin DIP",
-   "transistors": "4,500",
+   "transistors": "6,000",
    "notes": "CPU of the Altair 8800"
   },
   {
@@ -62,7 +62,7 @@
    "cores": 1,
    "process": "8 µm",
    "socket": "40-pin DIP",
-   "transistors": "3,510",
+   "transistors": "4,528 (3,510 active)",
    "notes": "Used in the Apple II, Commodore 64 (6510 variant), Atari 2600 (6507) and NES (2A03)"
   },
   {
@@ -124,7 +124,7 @@
    "maker": "Motorola",
    "year": 1979,
    "clock_speeds": "4–16.67 MHz",
-   "data_width": "32-bit",
+   "data_width": "16/32-bit (32-bit registers, 16-bit bus)",
    "cores": 1,
    "process": "3.5 µm",
    "socket": "64-pin DIP",
@@ -666,7 +666,7 @@
    "process": "130 nm",
    "socket": "Socket 370",
    "microarchitecture": "P6",
-   "transistors": "44 million"
+   "transistors": "45 million"
   },
   {
    "id": "hist-intel-pentium-4-northwood",
@@ -840,7 +840,7 @@
    "process": "90 nm",
    "socket": "LGA 775",
    "microarchitecture": "NetBurst",
-   "transistors": "230 million",
+   "transistors": "228 million",
    "notes": "Intel's first desktop dual-core"
   },
   {

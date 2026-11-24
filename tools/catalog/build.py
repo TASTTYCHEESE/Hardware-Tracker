@@ -501,6 +501,39 @@ def cpu_extras(name, arch):
     return out
 
 
+# Launch years for well-known desktop lines where the architecture year would be wrong (refreshes, late SKUs).
+MODEL_YEARS = [
+    (r"RYZEN 9 9(950|900)X3D", 2025), (r"RYZEN 7 9800X3D", 2024), (r"RYZEN \d 9\d{3}F?\b", 2025),
+    (r"RYZEN \d 9\d{3}X\b", 2024), (r"RYZEN \d 9\d00\b", 2024),
+    (r"RYZEN \d 8\d{3}G", 2024), (r"RYZEN \d 8\d{3}F", 2024), (r"RYZEN \d 8\d00\b", 2024),
+    (r"RYZEN 5 7600X3D", 2024), (r"RYZEN \d 7\d{3}X3D", 2023), (r"RYZEN 5 7500F", 2023), (r"RYZEN \d 7\d00\b", 2023),
+    (r"RYZEN \d 7\d{3}X\b", 2022),
+    (r"RYZEN 7 5700X3D", 2024), (r"RYZEN 5 5600X3D", 2023), (r"RYZEN 7 5800X3D", 2022),
+    (r"RYZEN \d 5\d{3}(GT|XT)\b", 2024), (r"RYZEN \d 5\d{3}(F)?\b", 2022), (r"RYZEN \d 5\d{3}G\b", 2021),
+    (r"RYZEN \d 5\d{3}X\b", 2020),
+    (r"CORE ULTRA \d 2\d{2}", 2024),
+    (r"I\d-14\d{3}(K|KF|KS)\b", 2023), (r"I\d-14\d{3}", 2024), (r"I\d-13\d{3}(K|KF)\b", 2022), (r"I\d-13\d{3}", 2023),
+    (r"I\d-12\d{3}(K|KF)\b", 2021), (r"I\d-12\d{3}", 2022),
+]
+
+
+def model_year(name):
+    n = name.upper()
+    for pat, year in MODEL_YEARS:
+        if re.search(pat, n):
+            return year
+    return None
+
+
+def boost_or_none(r):
+    """PCPartPicker sometimes has a boost clock below the base clock; that's a data error, so leave it out."""
+    b, c = r.get("boost_clock"), r.get("core_clock")
+    try:
+        return None if b is not None and c is not None and float(b) < float(c) else b
+    except (TypeError, ValueError):
+        return b
+
+
 def build_cpus(wd_items):
     wd_items = clean_wd(wd_items)
     rows = pcpp("cpu")
@@ -509,11 +542,14 @@ def build_cpus(wd_items):
     for r in rows:
         it = mk(r["name"], {
             "microarchitecture": r.get("microarchitecture"), "cores": r.get("core_count"),
-            "base_clock": r.get("core_clock"), "boost_clock": r.get("boost_clock"), "tdp": r.get("tdp"),
+            "base_clock": r.get("core_clock"), "boost_clock": boost_or_none(r), "tdp": r.get("tdp"),
             "graphics": r.get("graphics"), "year": ARCH_YEAR.get(r.get("microarchitecture") or ""),
             **cpu_extras(r["name"], r.get("microarchitecture")),
         })
-        if it.get("year"):
+        my = model_year(r["name"])
+        if my:
+            it["year"] = my
+        elif it.get("year"):
             it["year_note"] = "approx., from the architecture"
         items.append(it)
         seen.add(norm(r["name"]))
@@ -604,7 +640,7 @@ def build_pcpp_categories(gpu_by_norm):
         g = find_chip(chip)
         card = mk(r["name"], {
             "kind": "Retail card", "chipset": chip, "memory": f"{num(r['memory'])} GB" if r.get("memory") else None,
-            "core_clock": r.get("core_clock"), "boost_clock": r.get("boost_clock"), "length_mm": r.get("length"),
+            "core_clock": r.get("core_clock"), "boost_clock": boost_or_none(r), "length_mm": r.get("length"),
             "color": r.get("color"), "year": g.get("year") if g else None, "date": g.get("date") if g else None,
             "chip_id": g["id"] if g else None,
         })
@@ -903,6 +939,7 @@ def main():
     today = dt.date.today().isoformat()
     index = {"version": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H%M"), "updated": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"), "categories": []}
     for c in CATEGORIES:
+        disambiguate(c)
         c["items"].sort(key=lambda i: (-(i.get("year") or 0), i["name"].lower()))
         # Make ids unique inside a category.
         seen: dict[str, int] = {}
@@ -926,6 +963,64 @@ def main():
     with open(os.path.join(OUT, "index.json"), "w", encoding="utf-8") as f:
         json.dump(index, f, ensure_ascii=False, indent=1)
     log(f"Total items: {sum(c['count'] for c in index['categories'])}")
+
+
+# Fields that tell same-named listings apart, best first ("Acer Nitro OC" -> "Acer Nitro OC (Radeon RX 9070 XT)").
+TELL_APART = ["chipset", "capacity", "speed", "kit", "cas_latency", "size", "screen_size", "resolution", "refresh_rate",
+              "wattage", "memory", "socket", "form_factor", "interface", "type", "connection_type", "color"]
+META_KEYS = {"id", "pop_rank", "link", "steam_share", "steam_peak", "steam_peak_month", "first_word_latency", "date", "year",
+             "year_note", "chip_id", "wd", "name"}
+
+
+def disambiguate(c):
+    """Same-named rows: drop exact duplicates, then add the specs that differ to the name."""
+    units = {f["k"]: f.get("unit") for f in c["fields"]}
+    groups: dict[str, list] = {}
+    for i in c["items"]:
+        groups.setdefault(i["name"].strip().lower(), []).append(i)
+    drop = set()
+    for rows in groups.values():
+        if len(rows) < 2:
+            continue
+        rows.sort(key=lambda i: i.get("pop_rank") or 10**9)
+        sigs = set()
+        for i in rows:
+            sig = json.dumps({k: v for k, v in i.items() if k not in META_KEYS}, sort_keys=True, ensure_ascii=False)
+            if sig in sigs:
+                drop.add(id(i))
+            sigs.add(sig)
+        rows = [i for i in rows if id(i) not in drop]
+        if len(rows) < 2:
+            continue
+        keys = [k for k in TELL_APART + sorted({k for i in rows for k in i} - META_KEYS - set(TELL_APART) - {"maker"})
+                if len({json.dumps(i.get(k)) for i in rows}) > 1]
+        use: list = [k for k in keys if k in ("chipset", "capacity", "speed", "cas_latency", "wattage", "screen_size")]
+
+        def distinct(ks):
+            return len({tuple(json.dumps(i.get(x)) for x in ks) for i in rows})
+        while len(use) < 5 and distinct(use) < len(rows):  # greedily add the field that separates the most rows
+            best = max((k for k in keys if k not in use), key=lambda k: (distinct(use + [k]), -keys.index(k)), default=None)
+            if best is None or distinct(use + [best]) == distinct(use):
+                break
+            use.append(best)
+        use.sort(key=keys.index)
+
+        def fmt(k, v):
+            if v is None or v == "":
+                return None
+            if k == "cas_latency":
+                return f"CL{v}"
+            u = units.get(k)
+            if not u or u in str(v):
+                return str(v)
+            return f"{v}{u}" if u in ('"', "%", "″") else f"{v} {u}"
+        for i in rows:
+            extra = [x for x in (fmt(k, i.get(k)) for k in use) if x and x.lower() not in i["name"].lower()]
+            if extra:
+                i["name"] = f"{i['name']} ({', '.join(extra)})"
+    if drop:
+        c["items"] = [i for i in c["items"] if id(i) not in drop]
+        log(f"{c['id']}: dropped {len(drop)} duplicate listings")
 
 
 if __name__ == "__main__":

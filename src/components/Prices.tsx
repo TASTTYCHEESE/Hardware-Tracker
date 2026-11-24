@@ -3,7 +3,7 @@ import { convert, loadRates, type Currency, type Rates } from '../lib/fx';
 import type { AppData } from '../lib/useData';
 import type { Category, PricePoint, Region } from '../lib/types';
 import { COUNTRIES, COUNTRY_CODES, CURRENCIES, GROUPS, type CountryCode } from '../lib/regions';
-import { CatBadge, DirBadge, Sparkline, catLabel } from './Common';
+import { CatBadge, DirBadge, Sparkline, StickyTable, catLabel } from './Common';
 import { REGION_LABEL, fmtDate, fmtPct, money, pct } from '../lib/format';
 import { parseRam, ramLabel } from '../lib/ram';
 import { PERF_NOTE, perfFor } from '../lib/perf';
@@ -337,6 +337,7 @@ export function Prices({ data }: { data: AppData }) {
         </div>
       )}
       <div className="ptable-wrap">
+      <StickyTable>
       <table className="ptable">
         <thead>
           <tr>
@@ -430,6 +431,7 @@ export function Prices({ data }: { data: AppData }) {
           ))}
         </tbody>
       </table>
+      </StickyTable>
       </div>
       </div>
       {rows.length > 0 && (
