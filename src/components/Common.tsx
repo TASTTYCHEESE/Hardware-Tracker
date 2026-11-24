@@ -2,8 +2,12 @@ import type { Category, Direction, NewsItem, Source } from '../lib/types';
 
 export const CATS: Category[] = ['GPU', 'CPU', 'RAM'];
 
+/** How a category is written on screen: plural for GPUs and CPUs. */
+export const CAT_LABEL: Record<Category, string> = { GPU: 'GPUs', CPU: 'CPUs', RAM: 'RAM', Industry: 'Industry', Other: 'Other' };
+export const catLabel = (c: Category | 'All') => (c === 'All' ? 'All' : CAT_LABEL[c] ?? c);
+
 export function CatBadge({ c }: { c: Category }) {
-  return <span className={`badge cat-${c}`}>{c}</span>;
+  return <span className={`badge cat-${c}`}>{CAT_LABEL[c] ?? c}</span>;
 }
 
 export function DirBadge({ d, text }: { d: Direction; text?: string }) {

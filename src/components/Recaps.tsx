@@ -4,7 +4,7 @@ import { CatBadge, DirBadge } from './Common';
 import { REGION_LABEL, fmtDate, fmtPct, money, pct } from '../lib/format';
 
 const TYPE_LABEL = { daily: 'Daily recap', weekly: 'Weekly recap', catchup: 'Catch-up' } as const;
-const CAT_LABEL: Record<Category, string> = { GPU: 'GPU', CPU: 'CPU', RAM: 'RAM', Industry: 'Industry & people', Other: 'Other' };
+const CAT_LABEL: Record<Category, string> = { GPU: 'GPUs', CPU: 'CPUs', RAM: 'RAM', Industry: 'Industry & people', Other: 'Other' };
 
 type Tab = 'summary' | 'news' | 'prices';
 

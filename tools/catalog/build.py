@@ -159,6 +159,27 @@ def build_gpus():
     log(f"GPUs: {len(items)}")
     for i in items:
         i["kind"] = "GPU chip"
+    # How many Steam users have each chip (latest month and all-time peak).
+    usage, month = steam_usage("Video Card Description")
+    by_norm = {norm(i["name"]): i for i in items}
+    keys = sorted(by_norm, key=len)
+    matched = 0
+    for name, u in usage.items():
+        s = re.sub(r"^(NVIDIA|AMD|ATI|Intel)\s+", "", name, flags=re.I)
+        s = s.replace("Laptop GPU", "Mobile").replace("(TM)", "").replace("(R)", "")
+        k = norm(s)
+        # The survey doesn't split memory variants (RTX 3060 8 GB / 12 GB), so every variant gets the family's share.
+        targets = [by_norm[k]] if k in by_norm else [by_norm[kk] for kk in keys if kk.startswith(k) and re.fullmatch(r"\d+(gb|mb)?", kk[len(k):])]
+        if not targets:
+            continue
+        matched += 1
+        for g in targets:
+            if u["share"] is not None:
+                g["steam_share"] = max(g.get("steam_share", 0), u["share"])
+            if u["peak"] > g.get("steam_peak", 0):
+                g["steam_peak"], g["steam_peak_month"] = u["peak"], u["peak_month"]
+    GPU_DATA["steam_month"] = month
+    log(f"Steam survey matched {matched} GPU chips")
     GPU_DATA["fields"] = [("generation", "Generation", None), ("architecture", "Architecture", None), ("gpu_chip", "GPU chip", None),
          ("date", "Release date", None), ("foundry", "Foundry", None), ("process_nm", "Process", "nm"),
          ("transistors_m", "Transistors", "million"), ("die_mm2", "Die size", "mm²"), ("bus", "Bus interface", None),
@@ -293,12 +314,54 @@ def build_wikidata_cpus():
 
 
 # ---- PCPartPicker dataset ------------------------------------------------
+# PCPartPicker lists parts most popular first, so the position in the dataset is a popularity rank.
+RANK: dict[str, list[int]] = {}  # name -> ranks of rows with that name, in order (names repeat, e.g. "Sapphire PULSE")
+
+
 def pcpp(t):
     try:
-        return json.loads(get(PCPP.format(t)))
+        rows = json.loads(get(PCPP.format(t)))
     except Exception as e:  # noqa: BLE001
         log(f"pcpp {t} failed: {e}")
-        return []
+        rows = []
+    RANK.clear()
+    for i, r in enumerate(rows):
+        RANK.setdefault(r.get("name", ""), []).append(i + 1)
+    return rows
+
+
+# ---- Steam Hardware Survey (via jdegene/steamHWsurvey): how many gamers use each GPU / VR headset ----
+STEAM_CSV = "https://raw.githubusercontent.com/jdegene/steamHWsurvey/master/shs.csv"
+SRC_STEAM = {"name": "Steam Hardware Survey (via steamHWsurvey)", "url": "https://store.steampowered.com/hwsurvey"}
+
+
+def steam_usage(category_name):
+    """name -> {share (latest month, %), peak (%), peak_month} for one survey category."""
+    import csv
+    import io
+
+    try:
+        text = get(STEAM_CSV).decode("utf-8")
+    except Exception as e:  # noqa: BLE001
+        log(f"Steam survey failed: {e}")
+        return {}, ""
+    rows = [r for r in csv.DictReader(io.StringIO(text)) if r["category"] == category_name and r["name"] != "Other"]
+    if not rows:
+        return {}, ""
+    last = max(r["date"] for r in rows)
+    out: dict[str, dict] = {}
+    for r in rows:
+        try:
+            pct = float(r["percentage"]) * 100
+        except ValueError:
+            continue
+        o = out.setdefault(r["name"], {"share": None, "peak": 0.0, "peak_month": ""})
+        if pct > o["peak"]:
+            o["peak"], o["peak_month"] = round(pct, 2), r["date"][:7]
+        if r["date"] == last:
+            o["share"] = round(pct, 2)
+    log(f"Steam survey {category_name}: {len(out)} names, latest {last}")
+    return out, last[:7]
 
 
 def rng(v, unit="", scale=1):
@@ -310,6 +373,8 @@ def rng(v, unit="", scale=1):
 
 def mk(name, extra):
     it = {"id": slug(name), "name": name, "maker": brand(name)}
+    if RANK.get(name):
+        it["pop_rank"] = RANK[name].pop(0)
     it.update({k: v for k, v in extra.items() if v not in (None, "", [], "None")})
     return it
 
@@ -544,6 +609,9 @@ def build_pcpp_categories(gpu_by_norm):
             "chip_id": g["id"] if g else None,
         })
         if g:  # columns and filters come from the GPU chip; the app shows the chip's full specs too
+            if card.get("pop_rank"):
+                g["pop_rank"] = min(g.get("pop_rank", 10**9), card["pop_rank"])
+            # Steam usage stays on the chip (Steam counts chips, not retail cards); the card panel shows the chip's.
             for k in ("generation", "architecture", "memory_type", "memory_bus", "shaders", "tdp", "bus", "outputs"):
                 if g.get(k) and k not in card:
                     card[k] = g[k]
@@ -553,10 +621,10 @@ def build_pcpp_categories(gpu_by_norm):
     gpu_fields = [("kind", "Type", None)] + [f for k in first for f in chip_fields if f[0] == k] + [("chipset", "GPU", None)]
     gpu_fields += [f for f in chip_fields if f[0] not in first]
     gpu_fields += [("core_clock", "Core clock", "MHz"), ("color", "Color", None)]
-    category("gpu", "Graphics cards & GPUs", "hardware",
+    category("gpu", "Graphics cards (GPUs)", "hardware",
              "Every graphics chip since 1986 with full specifications, plus retail cards from MSI, Asus, Gigabyte, Sapphire and the other board partners.",
              gpu_fields, ["kind", "maker", "year", "generation", "architecture", "memory_type"],
-             GPU_DATA.get("items", []) + items, [SRC_TPU, SRC_PCPP])
+             GPU_DATA.get("items", []) + items, [SRC_TPU, SRC_PCPP, SRC_STEAM])
 
     rows = pcpp("motherboard")
     boards = []
@@ -756,6 +824,20 @@ def main():
         log(f"Using cached Wikidata processors: {len(wd)}")
     build_cpus(wd)
     build_pcpp_categories(gpu_by_norm)
+    # VR headsets: the Steam survey lists every headset gamers use.
+    vr, vr_month = steam_usage("VR Headsets")
+    if vr:
+        heads = []
+        for name, u in vr.items():
+            maker = name.split()[0]
+            maker = {"Oculus": "Meta (Oculus)", "Meta": "Meta (Oculus)", "Valve": "Valve", "HTC": "HTC", "Windows": "Microsoft (WMR)"}.get(maker, maker)
+            it = {"id": slug(name), "name": name, "maker": maker, "steam_peak": u["peak"], "steam_peak_month": u["peak_month"]}
+            if u["share"] is not None:
+                it["steam_share"] = u["share"]
+            heads.append({k: v for k, v in it.items() if v is not None})
+        category("vr-headset", "VR headsets", "peripherals", "PC VR headsets, with how many Steam VR users have each one.",
+                 [("steam_share", "Share of Steam VR users (latest)", "%"), ("steam_peak", "Peak share", "%"),
+                  ("steam_peak_month", "Peak month", None)], ["maker"], heads, [SRC_STEAM])
     extra = load_extra()
     have = {c["id"] for c in CATEGORIES}
     for cid, name, group, desc in EXTRA_CATEGORIES:
@@ -770,6 +852,17 @@ def main():
             if SRC_EXTRA not in c["sources"]:
                 c["sources"].append(SRC_EXTRA)
 
+    # Popularity (PCPartPicker rank) and usage (Steam survey) fields, where a category has them.
+    for c in CATEGORIES:
+        keys = {k for i in c["items"] for k in i}
+        have = {f["k"] for f in c["fields"]}
+        c["sorts"] = [x for x, k in (("popular", "pop_rank"), ("used", "steam_share")) if k in keys or (x == "used" and "steam_peak" in keys)]
+        for k, label, unit in (("pop_rank", "Popularity rank (PCPartPicker, 1 = most popular)", None),
+                               ("steam_share", "Steam users (latest survey)", "%"), ("steam_peak", "Steam users (peak)", "%"),
+                               ("steam_peak_month", "Steam peak month", None)):
+            if k in keys and k not in have:
+                c["fields"].append({"k": k, "label": label, **({"unit": unit} if unit else {})})
+
     today = dt.date.today().isoformat()
     index = {"version": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H%M"), "updated": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"), "categories": []}
     for c in CATEGORIES:
@@ -781,7 +874,7 @@ def main():
             seen[i["id"]] = n + 1
             if n:
                 i["id"] = f"{i['id']}-{n + 1}"
-        body = json.dumps({k: c[k] for k in ("id", "name", "group", "description", "fields", "filters", "sources", "note", "items")},
+        body = json.dumps({k: c[k] for k in ("id", "name", "group", "description", "fields", "filters", "sorts", "sources", "note", "items")},
                           ensure_ascii=False, separators=(",", ":"))
         with open(os.path.join(OUT, f"{c['id']}.json"), "w", encoding="utf-8") as f:
             f.write(body)

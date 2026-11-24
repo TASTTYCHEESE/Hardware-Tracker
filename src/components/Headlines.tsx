@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Category, FeedArticle } from '../lib/types';
-import { CatBadge } from './Common';
+import { CatBadge, catLabel } from './Common';
 
 const ORDER: Category[] = ['GPU', 'CPU', 'RAM', 'Industry', 'Other'];
 
@@ -20,7 +20,7 @@ export function HeadlineColumns({ articles, empty, limit = 15 }: { articles: Fee
         </button>
         {ORDER.filter((c) => counts[c]).map((c) => (
           <button key={c} className={cat === c ? 'chip on' : 'chip'} onClick={() => setCat(c)}>
-            {c === 'Industry' ? 'Industry' : c} <span className="muted small">{counts[c]}</span>
+            {catLabel(c)} <span className="muted small">{counts[c]}</span>
           </button>
         ))}
       </div>

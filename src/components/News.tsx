@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { AppData } from '../lib/useData';
 import type { Category } from '../lib/types';
-import { CatBadge } from './Common';
+import { CatBadge, catLabel } from './Common';
 import { ago } from '../lib/format';
 
 const FILTERS: (Category | 'All')[] = ['All', 'GPU', 'CPU', 'RAM', 'Industry', 'Other'];
@@ -27,7 +27,7 @@ export function News({ data }: { data: AppData }) {
         <div className="tabs">
           {FILTERS.map((f) => (
             <button key={f} className={f === cat ? 'tab active' : 'tab'} onClick={() => setCat(f)}>
-              {f}
+              {catLabel(f)}
               <span className="count">{f === 'All' ? data.feed.articles.length : data.feed.articles.filter((a) => a.category === f).length}</span>
             </button>
           ))}

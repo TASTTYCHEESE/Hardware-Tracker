@@ -11,7 +11,12 @@ import {
 } from '../lib/catalog';
 
 type Group = 'hardware' | 'peripherals';
-type Sort = 'new' | 'old' | 'name' | 'maker';
+type Sort = 'new' | 'old' | 'name' | 'maker' | 'popular' | 'unpopular' | 'used' | 'unused';
+
+const simplify = (x: string) => x.toLowerCase().replace(/[^a-z0-9]+/g, '');
+const num = (v: unknown) => (typeof v === 'number' ? v : undefined);
+/** Usage = latest Steam share, falling back to the all-time peak. */
+const usage = (i: CatalogItem) => num(i.steam_share) ?? (num(i.steam_peak) !== undefined ? (num(i.steam_peak) as number) / 1000 : undefined);
 const PAGE = 100;
 
 /** Cache categories for this session so switching back and forth is instant. */
@@ -173,24 +178,44 @@ function CategoryView({
   const filtered = useMemo(() => {
     if (!cat) return [];
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const q1 = simplify(query);
+    // Search and filters must both match. The search decides the order: best name matches first.
+    const score = new Map<CatalogItem, number>();
     const list = cat.items.filter((it) => {
       if (maker && it.maker !== maker) return false;
       if (from && (!it.year || it.year < from)) return false;
       if (to && (!it.year || it.year > to)) return false;
       for (const [k, v] of Object.entries(extra)) if (v && String(it[k] ?? '') !== v) return false;
       if (words.length) {
-        const hay = `${it.name} ${it.maker} ${Object.values(it).filter((x) => typeof x === 'string').join(' ')}`.toLowerCase();
-        if (!words.every((w) => hay.includes(w))) return false;
+        const name = it.name.toLowerCase();
+        const sname = simplify(it.name);
+        const hay = `${name} ${it.maker} ${Object.values(it).filter((x) => typeof x === 'string').join(' ')}`.toLowerCase();
+        const inName = words.every((w) => name.includes(w)) || sname.includes(q1);
+        if (!inName && !words.every((w) => hay.includes(w)) && !simplify(hay).includes(q1)) return false;
+        score.set(it, sname === q1 ? 0 : sname.startsWith(q1) || name.startsWith(words[0]) ? 1 : inName ? 2 : 3);
       }
       return true;
     });
+    // Items without data go last in every direction.
+    const ranked = (v: (i: CatalogItem) => number | undefined, dir: 1 | -1) => (a: CatalogItem, b: CatalogItem) => {
+      const x = v(a), y = v(b);
+      if (x === undefined && y === undefined) return a.name.localeCompare(b.name);
+      if (x === undefined) return 1;
+      if (y === undefined) return -1;
+      return dir * (x - y) || a.name.localeCompare(b.name);
+    };
     const by: Record<Sort, (a: CatalogItem, b: CatalogItem) => number> = {
       new: (a, b) => (b.date ?? String(b.year ?? '')).localeCompare(a.date ?? String(a.year ?? '')) || a.name.localeCompare(b.name),
       old: (a, b) => (a.year ?? 9999) - (b.year ?? 9999) || (a.date ?? '').localeCompare(b.date ?? '') || a.name.localeCompare(b.name),
       name: (a, b) => a.name.localeCompare(b.name),
       maker: (a, b) => a.maker.localeCompare(b.maker) || a.name.localeCompare(b.name),
+      popular: ranked((i) => num(i.pop_rank), 1),
+      unpopular: ranked((i) => num(i.pop_rank), -1),
+      used: ranked(usage, -1),
+      unused: ranked(usage, 1),
     };
-    return list.sort(by[sort]);
+    const cmp = by[sort];
+    return list.sort((a, b) => (score.get(a) ?? 0) - (score.get(b) ?? 0) || cmp(a, b));
   }, [cat, query, maker, from, to, extra, sort]);
 
   useEffect(() => setLimit(PAGE), [query, maker, from, to, extra, sort]);
@@ -224,9 +249,11 @@ function CategoryView({
   return (
     <div className="page hw-page">
       <div className="section-head">
-        <button className="link small" onClick={back}>
-          ← All categories
-        </button>
+        {!(cat && cat.items.length > 0) && (
+          <button className="link small" onClick={back}>
+            ← All categories
+          </button>
+        )}
         <h1>{info.name}</h1>
         <span className="muted small">
           {info.count.toLocaleString()} products
@@ -250,8 +277,11 @@ function CategoryView({
       {cat && cat.items.length > 0 && (
         <div style={{ ['--hw-sticky' as string]: `${stickyH}px` }}>
           <div className="hw-sticky" ref={stickyRef}>
+          <button className="link small hw-back" onClick={back}>
+            ← All categories
+          </button>
           <div className="hw-filters">
-            <input className="search" placeholder={`Search ${info.count.toLocaleString()} ${info.name.toLowerCase()}…`} value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
+            <input className="search" placeholder={`Search ${info.count.toLocaleString()} ${info.name.replace(/^[A-Z][a-z]/, (m) => m.toLowerCase())}…`} value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
             {options.kind && extraSelect('kind', options.kind)}
             {options.maker && (
               <select className="select" value={maker} onChange={(e) => setMaker(e.target.value)}>
@@ -291,6 +321,10 @@ function CategoryView({
               {years.length > 0 && <option value="old">Oldest first</option>}
               <option value="name">Name A–Z</option>
               <option value="maker">Manufacturer</option>
+              {cat.sorts?.includes('popular') && <option value="popular">Most popular</option>}
+              {cat.sorts?.includes('popular') && <option value="unpopular">Least popular</option>}
+              {cat.sorts?.includes('used') && <option value="used">Most used</option>}
+              {cat.sorts?.includes('used') && <option value="unused">Least used</option>}
             </select>
             {filtersOn && (
               <button
@@ -351,7 +385,28 @@ function CategoryView({
                   Show more ({(filtered.length - limit).toLocaleString()} left)
                 </button>
               )}
-              {!filtered.length && <p className="muted">Nothing matches these filters.</p>}
+              {!filtered.length && (
+                <div className="card hw-empty">
+                  <p>
+                    {q.trim()
+                      ? `Nothing matches "${q.trim()}"${(maker || from || to || Object.values(extra).some(Boolean)) ? ' with the filters you have set' : ''}.`
+                      : 'Nothing matches these filters.'}
+                  </p>
+                  {q.trim() && (maker || from || to || Object.values(extra).some(Boolean)) && (
+                    <button
+                      className="btn small"
+                      onClick={() => {
+                        setMaker('');
+                        setFrom(0);
+                        setTo(0);
+                        setExtra({});
+                      }}
+                    >
+                      Clear filters and keep the search
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
             {selected && <Detail cat={cat} item={selected} close={() => setSel(null)} select={setSel} openOther={openOther} />}
           </div>

@@ -13,6 +13,7 @@ interface Settings {
   seenRecaps?: string[];
   /** countries shown on the Prices page (default US) */
   priceRegions?: string[];
+  priceSort?: string;
   /** 'local' or a currency code to convert all prices into */
   priceCurrency?: string;
   watchlist?: import('./watch').WatchItem[];

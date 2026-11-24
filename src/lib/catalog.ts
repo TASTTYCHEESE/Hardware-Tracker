@@ -46,13 +46,15 @@ export interface CatalogCategory {
   fields: CatalogField[];
   filters: string[];
   sources: { name: string; url: string }[];
+  /** extra sort orders this category supports */
+  sorts?: ('popular' | 'used')[];
   note?: string;
   items: CatalogItem[];
   stale?: boolean;
 }
 
 /** Keys that are shown in the header, not as specifications. */
-export const META_KEYS = new Set(['id', 'name', 'maker', 'year', 'date', 'year_note', 'link', 'wd', 'chip_id']);
+export const META_KEYS = new Set(['id', 'name', 'maker', 'year', 'date', 'year_note', 'link', 'wd', 'chip_id', 'kind']);
 
 const PRETTY: Record<string, string> = {
   maker: 'Manufacturer',

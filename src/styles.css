@@ -356,3 +356,13 @@ textarea {
 .upd-older { margin-top: 10px; }
 .upd-older summary { cursor: pointer; }
 .upd-older h4 { margin: 14px 0 4px; }
+.hw-back { display: inline-block; margin: 2px 0 0; }
+.hw-empty { margin-top: 12px; }
+.hw-empty p { margin: 0 0 10px; }
+.p-stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 14px; }
+.p-stats > div { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; display: flex; flex-direction: column; min-width: 92px; }
+.p-stats b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.ptable-wrap { overflow-x: auto; border-radius: 12px; }
+.ptable td .small, .ptable td.small { font-size: 12px; }
+.ptable-wrap .ptable th, .ptable-wrap .ptable td { padding: 10px 10px; }
+.ptable-wrap .ptable th:first-child, .ptable-wrap .ptable td:first-child { padding-left: 16px; min-width: 150px; }

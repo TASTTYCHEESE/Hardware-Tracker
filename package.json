@@ -1,7 +1,7 @@
 {
   "name": "hardware-tracker",
   "productName": "Hardware Tracker",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "PC gaming hardware news, price trends and daily/weekly recaps (GPU, CPU, RAM).",
   "author": "Hardware Tracker",
   "private": true,

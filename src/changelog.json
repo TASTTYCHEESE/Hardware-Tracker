@@ -1,5 +1,19 @@
 [
   {
+    "version": "0.8.3",
+    "date": "2026-11-24",
+    "title": "Sorting, search and a better price tracker",
+    "notes": [
+      "PC Hardware: new sorts Most popular / Least popular (PCPartPicker ranking) and Most used / Least used (Steam hardware survey, for graphics cards and VR headsets).",
+      "Search now comes first: results must match both your search and your filters, best name matches are listed first, and you get a clear message plus a one-click fix when nothing matches.",
+      "The \"All categories\" button stays visible while you scroll.",
+      "Graphics chips and cards are now one section called \"Graphics cards (GPUs)\". VR headsets now have data.",
+      "GPU and CPU labels now read GPUs and CPUs across Overview, Live news, Archive, Price tracker and Price alerts.",
+      "Price tracker: filter by GPUs, CPUs, RAM or Other with counts, search products, and sort by highest or lowest change, most recent or oldest change, or best deal vs MSRP.",
+      "Price tracker shows more: MSRP, change since the first price, lowest and highest price seen, number of data points, date of the last change, and a rising / falling summary."
+    ]
+  },
+  {
     "version": "0.8.2",
     "date": "2026-11-24",
     "title": "PC Hardware improvements",
