@@ -210,6 +210,18 @@ export function BuyAdvisor({ data }: { data: AppData }) {
         </div>
       </div>
 
+      {list.length > 0 && (
+        <div className="row buy-tools">
+          <span className="muted small">
+            {list.length} on your list{list.some((l) => l.fav) ? ` · ${list.filter((l) => l.fav).length} ★ favorite` : ''}
+          </span>
+          {list.some((l) => !l.fav) && (
+            <button className="btn small ghost" onClick={() => save(list.filter((l) => l.fav))} title="Removes everything except your ★ favorites">
+              Clear{list.some((l) => l.fav) ? ' (keeps ★ favorites)' : ''}
+            </button>
+          )}
+        </div>
+      )}
       {!list.length && (
         <div className="card">
           <p>Search above for anything you're thinking of buying: a graphics card, a CPU, a monitor, a headset…</p>
@@ -217,7 +229,7 @@ export function BuyAdvisor({ data }: { data: AppData }) {
         </div>
       )}
       <div className="buy-grid">
-        {list.map((l) => {
+        {[...list.filter((l) => l.fav), ...list.filter((l) => !l.fav)].map((l) => {
           const c = cats[l.cat];
           const item = c?.items.find((i) => i.id === l.id);
           const sig = c && item ? signalsFor(data, c, item, launches) : [];
@@ -229,9 +241,18 @@ export function BuyAdvisor({ data }: { data: AppData }) {
                   <div className="muted small">{c?.name ?? l.cat}</div>
                   <strong>{l.name}</strong>
                 </div>
-                <button className="chip-x" title="Remove" onClick={() => save(list.filter((x) => !(x.cat === l.cat && x.id === l.id)))}>
-                  ×
-                </button>
+                <span className="buy-btns">
+                  <button
+                    className={l.fav ? 'fav on' : 'fav'}
+                    title={l.fav ? 'Unfavorite' : 'Favorite (Clear keeps it)'}
+                    onClick={() => save(list.map((x) => (x.cat === l.cat && x.id === l.id ? { ...x, fav: !x.fav } : x)))}
+                  >
+                    {l.fav ? '★' : '☆'}
+                  </button>
+                  <button className="chip-x" title="Remove" onClick={() => save(list.filter((x) => !(x.cat === l.cat && x.id === l.id)))}>
+                    ×
+                  </button>
+                </span>
               </div>
               {!c && <p className="muted small">Loading…</p>}
               {c && !item && <p className="muted small">This product isn't in the catalog any more.</p>}

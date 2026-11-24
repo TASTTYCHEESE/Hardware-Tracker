@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react';
 import { keywordHits } from '../lib/newsAlerts';
+import { isNvidiaDriver } from '../lib/feeds';
+import { langName } from '../lib/translate';
 import type { AppData } from '../lib/useData';
 import type { Category } from '../lib/types';
 import { CatBadge, catLabel } from './Common';
 import { ago } from '../lib/format';
 
-const FILTERS: (Category | 'All')[] = ['All', 'GPU', 'CPU', 'RAM', 'Industry', 'Other'];
+const FILTERS: (Category | 'All' | 'Drivers')[] = ['All', 'GPU', 'CPU', 'RAM', 'Industry', 'Other', 'Drivers'];
 
 export function News({ data, openReader }: { data: AppData; openReader?: (url: string) => void }) {
-  const [cat, setCat] = useState<Category | 'All'>('All');
+  const [cat, setCat] = useState<Category | 'All' | 'Drivers'>('All');
   const [q, setQ] = useState('');
   const [bell, setBell] = useState(false);
   const [kw, setKw] = useState('');
@@ -27,7 +29,7 @@ export function News({ data, openReader }: { data: AppData; openReader?: (url: s
     setKw('');
   };
   const list = data.feed.articles.filter(
-    (a) => (cat === 'All' || a.category === cat) && (!q || `${a.title} ${a.summary}`.toLowerCase().includes(q.toLowerCase())),
+    (a) => (cat === 'All' || (cat === 'Drivers' ? isNvidiaDriver(a) : a.category === cat)) && (!q || `${a.title} ${a.summary}`.toLowerCase().includes(q.toLowerCase())),
   );
   return (
     <div className="page">
@@ -102,8 +104,10 @@ export function News({ data, openReader }: { data: AppData; openReader?: (url: s
         <div className="tabs">
           {FILTERS.map((f) => (
             <button key={f} className={f === cat ? 'tab active' : 'tab'} onClick={() => setCat(f)}>
-              {catLabel(f)}
-              <span className="count">{f === 'All' ? data.feed.articles.length : data.feed.articles.filter((a) => a.category === f).length}</span>
+              {f === 'Drivers' ? 'Nvidia drivers' : catLabel(f)}
+              <span className="count">
+                {f === 'All' ? data.feed.articles.length : f === 'Drivers' ? data.feed.articles.filter(isNvidiaDriver).length : data.feed.articles.filter((a) => a.category === f).length}
+              </span>
             </button>
           ))}
         </div>
@@ -121,7 +125,8 @@ export function News({ data, openReader }: { data: AppData; openReader?: (url: s
                 {a.source} · {ago(a.date)}
               </span>
             </div>
-            <h4>{a.title}</h4>
+            <h4 title={a.origTitle ? `Original: ${a.origTitle}` : undefined}>{a.title}</h4>
+            {a.lang && <div className="muted small translated">Translated from {langName(a.lang)} · opens the translated page</div>}
             {a.summary && <p className="muted">{a.summary}</p>}
           </a>
         ))}

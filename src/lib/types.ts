@@ -81,4 +81,8 @@ export interface FeedArticle {
   source: string;
   summary: string;
   category: Category;
+  /** set when the headline was machine-translated to English */
+  lang?: string;
+  origTitle?: string;
+  origLink?: string;
 }

@@ -1,7 +1,7 @@
 {
   "name": "hardware-tracker",
   "productName": "Hardware Tracker",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "PC gaming hardware news, price trends and daily/weekly recaps (GPU, CPU, RAM).",
   "author": "Hardware Tracker",
   "private": true,
@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "@mozilla/readability": "0.6.0",
-    "dompurify": "3.2.6",
-    "electron-updater": "6.6.2",
+    "dompurify": "3.5.0",
+    "electron-updater": "6.8.11",
     "html-to-image": "^1.11.11",
     "react": "19.2.0",
     "react-dom": "19.2.0"
@@ -27,10 +27,10 @@
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "@vitejs/plugin-react": "5.1.0",
-    "electron": "39.2.0",
-    "electron-builder": "26.0.12",
+    "electron": "45.4.1",
+    "electron-builder": "26.18.0",
     "typescript": "5.9.3",
-    "vite": "7.2.2"
+    "vite": "7.3.8"
   },
   "build": {
     "appId": "app.hardwaretracker.desktop",

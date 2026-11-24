@@ -65,6 +65,14 @@ export function SettingsPage({ data }: { data: AppData }) {
         </label>
       </section>
 
+      <section className="card">
+        <h3>News language</h3>
+        <label className="check">
+          <input type="checkbox" checked={s.translateNews !== false} onChange={(e) => data.setSettings({ translateNews: e.target.checked })} />
+          Translate non-English headlines to English (uses Google Translate; only the headline and summary are sent)
+        </label>
+      </section>
+
       {desktop && (
         <section className="card">
           <h3>Background mode</h3>

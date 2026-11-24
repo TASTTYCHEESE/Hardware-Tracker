@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Category, Recap } from '../lib/types';
 import { CatBadge, DirBadge } from './Common';
-import { REGION_LABEL, fmtDate, fmtPct, money, pct } from '../lib/format';
+import { REGION_LABEL, fmtDate, fmtPct, money, pct, safeUrl } from '../lib/format';
 
 const TYPE_LABEL = { daily: 'Daily recap', weekly: 'Weekly recap', catchup: 'Catch-up' } as const;
 const CAT_LABEL: Record<Category, string> = { GPU: 'GPUs', CPU: 'CPUs', RAM: 'RAM', Industry: 'Industry & people', Other: 'Other' };
@@ -90,7 +90,7 @@ export function RecapView({ r, compact = false }: { r: Recap; compact?: boolean 
                   {it.sources && it.sources.length > 0 && (
                     <div className="story-src">
                       {it.sources.map((src) => (
-                        <a key={src.url} href={src.url} target="_blank" rel="noreferrer">
+                        <a key={src.url} href={safeUrl(src.url)} target="_blank" rel="noreferrer">
                           {src.title.split(':')[0]}
                         </a>
                       ))}

@@ -1,5 +1,19 @@
 [
   {
+    "version": "0.9.1",
+    "date": "2026-11-24",
+    "title": "Chipsets, capture cards, water cooling, translated news and a security pass",
+    "notes": [
+      "New PC Hardware categories: Chipsets (55 Intel and AMD desktop and workstation chipsets with socket, supported CPUs, memory, overclocking, PCIe generation for the graphics slot and M.2, chipset lanes and USB4/Thunderbolt), Capture cards, Custom water cooling (blocks, pumps, reservoirs, radiators, tubing, fittings, coolant) and AIO water coolers (1,293 coolers by radiator size).",
+      "CPU coolers now have a Type filter: Air or AIO liquid.",
+      "Buy or wait?: new Clear button, and a ☆ favorite on each item. Favorites stay at the top and are kept when you clear the list.",
+      "Headlines and Live news: new Nvidia drivers tab for GeForce driver releases and hotfixes.",
+      "News in other languages is translated to English automatically (with a \"Translated from …\" note and a link to the original). You can turn this off in Settings → News language.",
+      "Fact check: chipset, capture card, VR headset, peripheral, launch-price and calendar data checked against manufacturer pages and big hardware sites; a few years, prices and specs were corrected.",
+      "Security: Electron 45 with the latest security fixes, updated build tools and libraries, stricter link and navigation checks, all browser permission requests denied, safer settings handling, and network requests that never send cookies or credentials. No passwords, keys or tokens are stored in the app or its code."
+    ]
+  },
+  {
     "version": "0.9.0",
     "date": "2026-11-24",
     "title": "The big one: Compare, Buy or wait?, Launch calendar and more",

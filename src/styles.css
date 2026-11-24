@@ -438,3 +438,6 @@ textarea {
 .bell-item .dot { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; margin-top: 5px; flex: none; }
 .pill.alert, .seg-count.alert { background: #f0475a; color: #fff; }
 .export-row { margin: 8px 0; gap: 10px; align-items: center; }
+.buy-tools { margin: 4px 0 8px; gap: 12px; align-items: center; }
+.buy-btns { display: inline-flex; gap: 4px; align-items: flex-start; }
+.buy-btns .fav { font-size: 18px; }

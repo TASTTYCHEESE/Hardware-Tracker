@@ -40,3 +40,6 @@ export function ago(ts: number): string {
   if (h < 48) return `${h}h ago`;
   return `${Math.round(h / 24)}d ago`;
 }
+
+/** Links from recaps and feeds: only http(s) web addresses, anything else becomes inert. */
+export const safeUrl = (u: unknown): string | undefined => (typeof u === 'string' && /^https?:\/\//i.test(u) ? u : undefined);

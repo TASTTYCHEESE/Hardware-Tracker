@@ -1,6 +1,6 @@
 import type { AppData } from '../lib/useData';
 import { CatBadge, DirBadge } from './Common';
-import { REGION_LABEL, fmtDate, fmtPct, money, pct } from '../lib/format';
+import { REGION_LABEL, fmtDate, fmtPct, money, pct, safeUrl } from '../lib/format';
 
 export function Alerts({ data }: { data: AppData }) {
   const list = [...data.alerts].sort((a, b) => b.date.localeCompare(a.date));
@@ -25,7 +25,7 @@ export function Alerts({ data }: { data: AppData }) {
             </div>
             {a.note && <div className="muted small">{a.note}</div>}
             {a.source && (
-              <a className="small" href={a.source.url} target="_blank" rel="noreferrer">
+              <a className="small" href={safeUrl(a.source.url)} target="_blank" rel="noreferrer">
                 {a.source.title}
               </a>
             )}

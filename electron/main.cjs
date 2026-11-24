@@ -180,6 +180,13 @@ function createWindow() {
     if (!/^https?:\/\//.test(params.src)) e.preventDefault();
   });
   win.webContents.on('did-attach-webview', (_e, contents) => {
+    // Articles may only go to web pages, never file:// or other schemes.
+    const webOnly = (e, url) => {
+      if (!/^https?:\/\//i.test(url)) e.preventDefault();
+    };
+    contents.on('will-navigate', webOnly);
+    contents.on('will-redirect', webOnly);
+    contents.on('will-frame-navigate', (e) => webOnly(e, e.url));
     // Pop-ups from articles open in the normal browser.
     contents.setWindowOpenHandler(({ url }) => {
       if (/^https?:\/\//.test(url)) shell.openExternal(url);
@@ -196,13 +203,27 @@ function createWindow() {
 
 // ---- IPC -------------------------------------------------------------------
 
+const MAX_FETCH = 15 * 1024 * 1024;
 ipcMain.handle('fetch-text', async (_e, url) => {
-  if (typeof url !== 'string' || !/^https?:\/\//.test(url)) throw new Error('Bad URL');
-  const res = await net.fetch(url, {
-    headers: { 'User-Agent': 'HardwareTracker/0.1 (+desktop app)' },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return await res.text();
+  if (typeof url !== 'string' || url.length > 4000 || !/^https?:\/\//i.test(url)) throw new Error('Bad URL');
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 25000);
+  try {
+    const res = await net.fetch(url, {
+      headers: { 'User-Agent': `HardwareTracker/${app.getVersion()} (+desktop app)` },
+      signal: ctrl.signal,
+      credentials: 'omit',
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!/^https?:/i.test(res.url || url)) throw new Error('Bad redirect');
+    const len = Number(res.headers.get('content-length') || 0);
+    if (len > MAX_FETCH) throw new Error('Too large');
+    const text = await res.text();
+    if (text.length > MAX_FETCH) throw new Error('Too large');
+    return text;
+  } finally {
+    clearTimeout(timer);
+  }
 });
 
 ipcMain.handle('read-recaps', async () => {
@@ -285,6 +306,16 @@ ipcMain.handle('read-archive-day', async (_e, day) => (/^\d{4}-\d{2}-\d{2}$/.tes
 ipcMain.handle('get-settings', async () => ({ ...readSettings(), dataDir: dataDir() }));
 
 ipcMain.handle('set-settings', async (_e, patch) => {
+  // Only plain settings objects; never prototype keys.
+  if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw new Error('Bad settings');
+  const clean = {};
+  for (const [k, v] of Object.entries(patch)) {
+    if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+    clean[k] = v;
+  }
+  if ('dataDir' in clean && clean.dataDir && (typeof clean.dataDir !== 'string' || !path.isAbsolute(clean.dataDir))) throw new Error('Bad folder');
+  for (const k of ['catalogUrl', 'syncUrl']) if (clean[k] && (typeof clean[k] !== 'string' || !/^https?:\/\//i.test(clean[k]))) throw new Error('Bad URL');
+  patch = clean;
   const next = { ...readSettings(), ...patch };
   writeSettings(next);
   if ('dataDir' in patch) {
@@ -305,7 +336,7 @@ ipcMain.handle('open-folder', async () => shell.openPath(dataDir()));
 // "Save as image": the renderer draws the element to a PNG; ask where to save it.
 ipcMain.handle('save-image', async (e, dataUrl, name) => {
   const w = BrowserWindow.fromWebContents(e.sender);
-  if (!w || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/png;base64,')) return { ok: false };
+  if (!w || typeof dataUrl !== 'string' || dataUrl.length > 60e6 || !dataUrl.startsWith('data:image/png;base64,')) return { ok: false };
   const safe = String(name || 'hardware-tracker').replace(/[^\w\- ]+/g, '').trim().slice(0, 80) || 'hardware-tracker';
   const res = await dialog.showSaveDialog(w, {
     title: 'Save as image',
@@ -341,7 +372,24 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.on('second-instance', () => showWindow());
+  // Security: web pages (including articles in the viewer) get no camera, microphone,
+  // location, notifications or other permissions, and can't open new app windows.
+  app.on('web-contents-created', (_e, contents) => {
+    contents.setWindowOpenHandler(({ url }) => {
+      if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+      return { action: 'deny' };
+    });
+  });
   app.whenReady().then(() => {
+    const { session } = require('electron');
+    for (const ses of [session.defaultSession]) {
+      ses.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
+      ses.setPermissionCheckHandler(() => false);
+    }
+    app.on('session-created', (ses) => {
+      ses.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
+      ses.setPermissionCheckHandler(() => false);
+    });
     seedRecaps();
     watchDataDir();
     applyLoginItem();

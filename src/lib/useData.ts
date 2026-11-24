@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, type Settings } from './platform';
+import { translateArticles } from './translate';
 import { DEFAULT_FEEDS, loadFeeds, type FeedResult } from './feeds';
 import type { PriceAlert, PricePoint, Recap } from './types';
 import { DEFAULT_WATCHLIST, latestFor } from './watch';
@@ -10,6 +11,8 @@ const FEED_REFRESH_MS = 30 * 60 * 1000;
 
 export function useData() {
   const [settings, setSettingsState] = useState<Settings>({});
+  const settingsRef = useRef<Settings>({});
+  settingsRef.current = settings;
   const [fileRecaps, setFileRecaps] = useState<Recap[]>([]);
   const [feed, setFeed] = useState<FeedResult>({ articles: [], errors: [] });
   const [feedLoading, setFeedLoading] = useState(false);
@@ -39,7 +42,10 @@ export function useData() {
   const refreshFeeds = useCallback(async () => {
     setFeedLoading(true);
     try {
-      const result = await loadFeeds(feeds);
+      const loaded = await loadFeeds(feeds);
+      setFeed(loaded);
+      // Then swap in English translations of non-English headlines.
+      const result = settingsRef.current.translateNews === false ? loaded : { ...loaded, articles: await translateArticles(loaded.articles) };
       setFeed(result);
       setFeedUpdated(Date.now());
       try {

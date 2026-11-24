@@ -771,6 +771,27 @@ def build_pcpp_categories(gpu_by_norm):
         if cid == "monitor":
             fields = fields[:2] + [("resolution_class", "Class", None), ("ppi", "Pixel density", "PPI")] + fields[2:]
             filters = filters + ["resolution_class"]
+        if cid == "cpu-cooler":
+            # A radiator size means an all-in-one liquid cooler; everything else is an air cooler.
+            for it in items:
+                it["type"] = "AIO liquid" if it.get("size") else "Air"
+            fields = [("type", "Type", None)] + fields
+            filters = ["maker", "type", "size"]
+            aio = []
+            for it in items:
+                if it.get("size"):
+                    a = dict(it)
+                    a.pop("type", None)
+                    m = re.match(r"(\d+)", str(a["size"]))
+                    if m:
+                        fans = {120: 1, 140: 1, 240: 2, 280: 2, 360: 3, 420: 3, 480: 4}.get(int(m.group(1)))
+                        if fans:
+                            a["fans"] = fans
+                    aio.append(a)
+            category("aio", "AIO water coolers", "hardware", "All-in-one liquid CPU coolers, by radiator size.",
+                     [("size", "Radiator size", "mm"), ("fans", "Fans (typical)", None), ("rpm", "Fan speed", "RPM"),
+                      ("noise_level", "Noise", "dB"), ("color", "Color", None)],
+                     ["maker", "size", "color"], aio, [SRC_PCPP])
         category(cid, name, group, desc, fields, filters, items, [SRC_PCPP])
 
 

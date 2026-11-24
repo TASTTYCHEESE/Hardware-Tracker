@@ -36,7 +36,9 @@ export function parseFeed(xml: string, sourceName: string): FeedArticle[] {
     const get = (sel: string) => n.querySelector(sel)?.textContent?.trim() ?? '';
     const title = strip(get('title'));
     const linkEl = n.querySelector('link');
-    const link = linkEl?.getAttribute('href') || linkEl?.textContent?.trim() || get('guid');
+    const rawLink = linkEl?.getAttribute('href') || linkEl?.textContent?.trim() || get('guid');
+    // Only real web links (never javascript:, file: or data: URLs from a feed).
+    const link = /^https?:\/\//i.test(rawLink) ? rawLink : '';
     const dateStr = get('pubDate') || get('published') || get('updated') || get('dc\\:date');
     const raw = get('description') || get('summary') || get('content');
     const summary = strip(raw).slice(0, 320);
@@ -76,3 +78,8 @@ export async function loadFeeds(feeds: { name: string; url: string }[]): Promise
     .sort((a, b) => b.date - a.date);
   return { articles, errors };
 }
+
+/** Nvidia driver news: Game Ready / Studio / hotfix drivers and GeForce driver updates. */
+const DRIVER_RE =
+  /(game ready|studio|hotfix|geforce|nvidia)[^.]{0,60}\bdrivers?\b|\bdrivers?\b[^.]{0,40}\b(geforce|nvidia)\b|\bgeforce\s+(?:game ready\s+)?\d{3}\.\d{2}\b|\bnvidia app\b[^.]{0,40}\bupdate/i;
+export const isNvidiaDriver = (a: { title: string; summary?: string }) => DRIVER_RE.test(`${a.title} ${a.summary ?? ''}`);

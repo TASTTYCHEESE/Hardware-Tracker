@@ -1,0 +1,208 @@
+{
+ "fields": [
+  [
+   "part",
+   "Part",
+   null
+  ],
+  [
+   "fits",
+   "Fits",
+   null
+  ],
+  [
+   "size",
+   "Size",
+   null
+  ],
+  [
+   "material",
+   "Material",
+   null
+  ],
+  [
+   "spec",
+   "Key specs",
+   null
+  ],
+  [
+   "notes",
+   "Notes",
+   null
+  ]
+ ],
+ "filters": [
+  "maker",
+  "part"
+ ],
+ "note": "Parts for custom water-cooling loops: blocks, pumps, reservoirs, radiators, tubing, fittings and coolant. For all-in-one coolers see AIO water coolers.",
+ "sources": [
+  {
+   "name": "Manufacturer spec sheets",
+   "url": "https://github.com/TASTTYCHEESE/Hardware-Tracker/tree/main/catalog-extra"
+  }
+ ],
+ "items": [
+  {
+   "name": "EK-Quantum Velocity² D-RGB",
+   "maker": "EK",
+   "year": 2021,
+   "part": "CPU block",
+   "fits": "Intel LGA1700 / LGA1851 or AMD AM5 (versions)",
+   "material": "Nickel-plated copper, acrylic or acetal top",
+   "spec": "G1/4\" ports",
+   "id": "ek-quantum-velocity-d-rgb"
+  },
+  {
+   "name": "Corsair Hydro X XC7 RGB Elite",
+   "maker": "Corsair",
+   "year": 2021,
+   "part": "CPU block",
+   "fits": "Intel LGA1700 and AMD AM4 / AM5",
+   "material": "Nickel-plated copper",
+   "spec": "G1/4\" ports, RGB",
+   "id": "corsair-hydro-x-xc7-rgb-elite"
+  },
+  {
+   "name": "Optimus Foundation",
+   "maker": "Optimus Water Cooling",
+   "part": "CPU block",
+   "fits": "Intel and AMD (versions)",
+   "material": "Copper, acetal or acrylic top",
+   "spec": "G1/4\" ports",
+   "notes": "Known for strong cooling results in reviews",
+   "id": "optimus-foundation"
+  },
+  {
+   "name": "EK-Quantum Vector² (GPU blocks)",
+   "maker": "EK",
+   "year": 2022,
+   "part": "GPU block",
+   "fits": "Specific graphics card models (check the EK configurator)",
+   "material": "Nickel-plated copper",
+   "spec": "G1/4\" ports",
+   "notes": "GPU blocks are made for one PCB design each",
+   "id": "ek-quantum-vector-gpu-blocks"
+  },
+  {
+   "name": "Xylem D5 pump",
+   "maker": "Xylem (Laing)",
+   "part": "Pump",
+   "fits": "Universal",
+   "spec": "Up to 1,500 L/h, up to 3.9 m head",
+   "notes": "The most common pump in custom loops; quiet",
+   "id": "xylem-d5-pump"
+  },
+  {
+   "name": "Laing DDC pump",
+   "maker": "Xylem (Laing)",
+   "part": "Pump",
+   "fits": "Universal",
+   "spec": "Up to about 1,000 L/h, up to about 5 m head",
+   "notes": "Smaller than a D5, higher pressure, runs warmer",
+   "id": "laing-ddc-pump"
+  },
+  {
+   "name": "EK-Quantum Kinetic TBE 200 D5",
+   "maker": "EK",
+   "part": "Pump + reservoir",
+   "fits": "Universal",
+   "size": "200 mm reservoir",
+   "material": "Acrylic",
+   "spec": "D5 pump included",
+   "id": "ek-quantum-kinetic-tbe-200-d5"
+  },
+  {
+   "name": "Corsair Hydro X XD5 RGB",
+   "maker": "Corsair",
+   "year": 2019,
+   "part": "Pump + reservoir",
+   "fits": "Universal",
+   "material": "Acrylic",
+   "spec": "D5 pump included",
+   "id": "corsair-hydro-x-xd5-rgb"
+  },
+  {
+   "name": "Hardware Labs Black Ice Nemesis GTX 360",
+   "maker": "Hardware Labs",
+   "part": "Radiator",
+   "fits": "3 × 120 mm fans",
+   "size": "360 mm, 54 mm thick",
+   "material": "Copper fins, brass tubes",
+   "spec": "G1/4\" ports",
+   "notes": "Thick radiator for high heat loads",
+   "id": "hardware-labs-black-ice-nemesis-gtx-360"
+  },
+  {
+   "name": "Alphacool NexXxoS XT45 360",
+   "maker": "Alphacool",
+   "part": "Radiator",
+   "fits": "3 × 120 mm fans",
+   "size": "360 mm, 45 mm thick",
+   "material": "Copper",
+   "spec": "G1/4\" ports",
+   "id": "alphacool-nexxxos-xt45-360"
+  },
+  {
+   "name": "Corsair Hydro X XR5 360",
+   "maker": "Corsair",
+   "year": 2019,
+   "part": "Radiator",
+   "fits": "3 × 120 mm fans",
+   "size": "360 mm, 30 mm thick",
+   "material": "Copper",
+   "spec": "G1/4\" ports",
+   "id": "corsair-hydro-x-xr5-360"
+  },
+  {
+   "name": "Corsair Hydro X XR7 360",
+   "maker": "Corsair",
+   "year": 2019,
+   "part": "Radiator",
+   "fits": "3 × 120 mm fans",
+   "size": "360 mm, 55 mm thick",
+   "material": "Copper",
+   "spec": "G1/4\" ports",
+   "id": "corsair-hydro-x-xr7-360"
+  },
+  {
+   "name": "Soft tubing (PVC / EPDM)",
+   "maker": "Various",
+   "part": "Tubing",
+   "fits": "Compression fittings",
+   "size": "Common: 10/13 mm, 10/16 mm",
+   "material": "PVC or EPDM rubber",
+   "notes": "Easiest to build with; EPDM doesn't release plasticizer",
+   "id": "soft-tubing-pvc-epdm"
+  },
+  {
+   "name": "Hard tubing (PETG / acrylic)",
+   "maker": "Various",
+   "part": "Tubing",
+   "fits": "Hard-tube fittings",
+   "size": "Common: 12, 14 or 16 mm OD",
+   "material": "PETG, acrylic or glass",
+   "notes": "Needs bending; PETG is easier, acrylic is clearer and more heat resistant",
+   "id": "hard-tubing-petg-acrylic"
+  },
+  {
+   "name": "G1/4\" fittings",
+   "maker": "Various",
+   "part": "Fittings",
+   "fits": "Every standard block, radiator and reservoir",
+   "material": "Brass (plated)",
+   "spec": "G1/4\" BSPP thread",
+   "notes": "The universal thread size in PC water cooling",
+   "id": "g1-4-fittings"
+  },
+  {
+   "name": "Premixed coolant (e.g. EK-CryoFuel, Mayhems X1)",
+   "maker": "Various",
+   "part": "Coolant",
+   "fits": "Any loop",
+   "spec": "Anti-corrosion and biocide additives",
+   "notes": "Distilled water with additives also works",
+   "id": "premixed-coolant-e-g-ek-cryofuel-mayhems-x1"
+  }
+ ]
+}

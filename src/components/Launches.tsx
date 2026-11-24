@@ -1,3 +1,4 @@
+import { safeUrl } from '../lib/format';
 import { useMemo, useState } from 'react';
 import { countdown, launchLabel, launchTime, useLaunches, type Launch } from '../lib/launches';
 import { catLabel } from './Common';
@@ -73,7 +74,7 @@ export function Launches() {
                 </div>
                 {e.note && <div className="muted small">{e.note}</div>}
                 {e.source && (
-                  <a className="small" href={e.source}>
+                  <a className="small" href={safeUrl(e.source)}>
                     Source →
                   </a>
                 )}

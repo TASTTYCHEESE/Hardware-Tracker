@@ -1,3 +1,4 @@
+import { safeUrl } from '../lib/format';
 import type { Category, Direction, NewsItem, Source } from '../lib/types';
 
 export const CATS: Category[] = ['GPU', 'CPU', 'RAM'];
@@ -25,7 +26,7 @@ export function Sources({ list }: { list?: Source[] }) {
   return (
     <div className="sources">
       {list.map((s) => (
-        <a key={s.url + s.title} href={s.url} target="_blank" rel="noreferrer">
+        <a key={s.url + s.title} href={safeUrl(s.url)} target="_blank" rel="noreferrer">
           {s.title}
         </a>
       ))}

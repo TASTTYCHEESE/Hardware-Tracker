@@ -21,11 +21,13 @@ interface Settings {
   /** products being compared */
   compare?: { cat: string; ids: string[] };
   /** products on the "Buy or wait?" list */
-  buyList?: { cat: string; id: string; name: string }[];
+  buyList?: { cat: string; id: string; name: string; fav?: boolean }[];
   /** Live news keyword alerts */
   newsKeywords?: string[];
   /** ids of keyword-alert articles already seen */
   newsSeen?: string[];
+  /** translate non-English headlines to English (default on) */
+  translateNews?: boolean;
   /** products the user added to the price tracker */
   priceProducts?: { model: string; category: 'GPU' | 'CPU' | 'RAM' }[];
   /** 'local' or a currency code to convert all prices into */
