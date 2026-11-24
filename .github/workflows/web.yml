@@ -38,7 +38,7 @@ jobs:
       - run: npm run build
       - run: node tools/web/snapshot.mjs dist
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
       - id: deployment
