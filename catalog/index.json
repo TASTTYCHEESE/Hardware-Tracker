@@ -1,6 +1,6 @@
 {
- "version": "2026-11-24T1519",
- "updated": "2026-11-24T15:19Z",
+ "version": "2026-11-24T1637",
+ "updated": "2026-11-24T16:37Z",
  "categories": [
   {
    "id": "cpu",
@@ -86,6 +86,17 @@
    "file": "power-supply.json"
   },
   {
+   "id": "aio",
+   "name": "AIO water coolers",
+   "group": "hardware",
+   "description": "All-in-one liquid CPU coolers, by radiator size.",
+   "count": 1293,
+   "makers": 70,
+   "years": null,
+   "bytes": 227958,
+   "file": "aio.json"
+  },
+  {
    "id": "cpu-cooler",
    "name": "CPU coolers",
    "group": "hardware",
@@ -93,7 +104,7 @@
    "count": 2851,
    "makers": 107,
    "years": null,
-   "bytes": 444500,
+   "bytes": 490649,
    "file": "cpu-cooler.json"
   },
   {
@@ -313,10 +324,13 @@
    "name": "Chipsets",
    "group": "hardware",
    "description": "Motherboard chipsets (Intel Z/B/H, AMD X/B/A series).",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 353,
+   "count": 55,
+   "makers": 2,
+   "years": [
+    2012,
+    2025
+   ],
+   "bytes": 16835,
    "file": "chipset.json"
   },
   {
@@ -324,10 +338,13 @@
    "name": "Capture cards",
    "group": "hardware",
    "description": "Internal and external video capture cards.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 352,
+   "count": 9,
+   "makers": 3,
+   "years": [
+    2017,
+    2024
+   ],
+   "bytes": 3249,
    "file": "capture-card.json"
   },
   {
@@ -335,10 +352,13 @@
    "name": "Custom water cooling",
    "group": "hardware",
    "description": "Water blocks, pumps, reservoirs and radiators.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 365,
+   "count": 16,
+   "makers": 7,
+   "years": [
+    2019,
+    2022
+   ],
+   "bytes": 4609,
    "file": "cooling-custom.json"
   },
   {
