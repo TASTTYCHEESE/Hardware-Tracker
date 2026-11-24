@@ -346,7 +346,42 @@ def wd_fields(wd: dict) -> dict:
     return {k: v for k, v in out.items() if v is not None}
 
 
+FOUNDRIES = {"TSMC", "GlobalFoundries", "Samsung Electronics", "UMC", "SMIC", "Tower Semiconductor Ltd."}
+NOT_A_CHIP = ("TOP500 System ID", "computer performance", "height", "width", "thickness", "mass", "operating system",
+              "display size", "battery capacity")
+
+
+def clean_wd(items):
+    """Wikidata's core-count property is also used for supercomputers and phones: keep only chips."""
+    out = []
+    for w in items:
+        wd = w.get("wd", {})
+        if any(k in wd for k in NOT_A_CHIP):
+            continue
+        chipish = any(k in wd for k in ("clock frequency", "frequency", "socket supported", "microarchitecture",
+                                        "instruction set", "fabrication method", "thermal design power",
+                                        "number of processor threads", "WikiChip article ID"))
+        if not chipish:
+            continue
+        w = dict(w)
+        maker = w.get("maker") or "Unknown"
+        designer = (wd.get("developer") or wd.get("designed by") or "").split(",")[0].strip()
+        if (maker in FOUNDRIES or maker == "Unknown") and designer:
+            maker = designer
+        w["maker"] = maker
+        if not w.get("year"):
+            for k in ("inception", "publication date", "commercialization date", "announcement date"):
+                v = wd.get(k, "")
+                if v[:4].isdigit():
+                    w["year"] = int(v[:4])
+                    w["date"] = v[:10] if len(v) >= 7 else None
+                    break
+        out.append(w)
+    return out
+
+
 def build_cpus(wd_items):
+    wd_items = clean_wd(wd_items)
     rows = pcpp("cpu")
     items = []
     seen = set()

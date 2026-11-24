@@ -28,6 +28,9 @@ jobs:
           python-version: '3.12'
       - run: pip install --upgrade dbgpu
       - run: python tools/catalog/build.py catalog
+        env:
+          # Wikidata is slow and rate-limited: only refresh it on the scheduled runs.
+          SKIP_WIKIDATA: ${{ github.event_name == 'push' && '1' || '' }}
       - name: Commit catalog if it changed
         run: |
           git config user.name "github-actions[bot]"
