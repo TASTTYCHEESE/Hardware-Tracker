@@ -32,7 +32,9 @@ jobs:
   # Mac and Linux run after Windows so they add their files to the release Windows created.
   mac:
     needs: build
-    runs-on: macos-latest
+    # Intel Mac runner: GitHub's Apple Silicon runners are often too busy to start.
+    # It builds both the Intel and the Apple Silicon app.
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
