@@ -19,6 +19,7 @@ import re
 import sys
 import time
 import urllib.parse
+import urllib.error
 import urllib.request
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "catalog"
@@ -37,12 +38,18 @@ def log(*a):
     print(*a, flush=True)
 
 
-def get(url, data=None, headers=None, tries=4):
+def get(url, data=None, headers=None, tries=6):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, data=data, headers={"User-Agent": UA, **(headers or {})})
             with urllib.request.urlopen(req, timeout=120) as r:
                 return r.read()
+        except urllib.error.HTTPError as e:
+            # Wikidata rate limits: wait as long as it asks (or longer each time).
+            wait = int(e.headers.get("Retry-After") or 0) if e.code == 429 else 0
+            wait = max(wait, 15 * (i + 1)) if e.code == 429 else 5 * (i + 1)
+            log(f"  retry {i + 1} in {wait}s {url[:90]}: {e}")
+            time.sleep(min(wait, 120))
         except Exception as e:  # noqa: BLE001
             log(f"  retry {i + 1} {url[:90]}: {e}")
             time.sleep(5 * (i + 1))
@@ -187,7 +194,9 @@ def wd_entities(ids, props="claims|labels"):
         raw = get(WD_API + "?" + urllib.parse.urlencode({
             "action": "wbgetentities", "ids": "|".join(chunk), "props": props, "languages": "en", "format": "json"}))
         out.update(json.loads(raw).get("entities", {}))
-        time.sleep(0.2)
+        time.sleep(1.0)  # stay well under Wikidata's rate limits
+        if (i // 50) % 40 == 0:
+            log(f"  Wikidata entities {i + len(chunk)}/{len(ids)}")
     return out
 
 
@@ -195,9 +204,8 @@ def build_wikidata_cpus():
     """Processors on Wikidata: anything that has a number of cores, or is a microprocessor model."""
     qids = set()
     queries = {
+        # Anything with a "number of processor cores" statement: ~11,000 CPUs and SoCs.
         "has core count": "SELECT DISTINCT ?i WHERE { ?i wdt:P1141 ?c . }",
-        "microprocessor subclass": "SELECT DISTINCT ?i WHERE { ?i wdt:P31/wdt:P279* wd:Q5297 . }",
-        "CPU subclass": "SELECT DISTINCT ?i WHERE { ?i wdt:P31/wdt:P279* wd:Q5300 . }",
     }
     for label, q in queries.items():
         try:
@@ -313,6 +321,31 @@ ARCH_YEAR = {"K10": 2007, "Skylake": 2015, "Haswell": 2013, "Sandy Bridge": 2011
              "Excavator": 2015, "Arrow Lake": 2024, "Jaguar": 2013, "Zen 5": 2024, "Cascade Lake": 2019, "Puma+": 2014}
 
 
+def wd_fields(wd: dict) -> dict:
+    """Pull the common CPU columns out of Wikidata's labelled statements."""
+    out = {}
+    for label, v in wd.items():
+        l = label.lower()
+        first = v.split(",")[0].strip()
+        m = re.match(r"([\d.]+)\s*(\w+)?", first)
+        if l == "number of processor cores" and m:
+            out["cores"] = num(float(m.group(1)))
+        elif l in ("number of threads", "number of hardware threads") and m:
+            out["threads"] = num(float(m.group(1)))
+        elif l in ("frequency", "clock speed", "clock rate") and m and "base_clock" not in out:
+            val, unit = float(m.group(1)), (m.group(2) or "").lower()
+            out["base_clock"] = num(round(val / 1000, 3)) if unit == "mhz" else (num(val) if unit == "ghz" else None)
+        elif "socket" in l:
+            out["socket"] = first
+        elif "microarchitecture" in l:
+            out["microarchitecture"] = first
+        elif l in ("thermal design power", "power consumption") and m:
+            out["tdp"] = num(float(m.group(1)))
+        elif l in ("fabrication process", "manufacturing process", "process node") and first:
+            out["process"] = first
+    return {k: v for k, v in out.items() if v is not None}
+
+
 def build_cpus(wd_items):
     rows = pcpp("cpu")
     items = []
@@ -340,16 +373,17 @@ def build_cpus(wd_items):
                 cand["year"], cand["date"] = w["year"], w.get("date")
                 cand.pop("year_note", None)
             continue
-        items.append(w)
+        items.append({**w, **wd_fields(w["wd"])})
         added += 1
     log(f"CPUs: {len(rows)} from PCPartPicker + {added} more from Wikidata")
     category(
         "cpu", "Processors (CPUs)", "hardware",
         "Desktop, laptop and server processors, from early chips to the newest releases.",
-        [("microarchitecture", "Microarchitecture", None), ("date", "Release date", None), ("cores", "Cores", None),
-         ("base_clock", "Base clock", "GHz"), ("boost_clock", "Boost clock", "GHz"), ("tdp", "TDP", "W"),
-         ("graphics", "Integrated graphics", None)],
-        ["maker", "year", "microarchitecture"], items, [SRC_PCPP, SRC_WD],
+        [("microarchitecture", "Microarchitecture", None), ("cores", "Cores", None), ("threads", "Threads", None),
+         ("base_clock", "Base clock", "GHz"), ("boost_clock", "Boost clock", "GHz"), ("socket", "Socket", None),
+         ("tdp", "TDP", "W"), ("process", "Process", None), ("graphics", "Integrated graphics", None),
+         ("date", "Release date", None)],
+        ["maker", "year", "microarchitecture", "socket", "cores"], items, [SRC_PCPP, SRC_WD],
         note="Release years marked approx. come from the chip's architecture.",
     )
 
@@ -548,11 +582,21 @@ def load_extra():
 def main():
     os.makedirs(OUT, exist_ok=True)
     gpu_by_norm = build_gpus()
-    try:
-        wd = [] if os.environ.get("SKIP_WIKIDATA") else build_wikidata_cpus()
-    except Exception as e:  # noqa: BLE001
-        log(f"Wikidata failed, CPUs from PCPartPicker only: {e}")
-        wd = []
+    # Wikidata results are kept in catalog-cache/ so a rate-limited run keeps last week's data.
+    cache = os.path.join(ROOT, "catalog-cache", "wikidata-cpus.json")
+    wd = []
+    if not os.environ.get("SKIP_WIKIDATA"):
+        try:
+            wd = build_wikidata_cpus()
+        except Exception as e:  # noqa: BLE001
+            log(f"Wikidata failed: {e}")
+    if len(wd) > 100:
+        os.makedirs(os.path.dirname(cache), exist_ok=True)
+        with open(cache, "w", encoding="utf-8") as f:
+            json.dump(wd, f, ensure_ascii=False, separators=(",", ":"))
+    elif os.path.exists(cache):
+        wd = json.load(open(cache, encoding="utf-8"))
+        log(f"Using cached Wikidata processors: {len(wd)}")
     build_cpus(wd)
     build_pcpp_categories(gpu_by_norm)
     extra = load_extra()

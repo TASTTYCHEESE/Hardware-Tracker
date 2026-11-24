@@ -4,6 +4,7 @@
 const { app, BrowserWindow, ipcMain, dialog, Notification, net, shell, Tray, Menu, nativeImage } = require('electron');
 const background = require('./background.cjs');
 const updater = require('./updater.cjs');
+const catalogMod = require('./catalog.cjs');
 const path = require('node:path');
 const fs = require('node:fs');
 
@@ -41,6 +42,7 @@ let tray = null;
 let watcher;
 let bg;
 let upd;
+let catalog;
 let quitting = false;
 let pendingTarget = null;
 
@@ -91,6 +93,7 @@ function createTray() {
     { label: 'Today', click: () => showWindow('today') },
     { label: 'Prices', click: () => showWindow('prices') },
     { label: 'Tracking', click: () => showWindow('tracking') },
+    { label: 'PC Hardware', click: () => showWindow('hardware') },
     { type: 'separator' },
     { label: 'Check for new recaps now', click: async () => { const r = await bg.sync(); if (r.added) notifyRenderer(); } },
     { type: 'separator' },
@@ -302,6 +305,9 @@ ipcMain.handle('sync-now', async () => {
   return r;
 });
 
+ipcMain.handle('catalog-index', async (_e, force) => catalog.index(!!force));
+ipcMain.handle('catalog-category', async (_e, id) => catalog.category(String(id)));
+
 ipcMain.handle('notify', async (_e, { title, body }) => {
   if (Notification.isSupported()) new Notification({ title, body }).show();
 });
@@ -318,7 +324,9 @@ if (!app.requestSingleInstanceLock()) {
     watchDataDir();
     applyLoginItem();
     createTray();
+    catalog = catalogMod.create({ readSettings, patchSettings, dataDir });
     bg = background.start({
+      catalog,
       readSettings,
       patchSettings,
       recapsDir,

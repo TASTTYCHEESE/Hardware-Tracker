@@ -10,13 +10,15 @@ import { Archive } from './components/Archive';
 import { Alerts } from './components/Alerts';
 import { Tracking } from './components/Tracking';
 import { SettingsPage } from './components/Settings';
+import { Hardware } from './components/Hardware';
 
-type Section = 'today' | 'overview' | 'prices' | 'settings';
+type Section = 'today' | 'overview' | 'prices' | 'hardware' | 'settings';
 
 const NAV: { id: Section; label: string; icon: string }[] = [
   { id: 'today', label: 'Today', icon: '★' },
   { id: 'overview', label: 'Overview', icon: '◎' },
   { id: 'prices', label: 'Prices', icon: '↗' },
+  { id: 'hardware', label: 'PC Hardware', icon: '▦' },
   { id: 'settings', label: 'Settings', icon: '⚙' },
 ];
 
@@ -37,13 +39,17 @@ const SUBTABS: Record<Section, { id: string; label: string }[]> = {
     { id: 'alerts', label: 'Price alerts' },
     { id: 'tracking', label: 'Tracking' },
   ],
+  hardware: [
+    { id: 'hardware', label: 'Hardware' },
+    { id: 'peripherals', label: 'Peripherals' },
+  ],
   settings: [],
 };
 
 export default function App() {
   const data = useData();
   const [section, setSection] = useState<Section>('today');
-  const [sub, setSub] = useState<Record<Section, string>>({ today: '0', overview: 'overview', prices: 'prices', settings: '' });
+  const [sub, setSub] = useState<Record<Section, string>>({ today: '0', overview: 'overview', prices: 'prices', hardware: 'hardware', settings: '' });
   const [recapId, setRecapId] = useState<string>();
   const [reading, setReading] = useState<string | null>(null);
 
@@ -83,6 +89,8 @@ export default function App() {
       prices: ['prices', 'prices'],
       alerts: ['prices', 'alerts'],
       tracking: ['prices', 'tracking'],
+      hardware: ['hardware', 'hardware'],
+      peripherals: ['hardware', 'peripherals'],
       settings: ['settings', ''],
     };
     const [s, t] = map[v] ?? ['today', '0'];
@@ -103,7 +111,7 @@ export default function App() {
           <span className="logo">HT</span>
           <div>
             <strong>Hardware Tracker</strong>
-            <div className="muted small">GPU · CPU · RAM</div>
+            <div className="muted small">News · Prices · Specs</div>
           </div>
         </div>
         {NAV.map((n) => (
@@ -142,6 +150,7 @@ export default function App() {
           {section === 'prices' && current === 'prices' && <Prices data={data} />}
           {section === 'prices' && current === 'alerts' && <Alerts data={data} />}
           {section === 'prices' && current === 'tracking' && <Tracking data={data} />}
+          {section === 'hardware' && <Hardware key={current} group={current === 'peripherals' ? 'peripherals' : 'hardware'} />}
           {section === 'settings' && <SettingsPage data={data} />}
         </div>
       </main>

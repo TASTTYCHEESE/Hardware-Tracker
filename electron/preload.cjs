@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld('hwt', {
   appInfo: () => ipcRenderer.invoke('app-info'),
   checkForUpdates: () => ipcRenderer.invoke('check-updates'),
   syncNow: () => ipcRenderer.invoke('sync-now'),
+  catalogIndex: (force) => ipcRenderer.invoke('catalog-index', force),
+  catalogCategory: (id) => ipcRenderer.invoke('catalog-category', id),
   onNavigate: (cb) => {
     const h = (_e, target) => cb(target);
     ipcRenderer.on('navigate', h);

@@ -20,7 +20,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -33,6 +33,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add catalog
+          if [ -d catalog-cache ]; then git add catalog-cache; fi
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Update hardware catalog ($(date -u +%Y-%m-%d))"
           git pull --rebase origin main

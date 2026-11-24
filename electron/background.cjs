@@ -13,7 +13,7 @@ const HOUR = 3600e3;
 const DEFAULT_SYNC_URL = 'https://raw.githubusercontent.com/TASTTYCHEESE/Hardware-Tracker/main/recaps/';
 
 function start(ctx) {
-  const { readSettings, patchSettings, recapsDir, showWindow, isWindowVisible, onRecapsChanged } = ctx;
+  const { readSettings, patchSettings, recapsDir, showWindow, isWindowVisible, onRecapsChanged, catalog } = ctx;
 
   // ---- helpers ---------------------------------------------------------------
   const readRecaps = () => {
@@ -161,6 +161,8 @@ function start(ctx) {
     if (r.added) onRecapsChanged();
     checkNotifications();
     morning();
+    // Hardware catalog: new version every few days; refresh categories already downloaded.
+    if (catalog) await catalog.refresh();
   };
   setTimeout(tick, 15e3); // shortly after start, not during startup
   setInterval(tick, HOUR);

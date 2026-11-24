@@ -2,6 +2,9 @@
 // phone build can implement the same interface (fetch via a proxy, storage via
 // localStorage / Capacitor Filesystem) without touching the UI.
 import type { FeedArticle, Recap } from './types';
+import type { CatalogCategory, CatalogIndex } from './catalog';
+
+const CATALOG_URL = 'https://raw.githubusercontent.com/TASTTYCHEESE/Hardware-Tracker/main/catalog/';
 
 interface Settings {
   dataDir?: string;
@@ -24,6 +27,9 @@ interface Settings {
   lastSyncError?: string;
   lastAutoQuit?: number;
   lastAutoQuitReason?: string;
+  catalogUrl?: string;
+  catalogChecked?: number;
+  catalogError?: string;
   fxRates?: { rates: Record<string, number>; date: string; source: string; fetchedAt?: number };
 }
 
@@ -45,6 +51,8 @@ interface HwtApi {
   appInfo?(): Promise<{ version: string; updateStatus?: string }>;
   checkForUpdates?(): Promise<string>;
   syncNow?(): Promise<{ added: number; error?: string }>;
+  catalogIndex(force?: boolean): Promise<CatalogIndex>;
+  catalogCategory(id: string): Promise<CatalogCategory>;
 }
 
 declare global {
@@ -127,6 +135,16 @@ const webApi: HwtApi = {
   },
   onDataChanged() {
     return () => {};
+  },
+  async catalogIndex() {
+    const r = await fetch(`${CATALOG_URL}index.json`, { cache: 'no-cache' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  },
+  async catalogCategory(id) {
+    const r = await fetch(`${CATALOG_URL}${id}.json`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
   },
 };
 
