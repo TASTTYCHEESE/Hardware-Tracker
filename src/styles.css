@@ -474,3 +474,69 @@ textarea {
   .seg { max-width: 100%; overflow-x: auto; }
   .seg-btn { white-space: nowrap; }
 }
+
+/* ---- App version ---- */
+.app-version { display: block; margin-top: 10px; background: none; border: 0; padding: 0; color: var(--muted); font: inherit; cursor: pointer; }
+.app-version:hover { color: var(--text); text-decoration: underline; }
+.app-version-line { margin: 28px 0 8px; padding-top: 16px; border-top: 1px solid var(--line); text-align: center; font-size: 14px; }
+
+/* ---- Benchmarks, bottleneck checker, deal checker, used prices ---- */
+.bench, .deal, .used { display: flex; flex-direction: column; gap: 14px; max-width: 920px; }
+.bench h3, .bn h3 { margin: 0 0 4px; }
+.deal-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 8px 0; }
+.deal-form { display: flex; flex-direction: column; gap: 2px; }
+.deal-part { min-width: 260px; }
+.deal-price { width: 160px; font-size: 16px; }
+.used-search { flex: 1; min-width: 160px; }
+.deal-result { border-left: 4px solid var(--line); }
+.deal-result.v-great, .deal-result.v-good { border-left-color: #3fd08f; }
+.deal-result.v-fair { border-left-color: #f5c451; }
+.deal-result.v-bad { border-left-color: #f06a6a; }
+.deal-verdict { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.deal-sub { margin: 14px 0 6px; font-size: 14px; }
+.bench-bar { height: 10px; background: var(--bg); border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+.bench-bar > div { height: 100%; background: var(--accent); border-radius: 6px; }
+.bench-bar > .mk-nvidia { background: var(--gpu); }
+.bench-bar > .mk-amd { background: #e8484c; }
+.bench-bar > .mk-intel { background: #3d8bfd; }
+.bench-bar.small-bar { height: 6px; margin-top: 6px; max-width: 280px; }
+.bench-list { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+.bench-row { display: grid; grid-template-columns: minmax(180px, 260px) 1fr 44px; gap: 12px; align-items: center; padding: 7px 0; border-top: 1px solid var(--line); }
+.bench-name { display: flex; flex-direction: column; min-width: 0; }
+.bench-score { text-align: right; font-variant-numeric: tabular-nums; }
+.bn-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin: 10px 0 14px; }
+.bn-form label, .bn-form > div { display: flex; flex-direction: column; gap: 4px; }
+.bn-form .select { min-width: 220px; }
+.bn-result { padding: 14px 16px; background: var(--panel-2); border-radius: 10px; }
+.bn-result p { margin: 10px 0 0; }
+.bn-bars { display: flex; flex-direction: column; gap: 8px; }
+.bn-line { display: grid; grid-template-columns: 170px 1fr 70px; gap: 12px; align-items: center; font-size: 13px; }
+.bn-line b { text-align: right; font-variant-numeric: tabular-nums; }
+.bn-line .bench-bar { height: 14px; }
+.bn-line .bench-bar > div { background: #4b5b6e; }
+.bn-line .bench-bar > div.lim { background: var(--accent); }
+.used-list { padding: 4px 16px; }
+.used-row { display: flex; justify-content: space-between; gap: 14px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.used-row:first-child { border-top: 0; }
+.used-name { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.used-price { display: flex; flex-direction: column; align-items: flex-end; text-align: right; white-space: nowrap; }
+.buy-tabs { margin-bottom: 14px; }
+@media (max-width: 760px) {
+  .deal-part, .bn-form .select, .bn-form label, .bn-form > div { width: 100%; min-width: 0; }
+  .deal-row > .seg { flex: 1 1 auto; }
+  .deal-price { flex: 1; width: auto; }
+  .bench-row { grid-template-columns: 1fr 40px; gap: 4px 10px; }
+  .bench-row .bench-bar { grid-column: 1 / -1; grid-row: 2; }
+  .bench-row .bench-score { grid-row: 1; grid-column: 2; }
+  .bn-line { grid-template-columns: 1fr 64px; gap: 4px 10px; }
+  .bn-line .bench-bar { grid-column: 1 / -1; grid-row: 2; }
+  .bn-line b { grid-row: 1; grid-column: 2; }
+  .used-row { flex-direction: column; align-items: stretch; gap: 6px; }
+  .used-price { align-items: flex-start; text-align: left; white-space: normal; }
+  .deal-verdict { font-size: 17px; }
+}
+@media (max-width: 760px) {
+  .deal-row > .seg .seg-btn, .bn-form .seg .seg-btn { flex: 1; justify-content: center; }
+  .deal-row > .seg, .bn-form .seg { display: flex; }
+}
+.phone-alerts { margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }

@@ -7,6 +7,7 @@ import { countdown, launchTime, useLaunches, type Launch } from '../lib/launches
 import { perfFor } from '../lib/perf';
 import { money, REGION_LABEL } from '../lib/format';
 import { loadCategory } from './Compare';
+import { DealChecker, UsedPrices } from './Deals';
 import { modelName } from './PriceProducts';
 import type { Category, Region } from '../lib/types';
 
@@ -116,7 +117,7 @@ function verdict(sig: Signal[]) {
 }
 
 /** "Buy or wait?": pick anything you want to buy and get a verdict with reasons. */
-export function BuyAdvisor({ data }: { data: AppData }) {
+function BuyList({ data }: { data: AppData }) {
   const [index, setIndex] = useState<CatalogIndex | null>(null);
   const [group, setGroup] = useState<Group>('hardware');
   const [catId, setCatId] = useState('gpu');
@@ -154,11 +155,8 @@ export function BuyAdvisor({ data }: { data: AppData }) {
   const save = (next: typeof list) => data.setSettings({ buyList: next });
 
   return (
-    <div className="page">
-      <div className="section-head">
-        <h1>Buy or wait?</h1>
-        <span className="muted small">Pick what you want to buy. The verdict looks at its price history, the market, newer models, upcoming launches and the news.</span>
-      </div>
+    <div>
+      <p className="muted small buy-intro">Pick what you want to buy. The verdict looks at its price history, the market, newer models, upcoming launches and the news.</p>
       {err && <p className="muted">{err}</p>}
       <div className="toolbar">
         <div className="tabs">
@@ -278,6 +276,48 @@ export function BuyAdvisor({ data }: { data: AppData }) {
       <p className="muted small">
         Prices come from the weekly recaps for your first country in the Price tracker. This is a guide, not financial advice: it can't see shop-specific deals.
       </p>
+    </div>
+  );
+}
+
+type BuyTab = 'list' | 'deal' | 'used';
+const BUY_TABS: { id: BuyTab; label: string }[] = [
+  { id: 'list', label: 'My list' },
+  { id: 'deal', label: 'Is this a good deal?' },
+  { id: 'used', label: 'Used prices' },
+];
+
+export function BuyAdvisor({ data }: { data: AppData }) {
+  const [tab, setTab] = useState<BuyTab>(() => {
+    try {
+      return (sessionStorage.getItem('hwt-buy-tab') as BuyTab) || 'list';
+    } catch {
+      return 'list';
+    }
+  });
+  const pick = (t: BuyTab) => {
+    setTab(t);
+    try {
+      sessionStorage.setItem('hwt-buy-tab', t);
+    } catch {
+      /* ignore */
+    }
+  };
+  return (
+    <div className="page">
+      <div className="section-head">
+        <h1>Buy or wait?</h1>
+      </div>
+      <div className="seg buy-tabs">
+        {BUY_TABS.map((t) => (
+          <button key={t.id} className={tab === t.id ? 'seg-btn on' : 'seg-btn'} onClick={() => pick(t.id)}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {tab === 'list' && <BuyList data={data} />}
+      {tab === 'deal' && <DealChecker data={data} />}
+      {tab === 'used' && <UsedPrices data={data} />}
     </div>
   );
 }

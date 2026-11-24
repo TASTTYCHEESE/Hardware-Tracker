@@ -10,6 +10,8 @@ interface Settings {
   dataDir?: string;
   feeds?: string[];
   notify?: boolean;
+  /** Android: we asked for notification permission once already */
+  askedNotify?: boolean;
   seenRecaps?: string[];
   /** countries shown on the Prices page (default US) */
   priceRegions?: string[];
@@ -88,6 +90,11 @@ interface HwtApi {
   restartToUpdate?(): Promise<boolean>;
   onUpdateStatus?(cb: (info: UpdateInfo) => void): () => void;
   syncNow?(): Promise<{ added: number; error?: string }>;
+  /** Android: background checks that send notifications while the app is closed. */
+  phoneAlerts?: {
+    sync(s: Settings): Promise<void>;
+    permission(request?: boolean): Promise<string>;
+  };
   catalogIndex(force?: boolean): Promise<CatalogIndex>;
   catalogCategory(id: string): Promise<CatalogCategory>;
 }
@@ -135,8 +142,36 @@ const newer = (a: string, b: string) => {
 
 let lastUpdate: UpdateInfo | null = null;
 
+// Background Runner (Android): runs public/runners/background.js every ~15 minutes, even when the app is closed.
+type Runner = {
+  dispatchEvent(o: { label: string; event: string; details: Record<string, unknown> }): Promise<unknown>;
+  checkPermissions(): Promise<{ notifications?: string }>;
+  requestPermissions(o: { apis: string[] }): Promise<{ notifications?: string }>;
+};
+const runner = (): Runner | undefined => (window as unknown as { Capacitor?: { Plugins?: { BackgroundRunner?: Runner } } }).Capacitor?.Plugins?.BackgroundRunner;
+const RUNNER_LABEL = 'app.hardwaretracker.mobile.check';
+const phoneAlerts: HwtApi['phoneAlerts'] = {
+  async sync(s) {
+    const r = runner();
+    if (!r) return;
+    const details = { notify: s.notify, morningSummary: s.morningSummary, watchlist: s.watchlist ?? [], newsKeywords: s.newsKeywords ?? [], syncUrl: s.syncUrl ?? '' };
+    await r.dispatchEvent({ label: RUNNER_LABEL, event: 'syncSettings', details }).catch(() => {});
+  },
+  async permission(request) {
+    const r = runner();
+    if (!r) return 'unsupported';
+    try {
+      const st = request ? await r.requestPermissions({ apis: ['notifications'] }) : await r.checkPermissions();
+      return st.notifications ?? 'prompt';
+    } catch {
+      return 'unsupported';
+    }
+  },
+};
+
 const webApi: HwtApi = {
   platform: native ? 'android' : 'web',
+  phoneAlerts: native ? phoneAlerts : undefined,
   async fetchText(url) {
     try {
       const r = await fetch(url);

@@ -110,6 +110,19 @@ export function useData() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsLoaded]);
 
+  // Android: hand the alert settings to the background checker (it can't read the app's storage).
+  useEffect(() => {
+    if (!settingsLoaded || !api.phoneAlerts) return;
+    api.phoneAlerts.sync(settings);
+    // Ask for notification permission once, on the first start of the Android app.
+    if (settings.notify !== false && !settings.askedNotify)
+      api.phoneAlerts.permission().then((p) => {
+        if (p === 'prompt' || p === 'prompt-with-rationale') api.phoneAlerts!.permission(true);
+        setSettings({ askedNotify: true });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settingsLoaded, settings.notify, settings.morningSummary, settings.watchlist, settings.newsKeywords, settings.syncUrl]);
+
   async function setSettings(patch: Partial<Settings>) {
     setSettingsState(await api.setSettings(patch));
   }

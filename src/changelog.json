@@ -1,5 +1,17 @@
 [
   {
+    "version": "0.9.5",
+    "date": "2026-11-24",
+    "title": "The Benchmarking Update",
+    "notes": [
+      "New Benchmarks tab in PC Hardware, between Compare and Buy or wait?: a ranking of about 80 graphics cards and 50 processors by gaming performance, with search and a filter by maker.",
+      "Bottleneck checker: pick your processor, graphics card and resolution (1080p, 1440p or 4K) to see which part limits your frame rate, about how many fps you get, and what to upgrade.",
+      "Buy or wait? has two new tabs. \"Is this a good deal?\": type the part and the price you were offered (new or used, in your currency) and get a verdict, with faster options for less money. \"Used prices\": what older graphics cards and processors are fairly worth second-hand.",
+      "Android: notifications while the app is closed. About every 15 minutes the app checks for new recaps, price drops, tracked items hitting your target and news matching your keywords, plus the morning summary. Turn it on or off in Settings → Notifications.",
+      "The app version is now shown at the bottom left on Windows, Mac and Linux (click it to open Updates), and at the bottom of Settings on Android and the web app."
+    ]
+  },
+  {
     "version": "0.9.4",
     "date": "2026-11-24",
     "title": "The Mobile App Update",

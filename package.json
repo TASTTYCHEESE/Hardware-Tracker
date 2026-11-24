@@ -1,7 +1,7 @@
 {
   "name": "hardware-tracker",
   "productName": "Hardware Tracker",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "PC gaming hardware news, price trends and daily/weekly recaps (GPU, CPU, RAM).",
   "author": "Hardware Tracker",
   "private": true,
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@capacitor/android": "^8.6.2",
+    "@capacitor/background-runner": "^3.0.0",
     "@capacitor/cli": "^8.6.2",
     "@capacitor/core": "^8.6.2",
     "@types/react": "19.2.2",

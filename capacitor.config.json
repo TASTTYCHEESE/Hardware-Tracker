@@ -6,6 +6,16 @@
     "allowMixedContent": false
   },
   "plugins": {
-    "CapacitorHttp": { "enabled": true }
+    "CapacitorHttp": {
+      "enabled": true
+    },
+    "BackgroundRunner": {
+      "label": "app.hardwaretracker.mobile.check",
+      "src": "runners/background.js",
+      "event": "checkForUpdates",
+      "repeat": true,
+      "interval": 15,
+      "autoStart": true
+    }
   }
 }

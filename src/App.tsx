@@ -14,6 +14,7 @@ import { Hardware, resetHardwareViews } from './components/Hardware';
 import { Updates } from './components/Updates';
 import { Compare } from './components/Compare';
 import { BuyAdvisor } from './components/BuyAdvisor';
+import { Benchmarks } from './components/Benchmarks';
 import { Launches } from './components/Launches';
 import { keywordHits } from './lib/newsAlerts';
 import type { UpdateInfo } from './lib/platform';
@@ -51,6 +52,7 @@ const SUBTABS: Record<Section, { id: string; label: string }[]> = {
     { id: 'hardware', label: 'Hardware' },
     { id: 'peripherals', label: 'Peripherals' },
     { id: 'compare', label: 'Compare' },
+    { id: 'bench', label: 'Benchmarks' },
     { id: 'buy', label: 'Buy or wait?' },
   ],
   settings: [],
@@ -144,6 +146,10 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [update, setUpdate] = useState<UpdateInfo | null>(null);
+  const [version, setVersion] = useState('');
+  useEffect(() => {
+    api.appInfo?.().then((i) => setVersion(i.version)).catch(() => {});
+  }, []);
   useEffect(() => {
     api.updateInfo?.().then((i) => i && setUpdate(i)).catch(() => {});
     return api.onUpdateStatus?.(setUpdate);
@@ -195,6 +201,7 @@ export default function App() {
       tracking: ['prices', 'tracking'],
       hardware: ['hardware', 'hardware'],
       compare: ['hardware', 'compare'],
+      bench: ['hardware', 'bench'],
       buy: ['hardware', 'buy'],
       launches: ['overview', 'launches'],
       peripherals: ['hardware', 'peripherals'],
@@ -239,6 +246,11 @@ export default function App() {
           Daily recap 8:00 · Weekly recap Mon 8:00
           <br />
           (Sofia time)
+          {version && (
+            <button className="app-version" onClick={() => nav({ section: 'updates', sub: '', cat: null, item: null })} title="What's new">
+              Version {version}
+            </button>
+          )}
         </div>
       </nav>
       <main className="main">
@@ -267,6 +279,7 @@ export default function App() {
           {section === 'prices' && current === 'alerts' && <Alerts data={data} />}
           {section === 'prices' && current === 'tracking' && <Tracking data={data} />}
           {section === 'hardware' && current === 'compare' && <Compare data={data} />}
+          {section === 'hardware' && current === 'bench' && <Benchmarks data={data} />}
           {section === 'hardware' && current === 'buy' && <BuyAdvisor data={data} />}
           {section === 'hardware' && (current === 'hardware' || current === 'peripherals') && <Hardware
               key={current}

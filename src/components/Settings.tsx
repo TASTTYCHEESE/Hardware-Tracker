@@ -15,6 +15,12 @@ export function SettingsPage({ data }: { data: AppData }) {
   useEffect(() => {
     api.appInfo?.().then(setInfo).catch(() => {});
   }, []);
+  // Android: notification permission for the background checks
+  const [perm, setPerm] = useState('');
+  useEffect(() => {
+    api.phoneAlerts?.permission().then(setPerm);
+  }, []);
+  const askPerm = async () => setPerm((await api.phoneAlerts?.permission(true)) ?? '');
 
   return (
     <div className="page narrow">
@@ -63,6 +69,29 @@ export function SettingsPage({ data }: { data: AppData }) {
           <input type="checkbox" checked={s.morningSummary !== false} onChange={(e) => data.setSettings({ morningSummary: e.target.checked })} />
           Morning summary: a notification with today's TL;DR (after 8:10)
         </label>
+        {api.phoneAlerts && (
+          <div className="phone-alerts">
+            {perm === 'granted' ? (
+              <p className="muted small">
+                ✓ Notifications are allowed. The app checks for new recaps, price targets and your news keywords about every 15 minutes, even when it's closed.
+                If they stop coming, turn off battery optimisation for Hardware Tracker in Android settings (Apps → Hardware Tracker → Battery → Unrestricted).
+              </p>
+            ) : (
+              <>
+                <p className="muted small">Android needs your permission before the app can send notifications while it's closed.</p>
+                <button className="btn small" onClick={askPerm}>
+                  Allow notifications
+                </button>
+                {perm === 'denied' && <p className="muted small">Notifications are blocked. Turn them on in Android settings → Apps → Hardware Tracker → Notifications.</p>}
+              </>
+            )}
+          </div>
+        )}
+        {api.platform === 'web' && (
+          <p className="muted small">
+            Notifications while the app is closed work in the Windows, Mac, Linux and Android apps. The iPhone web app can't receive them (that would need a paid push server), so open the app to see new recaps and alerts.
+          </p>
+        )}
       </section>
 
       <section className="card">
@@ -152,7 +181,10 @@ export function SettingsPage({ data }: { data: AppData }) {
         )}
       </section>
 
-      <p className="muted small">Hardware Tracker {info?.version ?? ''} · {api.platform} build</p>
+      <p className="app-version-line">
+        Hardware Tracker <strong>version {info?.version ?? ''}</strong>
+        <span className="muted"> · {api.platform === 'android' ? 'Android app' : api.platform === 'web' ? 'web app' : 'desktop app'}</span>
+      </p>
     </div>
   );
 }

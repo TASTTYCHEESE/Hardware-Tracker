@@ -7,12 +7,13 @@ export const REGION_LABEL: Record<Region, string> = {
   Global: 'Global',
 };
 
-export function money(v: number, currency: string): string {
+export function money(v: number, currency: string, whole = false): string {
   try {
     return new Intl.NumberFormat(undefined, {
       style: 'currency',
       currency,
-      maximumFractionDigits: currency === 'JPY' || v >= 1000 ? 0 : 2,
+      ...(whole ? { minimumFractionDigits: 0 } : {}),
+      maximumFractionDigits: whole || currency === 'JPY' || v >= 1000 ? 0 : 2,
     }).format(v);
   } catch {
     return `${v} ${currency}`;

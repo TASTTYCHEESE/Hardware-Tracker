@@ -19,6 +19,8 @@ Setup details for each one are further down.
 - **Today**: today's recap (Summary / News / Prices tabs) and headlines, plus **Yesterday** and **Day before**.
 - **Overview**: price direction per country, biggest drops, headlines. Top tabs: **Overview / Live news / Archive** (every past day).
 - **Prices**: tabs **Prices** (17 countries, any combination, optional single currency) / **Price alerts** / **Tracking** (watchlist with target prices; Windows notification when a target is hit).
+- **Benchmarks**: gaming performance rankings for about 80 graphics cards and 50 processors, and a **bottleneck checker** (CPU + GPU + resolution → which part holds you back, and roughly how many fps).
+- **Buy or wait?**: your list with buy/wait verdicts, **Is this a good deal?** (type a part and a price, new or used, in any currency) and **Used prices** (fair second-hand value of older parts).
 - **PC Hardware**: a spec encyclopedia. Pick **Hardware** or **Peripherals**, then a category (GPU chips since 1986, graphics cards, CPUs, motherboards, RAM, SSDs, HDDs, PSUs, coolers, cases, monitors, keyboards, mice, headsets and more), filter by manufacturer, years and category-specific specs, and open any product for its full specifications.
 - **In-app reader** for every link (Reader view or full Web page; Ctrl-click opens your browser).
 - **Background mode**: tray icon, starts with Windows (hidden), morning summary notification, hourly recap sync. Closing the window unloads it completely (low memory). Auto-closes when the PC is busy (CPU > 85% or memory < 10% free for 3 minutes) while in the background.
@@ -43,6 +45,8 @@ Download `HardwareTracker-<version>-linux-x86_64.AppImage`, make it executable (
 ## Android
 
 Download `HardwareTracker-<version>-android.apk` from the latest release on the phone and open it. Android asks once to allow installs from your browser or Files app. New versions show up on the Updates page with a download link; installing the new APK keeps your settings.
+
+Notifications: the Android app checks about every 15 minutes, even when closed, for new recaps, price drops, tracked items hitting your target and news matching your keywords. Allow notifications when asked (or in Settings → Notifications). Some phones (Samsung, Xiaomi, Huawei) stop background apps to save battery; if notifications stop, set Android settings → Apps → Hardware Tracker → Battery to **Unrestricted**.
 
 ## iPhone, iPad and any browser (web app)
 
@@ -78,7 +82,7 @@ npm run android        # build the web files and copy them into android/ (then o
 
 ## Roadmap
 
-Code signing (Windows and Mac), phone notifications for price alerts, iOS App Store app (needs an Apple Developer account).
+Code signing (Windows and Mac), notifications on iPhone (needs a push server), iOS App Store app (needs an Apple Developer account).
 
 ### Planned for 1.0.0: rename to "Hardware Hub"
 
