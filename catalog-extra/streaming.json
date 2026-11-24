@@ -1,0 +1,158 @@
+{
+ "fields": [
+  [
+   "type",
+   "Type",
+   null
+  ],
+  [
+   "key_specs",
+   "Key specs",
+   null
+  ],
+  [
+   "connection",
+   "Connection",
+   null
+  ],
+  [
+   "launch_price_usd",
+   "Launch price",
+   "USD"
+  ]
+ ],
+ "filters": [
+  "maker",
+  "year",
+  "type"
+ ],
+ "note": "Hand-picked popular models with their manufacturer specs. New models are added as they appear in the news.",
+ "sources": [
+  {
+   "name": "Manufacturer spec sheets",
+   "url": "https://github.com/TASTTYCHEESE/Hardware-Tracker/tree/main/catalog-extra"
+  }
+ ],
+ "items": [
+  {
+   "name": "Elgato Stream Deck MK.2",
+   "maker": "Elgato",
+   "year": 2021,
+   "type": "Stream controller",
+   "key_specs": "15 customizable LCD keys, swappable faceplate",
+   "connection": "USB-C (cable), USB-A to PC",
+   "launch_price_usd": 149.99,
+   "id": "elgato-stream-deck-mk-2"
+  },
+  {
+   "name": "Elgato Stream Deck XL",
+   "maker": "Elgato",
+   "year": 2019,
+   "type": "Stream controller",
+   "key_specs": "32 customizable LCD keys",
+   "connection": "USB",
+   "launch_price_usd": 249.99,
+   "id": "elgato-stream-deck-xl"
+  },
+  {
+   "name": "Elgato Stream Deck Mini",
+   "maker": "Elgato",
+   "year": 2018,
+   "type": "Stream controller",
+   "key_specs": "6 customizable LCD keys",
+   "connection": "USB",
+   "launch_price_usd": 79.99,
+   "id": "elgato-stream-deck-mini"
+  },
+  {
+   "name": "Elgato Stream Deck +",
+   "maker": "Elgato",
+   "year": 2022,
+   "type": "Stream controller",
+   "key_specs": "8 LCD keys, 4 push dials, touch strip",
+   "connection": "USB-C",
+   "launch_price_usd": 199.99,
+   "id": "elgato-stream-deck-plus"
+  },
+  {
+   "name": "Elgato Key Light",
+   "maker": "Elgato",
+   "year": 2018,
+   "type": "Light",
+   "key_specs": "2800 lumens, 2900–7000 K, app controlled",
+   "connection": "Wi-Fi",
+   "launch_price_usd": 199.99,
+   "id": "elgato-key-light"
+  },
+  {
+   "name": "Elgato Key Light Air",
+   "maker": "Elgato",
+   "year": 2020,
+   "type": "Light",
+   "key_specs": "1400 lumens, 2900–7000 K, app controlled",
+   "connection": "Wi-Fi",
+   "launch_price_usd": 129.99,
+   "id": "elgato-key-light-air"
+  },
+  {
+   "name": "Elgato Wave XLR",
+   "maker": "Elgato",
+   "year": 2021,
+   "type": "Audio interface",
+   "key_specs": "1 XLR input, 75 dB gain, 48 V phantom, tap-to-mute",
+   "connection": "USB-C",
+   "launch_price_usd": 159.99,
+   "id": "elgato-wave-xlr"
+  },
+  {
+   "name": "TC-Helicon GoXLR",
+   "maker": "TC-Helicon",
+   "year": 2018,
+   "type": "Streaming mixer",
+   "key_specs": "4 motorized faders, XLR input, voice effects, sampler",
+   "connection": "USB",
+   "launch_price_usd": 479.99,
+   "id": "tc-helicon-goxlr"
+  },
+  {
+   "name": "TC-Helicon GoXLR Mini",
+   "maker": "TC-Helicon",
+   "year": 2019,
+   "type": "Streaming mixer",
+   "key_specs": "4 faders, XLR input (no effects)",
+   "connection": "USB",
+   "launch_price_usd": 249.99,
+   "id": "tc-helicon-goxlr-mini"
+  },
+  {
+   "name": "Focusrite Scarlett Solo (4th Gen)",
+   "maker": "Focusrite",
+   "year": 2023,
+   "type": "Audio interface",
+   "key_specs": "1 XLR + 1 instrument input, 24-bit / 192 kHz",
+   "connection": "USB-C",
+   "launch_price_usd": 139.99,
+   "id": "focusrite-scarlett-solo-4th-gen"
+  },
+  {
+   "name": "Focusrite Scarlett 2i2 (4th Gen)",
+   "maker": "Focusrite",
+   "year": 2023,
+   "type": "Audio interface",
+   "key_specs": "2 combo inputs, 24-bit / 192 kHz, Auto Gain",
+   "connection": "USB-C",
+   "launch_price_usd": 199.99,
+   "id": "focusrite-scarlett-2i2-4th-gen"
+  },
+  {
+   "name": "Rode RODECaster Pro II",
+   "maker": "Rode",
+   "year": 2022,
+   "type": "Podcast / streaming console",
+   "key_specs": "4 XLR combo inputs, 9 faders, effects, recording to microSD",
+   "connection": "USB-C, Bluetooth",
+   "launch_price_usd": 699,
+   "id": "rode-rodecaster-pro-ii"
+  }
+ ]
+}

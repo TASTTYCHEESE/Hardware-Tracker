@@ -148,6 +148,11 @@ function createWindow() {
   });
   // Closing the window keeps the app in the tray. The window itself is destroyed,
   // which frees the renderer (most of the memory); background jobs keep running.
+  // Mouse back / forward buttons on Windows (the renderer also listens for them; it ignores duplicates).
+  win.on('app-command', (_e, cmd) => {
+    if (cmd === 'browser-backward') win.webContents.send('history', -1);
+    if (cmd === 'browser-forward') win.webContents.send('history', 1);
+  });
   win.on('close', (e) => {
     if (quitting || readSettings().closeToTray === false) return;
     if (!readSettings().trayHintShown && Notification.isSupported()) {

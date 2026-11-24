@@ -1,0 +1,214 @@
+{
+ "fields": [
+  [
+   "type",
+   "Type",
+   null
+  ],
+  [
+   "technology",
+   "Technology",
+   null
+  ],
+  [
+   "color",
+   "Color",
+   null
+  ],
+  [
+   "build_volume_mm",
+   "Build volume (3D)",
+   "mm"
+  ],
+  [
+   "speed",
+   "Speed",
+   null
+  ],
+  [
+   "connectivity",
+   "Connectivity",
+   null
+  ],
+  [
+   "launch_price_usd",
+   "Launch price",
+   "USD"
+  ]
+ ],
+ "filters": [
+  "maker",
+  "year",
+  "type",
+  "technology"
+ ],
+ "note": "Hand-picked popular models with their manufacturer specs. New models are added as they appear in the news.",
+ "sources": [
+  {
+   "name": "Manufacturer spec sheets",
+   "url": "https://github.com/TASTTYCHEESE/Hardware-Tracker/tree/main/catalog-extra"
+  }
+ ],
+ "items": [
+  {
+   "name": "Bambu Lab X1 Carbon",
+   "maker": "Bambu Lab",
+   "year": 2022,
+   "type": "3D printer",
+   "technology": "FDM, CoreXY, enclosed",
+   "color": "Multi-color with AMS",
+   "build_volume_mm": "256 × 256 × 256",
+   "speed": "Up to 500 mm/s",
+   "connectivity": "Wi-Fi, LAN (Bambu Handy app)",
+   "launch_price_usd": 1199,
+   "id": "bambu-lab-x1-carbon"
+  },
+  {
+   "name": "Bambu Lab P1S",
+   "maker": "Bambu Lab",
+   "year": 2023,
+   "type": "3D printer",
+   "technology": "FDM, CoreXY, enclosed",
+   "color": "Multi-color with AMS",
+   "build_volume_mm": "256 × 256 × 256",
+   "speed": "Up to 500 mm/s",
+   "connectivity": "Wi-Fi",
+   "launch_price_usd": 699,
+   "id": "bambu-lab-p1s"
+  },
+  {
+   "name": "Bambu Lab A1",
+   "maker": "Bambu Lab",
+   "year": 2023,
+   "type": "3D printer",
+   "technology": "FDM, bed slinger",
+   "color": "Multi-color with AMS lite",
+   "build_volume_mm": "256 × 256 × 256",
+   "speed": "Up to 500 mm/s",
+   "connectivity": "Wi-Fi",
+   "launch_price_usd": 399,
+   "id": "bambu-lab-a1"
+  },
+  {
+   "name": "Bambu Lab A1 mini",
+   "maker": "Bambu Lab",
+   "year": 2023,
+   "type": "3D printer",
+   "technology": "FDM, bed slinger",
+   "color": "Multi-color with AMS lite",
+   "build_volume_mm": "180 × 180 × 180",
+   "speed": "Up to 500 mm/s",
+   "connectivity": "Wi-Fi",
+   "launch_price_usd": 299,
+   "id": "bambu-lab-a1-mini"
+  },
+  {
+   "name": "Prusa MK4",
+   "maker": "Prusa Research",
+   "year": 2023,
+   "type": "3D printer",
+   "technology": "FDM, bed slinger",
+   "color": "Multi-color with MMU3",
+   "build_volume_mm": "250 × 210 × 220",
+   "connectivity": "Wi-Fi, LAN, USB",
+   "launch_price_usd": 1099,
+   "id": "prusa-mk4"
+  },
+  {
+   "name": "Creality Ender 3 V3 SE",
+   "maker": "Creality",
+   "year": 2023,
+   "type": "3D printer",
+   "technology": "FDM, bed slinger",
+   "color": "Single",
+   "build_volume_mm": "220 × 220 × 250",
+   "speed": "Up to 250 mm/s",
+   "connectivity": "USB drive",
+   "launch_price_usd": 199,
+   "id": "creality-ender-3-v3-se"
+  },
+  {
+   "name": "Creality K1",
+   "maker": "Creality",
+   "year": 2023,
+   "type": "3D printer",
+   "technology": "FDM, CoreXY, enclosed",
+   "color": "Single",
+   "build_volume_mm": "220 × 220 × 250",
+   "speed": "Up to 600 mm/s",
+   "connectivity": "Wi-Fi, USB",
+   "launch_price_usd": 599,
+   "id": "creality-k1"
+  },
+  {
+   "name": "Brother HL-L2350DW",
+   "maker": "Brother",
+   "year": 2018,
+   "type": "Printer",
+   "technology": "Mono laser",
+   "color": "Black & white",
+   "speed": "Up to 32 pages/min, auto duplex",
+   "connectivity": "Wi-Fi, USB",
+   "launch_price_usd": 119.99,
+   "id": "brother-hl-l2350dw"
+  },
+  {
+   "name": "Epson EcoTank ET-2800",
+   "maker": "Epson",
+   "year": 2021,
+   "type": "All-in-one (print, scan, copy)",
+   "technology": "Ink tank",
+   "color": "Color",
+   "speed": "10 pages/min black, 5 color (ISO)",
+   "connectivity": "Wi-Fi, USB",
+   "launch_price_usd": 199.99,
+   "id": "epson-ecotank-et-2800"
+  },
+  {
+   "name": "Canon PIXMA TS6420a",
+   "maker": "Canon",
+   "type": "All-in-one (print, scan, copy)",
+   "technology": "Inkjet (cartridges)",
+   "color": "Color",
+   "speed": "15 pages/min black, 10 color (ISO)",
+   "connectivity": "Wi-Fi, USB",
+   "launch_price_usd": 129.99,
+   "id": "canon-pixma-ts6420a"
+  },
+  {
+   "name": "HP DeskJet 2755e",
+   "maker": "HP",
+   "year": 2021,
+   "type": "All-in-one (print, scan, copy)",
+   "technology": "Inkjet (cartridges)",
+   "color": "Color",
+   "speed": "7.5 pages/min black, 5.5 color (ISO)",
+   "connectivity": "Wi-Fi, USB",
+   "launch_price_usd": 84.99,
+   "id": "hp-deskjet-2755e"
+  },
+  {
+   "name": "Fujitsu ScanSnap iX1600",
+   "maker": "Fujitsu (Ricoh)",
+   "year": 2021,
+   "type": "Document scanner",
+   "technology": "Sheet-fed, duplex",
+   "color": "Color",
+   "speed": "Up to 40 pages/min",
+   "connectivity": "Wi-Fi, USB",
+   "launch_price_usd": 495,
+   "id": "fujitsu-scansnap-ix1600"
+  },
+  {
+   "name": "Epson Perfection V600 Photo",
+   "maker": "Epson",
+   "type": "Photo / film scanner",
+   "technology": "Flatbed",
+   "color": "Color",
+   "speed": "6400 dpi",
+   "connectivity": "USB",
+   "launch_price_usd": 229.99,
+   "id": "epson-perfection-v600-photo"
+  }
+ ]
+}

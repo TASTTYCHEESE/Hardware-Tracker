@@ -366,3 +366,17 @@ textarea {
 .ptable td .small, .ptable td.small { font-size: 12px; }
 .ptable-wrap .ptable th, .ptable-wrap .ptable td { padding: 10px 10px; }
 .ptable-wrap .ptable th:first-child, .ptable-wrap .ptable td:first-child { padding-left: 16px; min-width: 150px; }
+.add-products { margin: 0 0 16px; }
+.add-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.add-head .search { flex: 1; min-width: 220px; }
+.add-list { max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.add-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.add-row.static { cursor: default; margin-top: 10px; }
+.add-row.on { border-color: #2f5578; background: #1f3247; }
+.add-row > span:last-child { display: flex; gap: 10px; align-items: center; white-space: nowrap; }
+.add-btn { min-width: 64px; text-align: right; }
+.add-request { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.ram-filters { margin-bottom: 12px; }
+.mine-star { color: #f5c451; margin-left: 6px; }
+.ptable tr.waiting td { opacity: .85; }
+.ptable td .chip-x { display: inline-flex; margin-left: 6px; vertical-align: middle; }

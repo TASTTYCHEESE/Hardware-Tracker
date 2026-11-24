@@ -1,5 +1,21 @@
 [
   {
+    "version": "0.8.4",
+    "date": "2026-11-24",
+    "title": "Live filter counts, back / forward, add products to the price tracker",
+    "notes": [
+      "Filter counts are live: the number next to each manufacturer, type or year shows how many products you'd get with your current search and other filters.",
+      "Mouse back / forward buttons (buttons 4 and 5), and Alt+← / Alt+→, move through the pages and products you opened.",
+      "Clicking the menu or tab you're already on takes you to its start page.",
+      "Peripherals have full specs: VR headsets now list display, resolution, refresh rate, field of view, tracking, weight and price.",
+      "New spec sheets for microphones, controllers and wheels, mouse pads, printers and 3D printers, routers, drawing tablets and streaming gear.",
+      "Price tracker: \"+ Add products\" lets you pick GPUs and CPUs from the catalog, or build a memory kit by type, speed (MT/s), size, latency and desktop or laptop.",
+      "Memory now shows its specs first (DDR5, 6000 MT/s, 2 × 16 GB) and has its own type, speed and capacity filters.",
+      "\"My products\" shows just the products you added. Ones not on the weekly price list yet can be requested with one click.",
+      "The weekly price list grows to 53 products (more GPUs, CPUs and memory kits by spec)."
+    ]
+  },
+  {
     "version": "0.8.3",
     "date": "2026-11-24",
     "title": "Sorting, search and a better price tracker",

@@ -14,6 +14,8 @@ interface Settings {
   /** countries shown on the Prices page (default US) */
   priceRegions?: string[];
   priceSort?: string;
+  /** products the user added to the price tracker */
+  priceProducts?: { model: string; category: 'GPU' | 'CPU' | 'RAM' }[];
   /** 'local' or a currency code to convert all prices into */
   priceCurrency?: string;
   watchlist?: import('./watch').WatchItem[];
@@ -63,6 +65,7 @@ interface HwtApi {
   readArchiveDay(day: string): Promise<FeedArticle[]>;
   onDataChanged(cb: () => void): () => void;
   onNavigate?(cb: (target: string) => void): () => void;
+  onHistory?(cb: (direction: number) => void): () => void;
   appInfo?(): Promise<{ version: string; updateStatus?: string }>;
   checkForUpdates?(): Promise<UpdateInfo | null>;
   updateInfo?(): Promise<UpdateInfo | null>;

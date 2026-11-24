@@ -22,11 +22,33 @@ const PAGE = 100;
 /** Cache categories for this session so switching back and forth is instant. */
 const memo = new Map<string, CatalogCategory>();
 
-export function Hardware({ group, jump, onJumped }: { group: Group; jump?: { cat: string; item?: string } | null; onJumped?: () => void }) {
+/** Search, filters and sort per category, so Back / Forward returns to the list as you left it. */
+interface ViewState {
+  q: string;
+  maker: string;
+  from: number;
+  to: number;
+  extra: Record<string, string>;
+  sort: Sort;
+}
+const views = new Map<string, ViewState>();
+/** Forget remembered searches and filters (clicking the menu you're already on starts fresh). */
+export const resetHardwareViews = () => views.clear();
+
+/** The open category and product live in the app's history, so back / forward buttons work. */
+export function Hardware({
+  group,
+  cat: catId,
+  item,
+  navigate,
+}: {
+  group: Group;
+  cat: string | null;
+  item: string | null;
+  navigate: (cat: string | null, item: string | null, group?: Group) => void;
+}) {
   const [index, setIndex] = useState<CatalogIndex | null>(null);
   const [error, setError] = useState('');
-  const [catId, setCatId] = useState<string | null>(null);
-  const [pendingItem, setPendingItem] = useState<string | null>(null);
 
   const loadIndex = (force = false) => {
     setError('');
@@ -37,14 +59,6 @@ export function Hardware({ group, jump, onJumped }: { group: Group; jump?: { cat
   };
   useEffect(() => loadIndex(), []);
 
-  // Another page (or a graphics card's "GPU chip" link) asked for a specific item.
-  useEffect(() => {
-    if (!jump) return;
-    setCatId(jump.cat);
-    setPendingItem(jump.item ?? null);
-    onJumped?.();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jump]);
 
   if (error && !index)
     return (
@@ -66,14 +80,12 @@ export function Hardware({ group, jump, onJumped }: { group: Group; jump?: { cat
         key={catId}
         info={info}
         version={index.version}
-        initialItem={pendingItem}
-        back={() => {
-          setCatId(null);
-          setPendingItem(null);
-        }}
-        openOther={(cat, item) => {
-          setCatId(cat);
-          setPendingItem(item ?? null);
+        sel={item}
+        setSel={(id) => navigate(catId, id)}
+        back={() => navigate(null, null)}
+        openOther={(cat, it) => {
+          const g = index.categories.find((c) => c.id === cat)?.group;
+          navigate(cat, it ?? null, g && g !== group ? g : undefined);
         }}
       />
     );
@@ -90,7 +102,7 @@ export function Hardware({ group, jump, onJumped }: { group: Group; jump?: { cat
       </div>
       <div className="hw-grid">
         {cats.map((c) => (
-          <button key={c.id} className={c.count ? 'hw-tile' : 'hw-tile empty'} onClick={() => setCatId(c.id)}>
+          <button key={c.id} className={c.count ? 'hw-tile' : 'hw-tile empty'} onClick={() => navigate(c.id, null)}>
             <div className="hw-tile-top">
               <strong>{c.name}</strong>
               <span className="muted small">{c.count ? c.count.toLocaleString() : 'Coming soon'}</span>
@@ -115,27 +127,32 @@ export function Hardware({ group, jump, onJumped }: { group: Group; jump?: { cat
 function CategoryView({
   info,
   version,
-  initialItem,
+  sel,
+  setSel,
   back,
   openOther,
 }: {
   info: CatalogIndex['categories'][number];
   version: string;
-  initialItem: string | null;
+  sel: string | null;
+  setSel: (id: string | null) => void;
   back: () => void;
   openOther: (cat: string, item?: string) => void;
 }) {
   const [cat, setCat] = useState<CatalogCategory | null>(memo.get(`${info.id}@${version}`) ?? null);
   const [error, setError] = useState('');
-  const [q, setQ] = useState('');
+  const saved = views.get(info.id);
+  const [q, setQ] = useState(saved?.q ?? '');
   const query = useDeferredValue(q);
-  const [maker, setMaker] = useState('');
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
-  const [extra, setExtra] = useState<Record<string, string>>({});
-  const [sort, setSort] = useState<Sort>(info.years ? 'new' : 'name');
+  const [maker, setMaker] = useState(saved?.maker ?? '');
+  const [from, setFrom] = useState(saved?.from ?? 0);
+  const [to, setTo] = useState(saved?.to ?? 0);
+  const [extra, setExtra] = useState<Record<string, string>>(saved?.extra ?? {});
+  const [sort, setSort] = useState<Sort>(saved?.sort ?? (info.years ? 'new' : 'name'));
+  useEffect(() => {
+    views.set(info.id, { q, maker, from, to, extra, sort });
+  }, [info.id, q, maker, from, to, extra, sort]);
   const [limit, setLimit] = useState(PAGE);
-  const [sel, setSel] = useState<string | null>(initialItem);
 
   useEffect(() => {
     if (cat) return;
@@ -175,27 +192,65 @@ function CategoryView({
     return out;
   }, [cat]);
 
+  // Search: which items match the typed words, and how well (0 = exact name … 3 = matched another field).
+  const textScore = useMemo(() => {
+    const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!cat || !words.length) return null;
+    const q1 = simplify(query);
+    const score = new Map<CatalogItem, number>();
+    for (const it of cat.items) {
+      const name = it.name.toLowerCase();
+      const sname = simplify(it.name);
+      const inName = words.every((w) => name.includes(w)) || sname.includes(q1);
+      if (!inName) {
+        const hay = `${name} ${it.maker} ${Object.values(it).filter((x) => typeof x === 'string').join(' ')}`.toLowerCase();
+        if (!words.every((w) => hay.includes(w)) && !simplify(hay).includes(q1)) continue;
+      }
+      score.set(it, sname === q1 ? 0 : sname.startsWith(q1) || name.startsWith(words[0]) ? 1 : inName ? 2 : 3);
+    }
+    return score;
+  }, [cat, query]);
+
+  /** Does an item pass every filter, optionally ignoring one (for that filter's own counts)? */
+  const passes = (it: CatalogItem, skip?: string) => {
+    if (textScore && !textScore.has(it)) return false;
+    if (skip !== 'maker' && maker && it.maker !== maker) return false;
+    if (skip !== 'year' && from && (!it.year || it.year < from)) return false;
+    if (skip !== 'year' && to && (!it.year || it.year > to)) return false;
+    for (const [k, v] of Object.entries(extra)) if (k !== skip && v && String(it[k] ?? '') !== v) return false;
+    return true;
+  };
+
+  // Live counts next to every filter value: how many items you'd get by picking it, given the search and the other filters.
+  const counts = useMemo(() => {
+    const out: Record<string, Map<string, number>> = {};
+    if (!cat) return out;
+    for (const key of [...Object.keys(options), 'year']) {
+      const m = new Map<string, number>();
+      for (const it of cat.items) {
+        if (!passes(it, key)) continue;
+        const v = it[key];
+        if (v === undefined || v === null || v === '') continue;
+        m.set(String(v), (m.get(String(v)) ?? 0) + 1);
+      }
+      out[key] = m;
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cat, options, textScore, maker, from, to, extra]);
+
+  /** Items between two years (inclusive), given the search and the other filters. */
+  const yearCount = (a: number, b: number) => {
+    let n = 0;
+    for (const [y, c] of counts.year ?? []) if (Number(y) >= a && Number(y) <= b) n += c;
+    return n;
+  };
+
   const filtered = useMemo(() => {
     if (!cat) return [];
-    const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const q1 = simplify(query);
     // Search and filters must both match. The search decides the order: best name matches first.
-    const score = new Map<CatalogItem, number>();
-    const list = cat.items.filter((it) => {
-      if (maker && it.maker !== maker) return false;
-      if (from && (!it.year || it.year < from)) return false;
-      if (to && (!it.year || it.year > to)) return false;
-      for (const [k, v] of Object.entries(extra)) if (v && String(it[k] ?? '') !== v) return false;
-      if (words.length) {
-        const name = it.name.toLowerCase();
-        const sname = simplify(it.name);
-        const hay = `${name} ${it.maker} ${Object.values(it).filter((x) => typeof x === 'string').join(' ')}`.toLowerCase();
-        const inName = words.every((w) => name.includes(w)) || sname.includes(q1);
-        if (!inName && !words.every((w) => hay.includes(w)) && !simplify(hay).includes(q1)) return false;
-        score.set(it, sname === q1 ? 0 : sname.startsWith(q1) || name.startsWith(words[0]) ? 1 : inName ? 2 : 3);
-      }
-      return true;
-    });
+    const score = textScore ?? new Map<CatalogItem, number>();
+    const list = cat.items.filter((it) => passes(it));
     // Items without data go last in every direction.
     const ranked = (v: (i: CatalogItem) => number | undefined, dir: 1 | -1) => (a: CatalogItem, b: CatalogItem) => {
       const x = v(a), y = v(b);
@@ -216,7 +271,8 @@ function CategoryView({
     };
     const cmp = by[sort];
     return list.sort((a, b) => (score.get(a) ?? 0) - (score.get(b) ?? 0) || cmp(a, b));
-  }, [cat, query, maker, from, to, extra, sort]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cat, textScore, maker, from, to, extra, sort]);
 
   useEffect(() => setLimit(PAGE), [query, maker, from, to, extra, sort]);
 
@@ -237,9 +293,9 @@ function CategoryView({
     cat && (
       <select key={k} className="select" value={extra[k] ?? ''} onChange={(e) => setExtra((x) => ({ ...x, [k]: e.target.value }))}>
         <option value="">{k === 'kind' ? 'All types' : `Any ${labelFor(cat, k).toLowerCase()}`}</option>
-        {vals.slice(0, 1500).map(([v, n]) => (
+        {vals.slice(0, 1500).map(([v]) => (
           <option key={v} value={v}>
-            {formatValue(isNaN(Number(v)) ? v : Number(v), cat.fields.find((f) => f.k === k)?.unit)} ({n})
+            {formatValue(isNaN(Number(v)) ? v : Number(v), cat.fields.find((f) => f.k === k)?.unit)} ({(counts[k]?.get(v) ?? 0).toLocaleString()})
           </option>
         ))}
       </select>
@@ -286,9 +342,9 @@ function CategoryView({
             {options.maker && (
               <select className="select" value={maker} onChange={(e) => setMaker(e.target.value)}>
                 <option value="">All manufacturers</option>
-                {options.maker.map(([m, n]) => (
+                {options.maker.map(([m]) => (
                   <option key={m} value={m}>
-                    {m} ({n})
+                    {m} ({(counts.maker?.get(m) ?? 0).toLocaleString()})
                   </option>
                 ))}
               </select>
@@ -299,7 +355,7 @@ function CategoryView({
                   <option value={0}>From any year</option>
                   {years.map((y) => (
                     <option key={y} value={y}>
-                      From {y}
+                      From {y} ({yearCount(y, to || 9999).toLocaleString()})
                     </option>
                   ))}
                 </select>
@@ -307,7 +363,7 @@ function CategoryView({
                   <option value={0}>To any year</option>
                   {years.map((y) => (
                     <option key={y} value={y}>
-                      To {y}
+                      To {y} ({yearCount(from || 0, y).toLocaleString()})
                     </option>
                   ))}
                 </select>

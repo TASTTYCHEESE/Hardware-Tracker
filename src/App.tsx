@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Reader } from './components/Reader';
 import { api } from './lib/platform';
 import { useData } from './lib/useData';
@@ -10,7 +10,7 @@ import { Archive } from './components/Archive';
 import { Alerts } from './components/Alerts';
 import { Tracking } from './components/Tracking';
 import { SettingsPage } from './components/Settings';
-import { Hardware } from './components/Hardware';
+import { Hardware, resetHardwareViews } from './components/Hardware';
 import { Updates } from './components/Updates';
 import type { UpdateInfo } from './lib/platform';
 
@@ -50,10 +50,92 @@ const SUBTABS: Record<Section, { id: string; label: string }[]> = {
   updates: [],
 };
 
+const HOME_SUB: Record<Section, string> = { today: '0', overview: 'overview', prices: 'prices', hardware: 'hardware', settings: '', updates: '' };
+
+/** One place in the app. Back / forward (mouse buttons 4 and 5, Alt+←/→) move through these. */
+interface Loc {
+  section: Section;
+  sub: string;
+  /** PC Hardware: open category and product */
+  cat: string | null;
+  item: string | null;
+}
+const same = (a: Loc, b: Loc) => a.section === b.section && a.sub === b.sub && a.cat === b.cat && a.item === b.item;
+
 export default function App() {
   const data = useData();
-  const [section, setSection] = useState<Section>('today');
-  const [sub, setSub] = useState<Record<Section, string>>({ today: '0', overview: 'overview', prices: 'prices', hardware: 'hardware', settings: '', updates: '' });
+  const [hist, setHist] = useState<{ list: Loc[]; i: number }>({ list: [{ section: 'today', sub: '0', cat: null, item: null }], i: 0 });
+  const loc = hist.list[hist.i];
+  const section = loc.section;
+  // Last tab used in each section, so switching sections comes back to it.
+  const [sub, setSub] = useState<Record<Section, string>>(HOME_SUB);
+  // Bumped to reset a page to its starting state (clicking the menu you're already on).
+  const [nonce, setNonce] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const nav = (next: Partial<Loc>) => {
+    const h = histRef.current;
+    const cur = h.list[h.i];
+    const n = { ...cur, ...next };
+    if (same(n, cur)) return;
+    setSub((x) => ({ ...x, [n.section]: n.sub }));
+    const list = [...h.list.slice(0, h.i + 1), n].slice(-200);
+    histRef.current = { list, i: list.length - 1 };
+    setHist(histRef.current);
+  };
+  const readingRef = useRef<string | null>(null);
+  const histRef = useRef(hist);
+  histRef.current = hist;
+  const step = (d: -1 | 1) => {
+    // Back first closes the article reader if it's open.
+    if (readingRef.current) {
+      if (d === -1) setReading(null);
+      return;
+    }
+    const h = histRef.current;
+    const i = Math.min(h.list.length - 1, Math.max(0, h.i + d));
+    if (i === h.i) return;
+    setSub((x) => ({ ...x, [h.list[i].section]: h.list[i].sub }));
+    histRef.current = { ...h, i };
+    setHist(histRef.current);
+  };
+  const goHome = (s: Section, t: string) => {
+    setReading(null);
+    resetHardwareViews();
+    nav({ section: s, sub: t, cat: null, item: null });
+    setNonce((n) => n + 1);
+    contentRef.current?.scrollTo(0, 0);
+  };
+
+  // Mouse back / forward buttons (4 and 5), Alt+Left / Alt+Right, and the Windows app commands.
+  useEffect(() => {
+    let last = 0;
+    const fire = (d: -1 | 1) => {
+      if (Date.now() - last < 250) return;
+      last = Date.now();
+      step(d);
+    };
+    const onMouse = (e: MouseEvent) => {
+      if (e.button !== 3 && e.button !== 4) return;
+      e.preventDefault();
+      if (e.type === 'mouseup') fire(e.button === 3 ? -1 : 1);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.altKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault();
+      fire(e.key === 'ArrowLeft' ? -1 : 1);
+    };
+    window.addEventListener('mousedown', onMouse);
+    window.addEventListener('mouseup', onMouse);
+    window.addEventListener('keydown', onKey);
+    const off = window.hwt?.onHistory?.((d: number) => fire(d < 0 ? -1 : 1));
+    return () => {
+      window.removeEventListener('mousedown', onMouse);
+      window.removeEventListener('mouseup', onMouse);
+      window.removeEventListener('keydown', onKey);
+      off?.();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [update, setUpdate] = useState<UpdateInfo | null>(null);
   useEffect(() => {
     api.updateInfo?.().then((i) => i && setUpdate(i)).catch(() => {});
@@ -61,6 +143,7 @@ export default function App() {
   }, []);
   const [recapId, setRecapId] = useState<string>();
   const [reading, setReading] = useState<string | null>(null);
+  readingRef.current = reading;
 
   // Open every external link (news, sources, alerts) in the in-app reader.
   // Ctrl/Shift/middle-click still goes to the normal browser.
@@ -107,11 +190,10 @@ export default function App() {
     open(s, t);
   }
   function open(s: Section, t: string) {
-    setSection(s);
-    setSub((cur) => ({ ...cur, [s]: t }));
+    nav({ section: s, sub: t, cat: null, item: null });
   }
 
-  const current = sub[section];
+  const current = loc.sub;
   const tabs = SUBTABS[section];
 
   return (
@@ -125,7 +207,11 @@ export default function App() {
           </div>
         </div>
         {NAV.map((n) => (
-          <button key={n.id} className={section === n.id ? 'nav active' : 'nav'} onClick={() => { setReading(null); setSection(n.id); }}>
+          <button key={n.id} className={section === n.id ? 'nav active' : 'nav'} onClick={() => {
+              if (section === n.id) return goHome(n.id, HOME_SUB[n.id]);
+              setReading(null);
+              nav({ section: n.id, sub: sub[n.id], cat: null, item: null });
+            }}>
             <span className="nav-icon">{n.icon}</span>
             {n.label}
             {n.id === 'prices' && hitCount + dropCount > 0 && <span className="pill">{hitCount + dropCount}</span>}
@@ -144,7 +230,7 @@ export default function App() {
           <div className="topbar">
             <div className="seg">
               {tabs.map((t) => (
-                <button key={t.id} className={current === t.id ? 'seg-btn on' : 'seg-btn'} onClick={() => open(section, t.id)}>
+                <button key={t.id} className={current === t.id ? 'seg-btn on' : 'seg-btn'} onClick={() => (current === t.id ? goHome(section, t.id) : (setReading(null), open(section, t.id)))}>
                   {t.label}
                   {t.id === 'alerts' && dropCount > 0 && <span className="seg-count good">{dropCount}</span>}
                   {t.id === 'tracking' && hitCount > 0 && <span className="seg-count good">{hitCount}</span>}
@@ -153,7 +239,7 @@ export default function App() {
             </div>
           </div>
         )}
-        <div className="content">
+        <div className="content" ref={contentRef} key={nonce}>
           {section === 'today' && <Today data={data} go={go} offset={Number(current) || 0} />}
           {section === 'overview' && current === 'overview' && <Overview data={data} go={go} />}
           {section === 'overview' && current === 'news' && <News data={data} />}
@@ -161,7 +247,13 @@ export default function App() {
           {section === 'prices' && current === 'prices' && <Prices data={data} />}
           {section === 'prices' && current === 'alerts' && <Alerts data={data} />}
           {section === 'prices' && current === 'tracking' && <Tracking data={data} />}
-          {section === 'hardware' && <Hardware key={current} group={current === 'peripherals' ? 'peripherals' : 'hardware'} />}
+          {section === 'hardware' && <Hardware
+              key={current}
+              group={current === 'peripherals' ? 'peripherals' : 'hardware'}
+              cat={loc.cat}
+              item={loc.item}
+              navigate={(cat, item, group) => nav({ cat, item, ...(group ? { sub: group } : {}) })}
+            />}
           {section === 'settings' && <SettingsPage data={data} />}
           {section === 'updates' && <Updates data={data} info={update} setInfo={setUpdate} />}
         </div>

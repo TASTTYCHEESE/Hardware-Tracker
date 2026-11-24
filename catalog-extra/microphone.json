@@ -1,0 +1,318 @@
+{
+ "fields": [
+  [
+   "connection",
+   "Connection",
+   null
+  ],
+  [
+   "capsule",
+   "Capsule",
+   null
+  ],
+  [
+   "polar_patterns",
+   "Polar patterns",
+   null
+  ],
+  [
+   "frequency_response",
+   "Frequency response",
+   null
+  ],
+  [
+   "sample_rate",
+   "Bit depth / sample rate (USB)",
+   null
+  ],
+  [
+   "weight_g",
+   "Weight",
+   "g"
+  ],
+  [
+   "launch_price_usd",
+   "Launch price",
+   "USD"
+  ],
+  [
+   "notes",
+   "Notes",
+   null
+  ]
+ ],
+ "filters": [
+  "maker",
+  "year",
+  "connection",
+  "capsule"
+ ],
+ "note": "Hand-picked popular models with their manufacturer specs. New models are added as they appear in the news.",
+ "sources": [
+  {
+   "name": "Manufacturer spec sheets",
+   "url": "https://github.com/TASTTYCHEESE/Hardware-Tracker/tree/main/catalog-extra"
+  }
+ ],
+ "items": [
+  {
+   "name": "Shure SM7B",
+   "maker": "Shure",
+   "year": 2001,
+   "connection": "XLR",
+   "capsule": "Dynamic",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "50 Hz – 20 kHz",
+   "weight_g": 764,
+   "launch_price_usd": 399,
+   "notes": "Needs a lot of preamp gain",
+   "id": "shure-sm7b"
+  },
+  {
+   "name": "Shure SM7dB",
+   "maker": "Shure",
+   "year": 2023,
+   "connection": "XLR",
+   "capsule": "Dynamic (built-in preamp, +18/+28 dB)",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "50 Hz – 20 kHz",
+   "weight_g": 794,
+   "launch_price_usd": 499,
+   "notes": "Preamp needs 48 V phantom power",
+   "id": "shure-sm7db"
+  },
+  {
+   "name": "Shure MV7",
+   "maker": "Shure",
+   "year": 2020,
+   "connection": "USB (micro-USB) + XLR",
+   "capsule": "Dynamic",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "50 Hz – 16 kHz",
+   "sample_rate": "24-bit / 48 kHz",
+   "weight_g": 550,
+   "launch_price_usd": 249,
+   "id": "shure-mv7"
+  },
+  {
+   "name": "Shure MV7+",
+   "maker": "Shure",
+   "year": 2024,
+   "connection": "USB-C + XLR",
+   "capsule": "Dynamic",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "50 Hz – 16 kHz",
+   "sample_rate": "24-bit / 48 kHz",
+   "weight_g": 550,
+   "launch_price_usd": 279,
+   "notes": "Touch panel with LED ring",
+   "id": "shure-mv7-plus"
+  },
+  {
+   "name": "Shure SM58",
+   "maker": "Shure",
+   "year": 1966,
+   "connection": "XLR",
+   "capsule": "Dynamic",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "50 Hz – 15 kHz",
+   "weight_g": 298,
+   "id": "shure-sm58"
+  },
+  {
+   "name": "Blue Yeti",
+   "maker": "Logitech (Blue)",
+   "year": 2009,
+   "connection": "USB",
+   "capsule": "Condenser (3 capsules)",
+   "polar_patterns": "Cardioid, omni, figure-8, stereo",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "16-bit / 48 kHz",
+   "weight_g": 550,
+   "launch_price_usd": 129,
+   "notes": "Weight without the stand",
+   "id": "blue-yeti"
+  },
+  {
+   "name": "Blue Yeti X",
+   "maker": "Logitech (Blue)",
+   "year": 2019,
+   "connection": "USB",
+   "capsule": "Condenser (4 capsules)",
+   "polar_patterns": "Cardioid, omni, figure-8, stereo",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "24-bit / 48 kHz",
+   "weight_g": 519,
+   "launch_price_usd": 169,
+   "notes": "LED level meter",
+   "id": "blue-yeti-x"
+  },
+  {
+   "name": "Blue Snowball iCE",
+   "maker": "Logitech (Blue)",
+   "connection": "USB",
+   "capsule": "Condenser",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "40 Hz – 18 kHz",
+   "sample_rate": "16-bit / 44.1 kHz",
+   "weight_g": 460,
+   "launch_price_usd": 49,
+   "id": "blue-snowball-ice"
+  },
+  {
+   "name": "HyperX QuadCast",
+   "maker": "HyperX",
+   "year": 2019,
+   "connection": "USB",
+   "capsule": "Condenser",
+   "polar_patterns": "Cardioid, omni, figure-8, stereo",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "16-bit / 48 kHz",
+   "weight_g": 710,
+   "launch_price_usd": 139,
+   "notes": "Tap-to-mute, built-in shock mount",
+   "id": "hyperx-quadcast"
+  },
+  {
+   "name": "HyperX QuadCast S",
+   "maker": "HyperX",
+   "year": 2020,
+   "connection": "USB-C",
+   "capsule": "Condenser",
+   "polar_patterns": "Cardioid, omni, figure-8, stereo",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "16-bit / 48 kHz",
+   "weight_g": 710,
+   "launch_price_usd": 159,
+   "notes": "RGB lighting",
+   "id": "hyperx-quadcast-s"
+  },
+  {
+   "name": "Elgato Wave:3",
+   "maker": "Elgato",
+   "year": 2020,
+   "connection": "USB-C",
+   "capsule": "Condenser",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "70 Hz – 20 kHz",
+   "sample_rate": "24-bit / 96 kHz",
+   "weight_g": 280,
+   "launch_price_usd": 149,
+   "notes": "Clipguard anti-distortion",
+   "id": "elgato-wave-3"
+  },
+  {
+   "name": "Rode NT-USB",
+   "maker": "Rode",
+   "year": 2014,
+   "connection": "USB",
+   "capsule": "Condenser",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "16-bit / 48 kHz",
+   "weight_g": 520,
+   "launch_price_usd": 169,
+   "notes": "Headphone output with zero-latency monitoring",
+   "id": "rode-nt-usb"
+  },
+  {
+   "name": "Rode PodMic",
+   "maker": "Rode",
+   "year": 2019,
+   "connection": "XLR",
+   "capsule": "Dynamic",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "20 Hz – 20 kHz",
+   "weight_g": 937,
+   "launch_price_usd": 99,
+   "id": "rode-podmic"
+  },
+  {
+   "name": "Rode PodMic USB",
+   "maker": "Rode",
+   "year": 2023,
+   "connection": "USB-C + XLR",
+   "capsule": "Dynamic",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "24-bit / 48 kHz",
+   "weight_g": 1220,
+   "launch_price_usd": 199,
+   "id": "rode-podmic-usb"
+  },
+  {
+   "name": "Rode NT1 5th Generation",
+   "maker": "Rode",
+   "year": 2021,
+   "connection": "USB-C + XLR",
+   "capsule": "Condenser",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "32-bit float / 192 kHz",
+   "weight_g": 308,
+   "launch_price_usd": 259,
+   "id": "rode-nt1-5th-generation"
+  },
+  {
+   "name": "Audio-Technica AT2020",
+   "maker": "Audio-Technica",
+   "connection": "XLR",
+   "capsule": "Condenser",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "20 Hz – 20 kHz",
+   "weight_g": 345,
+   "launch_price_usd": 99,
+   "id": "audio-technica-at2020"
+  },
+  {
+   "name": "Audio-Technica AT2020USB+",
+   "maker": "Audio-Technica",
+   "connection": "USB",
+   "capsule": "Condenser",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "16-bit / 48 kHz",
+   "weight_g": 386,
+   "launch_price_usd": 149,
+   "id": "audio-technica-at2020usb-plus"
+  },
+  {
+   "name": "Electro-Voice RE20",
+   "maker": "Electro-Voice",
+   "year": 1968,
+   "connection": "XLR",
+   "capsule": "Dynamic",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "45 Hz – 18 kHz",
+   "weight_g": 737,
+   "launch_price_usd": 449,
+   "notes": "Broadcast standard",
+   "id": "electro-voice-re20"
+  },
+  {
+   "name": "Razer Seiren Mini",
+   "maker": "Razer",
+   "year": 2020,
+   "connection": "USB",
+   "capsule": "Condenser",
+   "polar_patterns": "Supercardioid",
+   "frequency_response": "20 Hz – 20 kHz",
+   "sample_rate": "16-bit / 48 kHz",
+   "weight_g": 265,
+   "launch_price_usd": 49,
+   "id": "razer-seiren-mini"
+  },
+  {
+   "name": "Samson Q2U",
+   "maker": "Samson",
+   "connection": "USB + XLR",
+   "capsule": "Dynamic",
+   "polar_patterns": "Cardioid",
+   "frequency_response": "50 Hz – 15 kHz",
+   "sample_rate": "16-bit / 48 kHz",
+   "weight_g": 263,
+   "launch_price_usd": 69,
+   "id": "samson-q2u"
+  }
+ ]
+}

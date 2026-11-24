@@ -30,6 +30,11 @@ contextBridge.exposeInMainWorld('hwt', {
     ipcRenderer.on('navigate', h);
     return () => ipcRenderer.removeListener('navigate', h);
   },
+  onHistory: (cb) => {
+    const h = (_e, d) => cb(d);
+    ipcRenderer.on('history', h);
+    return () => ipcRenderer.removeListener('history', h);
+  },
   onDataChanged: (cb) => {
     const h = () => cb();
     ipcRenderer.on('data-changed', h);

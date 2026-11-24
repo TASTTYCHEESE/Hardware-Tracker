@@ -798,7 +798,7 @@ def load_extra():
         for f in os.listdir(EXTRA):
             if f.endswith(".json"):
                 try:
-                    out[f[:-5]] = json.load(open(os.path.join(EXTRA, f), encoding="utf-8")).get("items", [])
+                    out[f[:-5]] = json.load(open(os.path.join(EXTRA, f), encoding="utf-8"))
                 except Exception as e:  # noqa: BLE001
                     log(f"bad extra file {f}: {e}")
     return out
@@ -824,28 +824,44 @@ def main():
         log(f"Using cached Wikidata processors: {len(wd)}")
     build_cpus(wd)
     build_pcpp_categories(gpu_by_norm)
-    # VR headsets: the Steam survey lists every headset gamers use.
+    # VR headsets: specs entered by hand (tools/catalog/vr_specs.py), plus how many Steam VR users have each one.
     vr, vr_month = steam_usage("VR Headsets")
     if vr:
-        heads = []
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import vr_specs
+        merged: dict[str, dict] = {}
         for name, u in vr.items():
+            if name in vr_specs.SKIP:
+                continue
+            name = vr_specs.ALIASES.get(name, name)
             maker = name.split()[0]
-            maker = {"Oculus": "Meta (Oculus)", "Meta": "Meta (Oculus)", "Valve": "Valve", "HTC": "HTC", "Windows": "Microsoft (WMR)"}.get(maker, maker)
-            it = {"id": slug(name), "name": name, "maker": maker, "steam_peak": u["peak"], "steam_peak_month": u["peak_month"]}
+            maker = {"Oculus": "Meta (Oculus)", "Meta": "Meta (Oculus)", "Windows": "Microsoft (WMR)"}.get(maker, maker)
+            it = merged.setdefault(name, {"id": slug(name), "name": name.replace(" HMD", "") if name == "Valve Index HMD" else name, "maker": maker})
             if u["share"] is not None:
-                it["steam_share"] = u["share"]
-            heads.append({k: v for k, v in it.items() if v is not None})
-        category("vr-headset", "VR headsets", "peripherals", "PC VR headsets, with how many Steam VR users have each one.",
-                 [("steam_share", "Share of Steam VR users (latest)", "%"), ("steam_peak", "Peak share", "%"),
-                  ("steam_peak_month", "Peak month", None)], ["maker"], heads, [SRC_STEAM])
+                it["steam_share"] = max(it.get("steam_share", 0), u["share"])
+            if u["peak"] > it.get("steam_peak", 0):
+                it["steam_peak"], it["steam_peak_month"] = u["peak"], u["peak_month"]
+        for name, spec in vr_specs.SPECS.items():
+            it = merged.setdefault(name, {"id": slug(name), "name": name, "maker": name.split()[0]})
+            it.update({k: v for k, v in spec.items() if v is not None})
+        heads = list(merged.values())
+        category("vr-headset", "VR headsets", "peripherals",
+                 "VR headsets used for PC gaming: display, resolution, refresh rate, field of view, tracking and more.",
+                 vr_specs.FIELDS + [("steam_share", "Share of Steam VR users (latest)", "%"), ("steam_peak", "Peak share of Steam VR users", "%"),
+                                    ("steam_peak_month", "Peak month", None)],
+                 ["maker", "year", "type", "display"], heads, [SRC_STEAM, {"name": "Manufacturer spec sheets", "url": "https://github.com/TASTTYCHEESE/Hardware-Tracker/blob/main/tools/catalog/vr_specs.py"}])
     extra = load_extra()
     have = {c["id"] for c in CATEGORIES}
     for cid, name, group, desc in EXTRA_CATEGORIES:
         if cid not in have:
-            category(cid, name, group, desc, [], ["maker", "year"], [], [SRC_EXTRA],
-                     note="New category: items are added as they appear in the news.")
+            # A hand-made file can bring its own spec columns and filters.
+            spec = extra.get(cid, {})
+            category(cid, name, group, desc, [tuple(f) for f in spec.get("fields", [])], spec.get("filters", ["maker", "year"]), [],
+                     [SRC_EXTRA] + spec.get("sources", []),
+                     note=spec.get("note", "New products are added as they appear in the news."))
     for c in CATEGORIES:
-        add = extra.get(c["id"], [])
+        add = extra.get(c["id"], {}).get("items", [])
         if add:
             ids = {i["id"] for i in c["items"]}
             c["items"].extend(i for i in add if i.get("id") and i["id"] not in ids)

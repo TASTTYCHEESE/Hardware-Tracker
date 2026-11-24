@@ -5,6 +5,26 @@ import type { Category, PricePoint, Region } from '../lib/types';
 import { COUNTRIES, COUNTRY_CODES, CURRENCIES, GROUPS, type CountryCode } from '../lib/regions';
 import { CatBadge, DirBadge, Sparkline, catLabel } from './Common';
 import { REGION_LABEL, fmtDate, fmtPct, money, pct } from '../lib/format';
+import { parseRam, ramLabel } from '../lib/ram';
+import { AddProducts, key as pkey, useProductList, type PriceProduct } from './PriceProducts';
+
+/** Product cell: memory kits by their specs (type, speed, size), everything else by model name. */
+function ProductName({ p, mine, remove }: { p: { model: string; category: Category }; mine?: boolean; remove?: () => void }) {
+  const ram = p.category === 'RAM' ? parseRam(p.model) : null;
+  const l = ram && ramLabel(ram);
+  return (
+    <>
+      <CatBadge c={p.category} /> {l ? <strong>{l.main}</strong> : p.model}
+      {mine && <span className="mine-star" title="On your list">★</span>}
+      {remove && (
+        <button className="chip-x" title="Remove from your list" onClick={remove}>
+          ×
+        </button>
+      )}
+      {l && <div className="muted small">{l.sub}</div>}
+    </>
+  );
+}
 
 const shortDate = (d: string) =>
   new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'short', ...(d.slice(0, 4) === String(new Date().getFullYear()) ? {} : { year: 'numeric' }) });
@@ -47,6 +67,15 @@ const missingLast = (x: number | string | undefined, y: number | string | undefi
 export function Prices({ data }: { data: AppData }) {
   const [cat, setCat] = useState<Category | 'All'>('All');
   const [q, setQ] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [onlyMine, setOnlyMine] = useState(false);
+  const [ramType, setRamType] = useState('');
+  const [ramSize, setRamSize] = useState('');
+  const [ramSpeed, setRamSpeed] = useState('');
+  const weekly = useProductList();
+  const mine = (data.settings.priceProducts ?? []) as PriceProduct[];
+  const mineKeys = new Set(mine.map((p) => pkey(p.model)));
+  const setMine = (next: PriceProduct[]) => data.setSettings({ priceProducts: next.map(({ model, category }) => ({ model, category })) });
   const sort = (data.settings.priceSort ?? 'product') as PSort;
   const setSort = (v: PSort) => data.setSettings({ priceSort: v });
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -86,19 +115,41 @@ export function Prices({ data }: { data: AppData }) {
     return [...m.values()].map(summarize);
   }, [data.prices, regions.join()]);
 
+  // Search, "my products" and memory filters; the category tabs count what's left (like the PC Hardware filters).
+  const matches = (model: string, category: Category, region?: Region) => {
+    const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    const ram = category === 'RAM' ? parseRam(model) : null;
+    const hay = `${model} ${region ? REGION_LABEL[region] : ''} ${category}s ${ram ? `${ram.type} ${ram.speed ?? ''} ${ram.total ?? ''}gb ${ram.form}` : ''}`.toLowerCase();
+    if (!words.every((w) => hay.includes(w))) return false;
+    if (onlyMine && !mineKeys.has(pkey(model))) return false;
+    if (category === 'RAM' && (ramType || ramSize || ramSpeed)) {
+      if (!ram) return false;
+      if (ramType && ram.type !== ramType) return false;
+      if (ramSize && String(ram.total) !== ramSize) return false;
+      if (ramSpeed && String(ram.speed) !== ramSpeed) return false;
+    }
+    return true;
+  };
+  // Your products that have no price yet in the chosen countries.
+  const waiting = mine.filter((p) => !all.some((r) => pkey(r.last.model) === pkey(p.model)));
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
-    for (const r of all) c[r.last.category] = (c[r.last.category] ?? 0) + 1;
+    for (const r of all) if (matches(r.last.model, r.last.category, r.last.region)) c[r.last.category] = (c[r.last.category] ?? 0) + 1;
+    for (const p of waiting) if (matches(p.model, p.category)) c[p.category] = (c[p.category] ?? 0) + 1;
     return c;
-  }, [all]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [all, q, onlyMine, ramType, ramSize, ramSpeed, mine.length]);
+  const ramOptions = useMemo(() => {
+    const specs = [...all.filter((r) => r.last.category === 'RAM').map((r) => r.last.model), ...mine.filter((p) => p.category === 'RAM').map((p) => p.model)]
+      .map(parseRam)
+      .filter((x): x is NonNullable<typeof x> => !!x);
+    const uniq = (v: (number | string | undefined)[]) => [...new Set(v.filter((x) => x !== undefined).map(String))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    return { type: uniq(specs.map((x) => x.type)), size: uniq(specs.map((x) => x.total)), speed: uniq(specs.map((x) => x.speed)) };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [all, mine.length]);
 
   const rows = useMemo(() => {
-    const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-    const list = all.filter((r) => {
-      if (cat !== 'All' && r.last.category !== cat) return false;
-      const hay = `${r.last.model} ${REGION_LABEL[r.last.region]} ${r.last.category}s`.toLowerCase();
-      return words.every((w) => hay.includes(w));
-    });
+    const list = all.filter((r) => (cat === 'All' || r.last.category === cat) && matches(r.last.model, r.last.category, r.last.region));
     const byName = (a: Row, b: Row) =>
       CAT_ORDER.indexOf(a.last.category) - CAT_ORDER.indexOf(b.last.category) ||
       a.last.model.localeCompare(b.last.model) ||
@@ -112,7 +163,9 @@ export function Prices({ data }: { data: AppData }) {
       msrp: (a, b) => missingLast(a.vsMsrp, b.vsMsrp) || (a.vsMsrp ?? 0) - (b.vsMsrp ?? 0) || byName(a, b),
     };
     return list.sort(cmp[sort] ?? byName);
-  }, [all, cat, q, sort]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [all, cat, q, sort, onlyMine, ramType, ramSize, ramSpeed, mine.length]);
+  const waitingShown = waiting.filter((p) => (cat === 'All' || p.category === cat) && matches(p.model, p.category));
 
   const rising = rows.filter((r) => (r.ch ?? 0) > 0.5).length;
   const falling = rows.filter((r) => (r.ch ?? 0) < -0.5).length;
@@ -133,14 +186,20 @@ export function Prices({ data }: { data: AppData }) {
       </div>
       <div className="toolbar">
         <div className="tabs">
-          {(['All', ...CAT_ORDER.filter((c) => counts[c])] as (Category | 'All')[]).map((c) => (
+          {(['All', 'GPU', 'CPU', 'RAM', ...(all.some((r) => r.last.category === 'Other') ? ['Other'] : [])] as (Category | 'All')[]).map((c) => (
             <button key={c} className={c === cat ? 'tab active' : 'tab'} onClick={() => setCat(c)}>
               {catLabel(c)}
-              <span className="count">{c === 'All' ? all.length : counts[c]}</span>
+              <span className="count">{c === 'All' ? Object.values(counts).reduce((a, b) => a + b, 0) : counts[c] ?? 0}</span>
             </button>
           ))}
         </div>
-        <input className="search" placeholder="Search products (e.g. 5090, 9800X3D, DDR5)…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className="search" placeholder="Search products (e.g. 5090, 9800X3D, DDR5 6000)…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <button className={onlyMine ? 'chip on' : 'chip'} onClick={() => setOnlyMine((x) => !x)} title="Show only the products you added">
+          ★ My products {mine.length > 0 && <span className="muted small">{mine.length}</span>}
+        </button>
+        <button className="btn small" onClick={() => setAdding((x) => !x)}>
+          {adding ? 'Close' : '+ Add products'}
+        </button>
         <div className="tabs">
           <span className="tab-label muted small">Sort</span>
           <select className="select" value={sort} onChange={(e) => setSort(e.target.value as PSort)}>
@@ -164,6 +223,34 @@ export function Prices({ data }: { data: AppData }) {
         </div>
       </div>
 
+      {adding && <AddProducts mine={mine} setMine={setMine} weekly={weekly ?? []} close={() => setAdding(false)} />}
+      {cat === 'RAM' && (
+        <div className="toolbar ram-filters">
+          <span className="muted small">Memory:</span>
+          <select className="select" value={ramType} onChange={(e) => setRamType(e.target.value)}>
+            <option value="">Any type</option>
+            {ramOptions.type.map((v) => (
+              <option key={v}>{v}</option>
+            ))}
+          </select>
+          <select className="select" value={ramSpeed} onChange={(e) => setRamSpeed(e.target.value)}>
+            <option value="">Any speed</option>
+            {ramOptions.speed.map((v) => (
+              <option key={v} value={v}>
+                {v} MT/s
+              </option>
+            ))}
+          </select>
+          <select className="select" value={ramSize} onChange={(e) => setRamSize(e.target.value)}>
+            <option value="">Any capacity</option>
+            {ramOptions.size.map((v) => (
+              <option key={v} value={v}>
+                {v} GB
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="country-bar">
         <span className="muted small">Countries:</span>
         {regions.map((r) => (
@@ -251,7 +338,7 @@ export function Prices({ data }: { data: AppData }) {
             return (
               <tr key={`${last.model}|${last.region}`}>
                 <td>
-                  <CatBadge c={last.category} /> {last.model}
+                  <ProductName p={last} mine={mineKeys.has(pkey(last.model))} />
                 </td>
                 {regions.length > 1 && <td>{REGION_LABEL[last.region]}</td>}
                 <td className="num">
@@ -287,10 +374,23 @@ export function Prices({ data }: { data: AppData }) {
               </tr>
             );
           })}
+          {waitingShown.map((p) => (
+            <tr key={`wait-${p.model}`} className="waiting">
+              <td>
+                <ProductName p={p} mine remove={() => setMine(mine.filter((x) => pkey(x.model) !== pkey(p.model)))} />
+              </td>
+              {regions.length > 1 && <td className="muted">–</td>}
+              <td colSpan={10} className="muted small">
+                {weekly?.some((w) => pkey(w.model) === pkey(p.model))
+                  ? 'On the weekly price list: the first price arrives with the next weekly recap (Monday 8:00).'
+                  : 'Not on the weekly price list yet. Use "+ Add products", then "Request prices", to add it.'}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
       </div>
-      {!rows.length && <p className="muted">{q.trim() ? `Nothing matches "${q.trim()}"${cat !== 'All' ? ` in ${catLabel(cat)}` : ''}.` : 'No prices for this filter yet.'}</p>}
+      {!rows.length && !waitingShown.length && <p className="muted">{q.trim() ? `Nothing matches "${q.trim()}"${cat !== 'All' ? ` in ${catLabel(cat)}` : ''}.` : 'No prices for this filter yet.'}</p>}
       <p className="muted small">
         "Change" compares the two most recent data points; "Since first" compares with the first price we recorded. "Last change" is the date the price last moved. Green on "vs MSRP" means below launch price. European, Japanese and most other prices include VAT; US and Canada prices don't include sales tax.
       </p>
