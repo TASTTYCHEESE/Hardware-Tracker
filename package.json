@@ -1,0 +1,77 @@
+{
+  "name": "hardware-tracker",
+  "productName": "Hardware Tracker",
+  "version": "0.7.0",
+  "description": "PC gaming hardware news, price trends and daily/weekly recaps (GPU, CPU, RAM).",
+  "author": "Hardware Tracker",
+  "private": true,
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "start": "npm run build && electron .",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:linux": "npm run build && electron-builder --linux dir",
+    "dist:win-zip": "npm run build && electron-builder --win zip --x64 --publish never"
+  },
+  "dependencies": {
+    "@mozilla/readability": "0.6.0",
+    "dompurify": "3.2.6",
+    "electron-updater": "6.6.2",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@vitejs/plugin-react": "5.1.0",
+    "electron": "39.2.0",
+    "electron-builder": "26.0.12",
+    "typescript": "5.9.3",
+    "vite": "7.2.2"
+  },
+  "build": {
+    "appId": "app.hardwaretracker.desktop",
+    "productName": "Hardware Tracker",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**",
+      "electron/**",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "linux": {
+      "target": [
+        "dir"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "HardwareTracker-Setup-${version}.${ext}",
+      "shortcutName": "Hardware Tracker"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "TASTTYCHEESE",
+        "repo": "Hardware-Tracker",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TASTTYCHEESE/Hardware-Tracker.git"
+  }
+}

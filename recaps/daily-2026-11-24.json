@@ -1,0 +1,143 @@
+{
+ "id": "daily-2026-11-24",
+ "type": "daily",
+ "date": "2026-11-24",
+ "title": "Jensen Huang is back as Nvidia CEO; memory stocks jump",
+ "summary": "The big story: Nvidia's board reinstated Jensen Huang as CEO on Monday, 11 days after he resigned, and Nvidia stock closed up 31%. Memory makers rallied with it (Micron +19%). There was no major GPU, CPU or RAM launch news in the last day, and no new notable price drops in the big markets ahead of Black Friday (Nov 27).",
+ "takeaways": [
+  "Huang's return means Nvidia's roadmap (Rubin, RTX 60 timing) stays in the same hands. Nothing about gaming GPUs changed yet.",
+  "Black Friday is Friday. Last check (Nov 23) still had RTX 5080 at $2,260 and RTX 5070 Ti at $1,459 in the US, far above MSRP, so treat 'deals' with care."
+ ],
+ "sections": [
+  {
+   "category": "Industry",
+   "items": [
+    {
+     "headline": "Nvidia reinstates Jensen Huang as CEO",
+     "detail": "Huang resigned on Nov 12 amid reports of extramarital affairs, including one with an alleged Chinese spy; CFO Colette Kress was interim CEO. On Monday Nov 23 the board voted unanimously to bring him back as president and CEO, saying input from senior US government levels convinced it there is no national security risk. An independent board committee is still investigating, and SEC and DOJ probes are ongoing. President Trump said he was 'represented in the board meeting'; some lawmakers including Sen. Warren criticised the move.",
+     "status": "confirmed",
+     "sources": [
+      {
+       "title": "Al Jazeera: Nvidia board reinstates Jensen Huang as CEO (Nov 23)",
+       "url": "https://www.aljazeera.com/economy/2026/11/23/nvidia-board-reinstates-jensen-huang-as-ceo"
+      },
+      {
+       "title": "StockTitan: Stock market today, Nov 23 2026",
+       "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-23-2026"
+      },
+      {
+       "title": "Bloomberg: Nvidia rehires Huang after Trump push (Nov 23)",
+       "url": "https://www.bloomberg.com/news/articles/2026-11-23/nvidia-reinstates-jensen-huang-as-ceo-with-government-input"
+      }
+     ]
+    },
+    {
+     "headline": "Nvidia stock +31%, chip stocks rally",
+     "detail": "Nvidia closed up 31.5% after falling 14% on Friday. Micron rose 19%, AMD 6.9%, Broadcom 3%. The S&P 500 gained 4.7%, one of its biggest one-day jumps since 1957.",
+     "status": "confirmed",
+     "sources": [
+      {
+       "title": "StockTitan: Stock market today, Nov 23 2026",
+       "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-23-2026"
+      }
+     ]
+    },
+    {
+     "headline": "Market share: Intel won back desktop share in Q3, AMD wins on revenue",
+     "detail": "Mercury Research figures (reported Nov 19) put Intel at 70.1% of desktop CPU units in Q3, up about 5 points, while AMD set records in laptops and servers. AMD separately guided about $17B revenue for Q4, which would top Intel's $15-16B guidance, but expects its PC/gaming revenue to fall over 20% this quarter because of memory prices.",
+     "status": "confirmed",
+     "sources": [
+      {
+       "title": "TechRadar: Intel regains x86 share lead in Q3 (Nov 19)",
+       "url": "https://www.techradar.com/pro/intel-claims-cpu-top-spot-for-the-first-time-for-over-a-year-now-can-it-stay-there-as-amd-fights-back"
+      },
+      {
+       "title": "Tom's Hardware: AMD expects to outsell Intel in Q4 (Nov 4)",
+       "url": "https://www.tomshardware.com/pc-components/cpus/amd-expects-to-outsell-intel-in-q4-for-the-first-time-in-history-usd17b-guidance-would-exceed-intels-projections"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "category": "CPU",
+   "items": [
+    {
+     "headline": "Intel Nova Lake laptop chips: specs leak",
+     "detail": "A recent leak of Nova Lake-H laptop CPUs shows up to 4.8 GHz boost and DDR5-8000 support. Desktop Nova Lake (Core Ultra 400, LGA 1954) is still expected around CES 2027.",
+     "status": "rumor",
+     "sources": [
+      {
+       "title": "Club386: Intel Nova Lake laptop specs leak",
+       "url": "https://www.club386.com/intel-nova-lake-h-specs-leak/"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "category": "GPU",
+   "items": [
+    {
+     "headline": "No new GPU launches; Black Friday prices still high",
+     "detail": "No new gaming GPU news in the last 24 hours. US lowest prices on Nov 23: RTX 5080 $2,260, RTX 5070 Ti $1,459, RTX 5070 $900, RX 9070 XT $980. UK: RTX 5080 £1,640, RX 9070 XT £830.",
+     "status": "confirmed",
+     "sources": [
+      {
+       "title": "PC Gamer Black Friday GPU deals (updated Nov 23)",
+       "url": "https://www.pcgamer.com/uk/heres-the-very-first-geforce-rtx-2080-deal-weve-seen"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "category": "RAM",
+   "items": [
+    {
+     "headline": "Memory makers lift on Nvidia news; no price relief",
+     "detail": "Micron jumped 19% on Monday. Retail DDR5 is unchanged from last week (cheapest 32GB DDR5-6000 about $429 in the US as of Nov 16). No new price data in the last day.",
+     "status": "confirmed",
+     "sources": [
+      {
+       "title": "StockTitan: Stock market today, Nov 23 2026",
+       "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-23-2026"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "alerts": [],
+ "prices": [],
+ "sources": [
+  {
+   "title": "Al Jazeera: Nvidia board reinstates Jensen Huang as CEO (Nov 23)",
+   "url": "https://www.aljazeera.com/economy/2026/11/23/nvidia-board-reinstates-jensen-huang-as-ceo"
+  },
+  {
+   "title": "StockTitan: Stock market today, Nov 23 2026",
+   "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-23-2026"
+  },
+  {
+   "title": "Bloomberg: Nvidia rehires Huang after Trump push (Nov 23)",
+   "url": "https://www.bloomberg.com/news/articles/2026-11-23/nvidia-reinstates-jensen-huang-as-ceo-with-government-input"
+  },
+  {
+   "title": "TechRadar: Intel regains x86 share lead in Q3 (Nov 19)",
+   "url": "https://www.techradar.com/pro/intel-claims-cpu-top-spot-for-the-first-time-for-over-a-year-now-can-it-stay-there-as-amd-fights-back"
+  },
+  {
+   "title": "Tom's Hardware: AMD expects to outsell Intel in Q4 (Nov 4)",
+   "url": "https://www.tomshardware.com/pc-components/cpus/amd-expects-to-outsell-intel-in-q4-for-the-first-time-in-history-usd17b-guidance-would-exceed-intels-projections"
+  },
+  {
+   "title": "Club386: Intel Nova Lake laptop specs leak",
+   "url": "https://www.club386.com/intel-nova-lake-h-specs-leak/"
+  },
+  {
+   "title": "PC Gamer Black Friday GPU deals (updated Nov 23)",
+   "url": "https://www.pcgamer.com/uk/heres-the-very-first-geforce-rtx-2080-deal-weve-seen"
+  }
+ ]
+}
