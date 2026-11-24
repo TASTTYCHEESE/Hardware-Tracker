@@ -1,6 +1,6 @@
 {
- "version": "2026-11-24T1400",
- "updated": "2026-11-24T14:00Z",
+ "version": "2026-11-24T1452",
+ "updated": "2026-11-24T14:52Z",
  "categories": [
   {
    "id": "cpu",
@@ -13,12 +13,12 @@
     1971,
     2025
    ],
-   "bytes": 682982,
+   "bytes": 704579,
    "file": "cpu.json"
   },
   {
    "id": "gpu",
-   "name": "Graphics cards & GPUs",
+   "name": "Graphics cards (GPUs)",
    "group": "hardware",
    "description": "Every graphics chip since 1986 with full specifications, plus retail cards from MSI, Asus, Gigabyte, Sapphire and the other board partners.",
    "count": 9460,
@@ -27,7 +27,7 @@
     1986,
     2025
    ],
-   "bytes": 5120210,
+   "bytes": 5246727,
    "file": "gpu.json"
   },
   {
@@ -38,7 +38,7 @@
    "count": 4973,
    "makers": 17,
    "years": null,
-   "bytes": 1050800,
+   "bytes": 1129357,
    "file": "motherboard.json"
   },
   {
@@ -49,7 +49,7 @@
    "count": 13553,
    "makers": 54,
    "years": null,
-   "bytes": 2994192,
+   "bytes": 3213583,
    "file": "memory.json"
   },
   {
@@ -60,7 +60,7 @@
    "count": 4677,
    "makers": 93,
    "years": null,
-   "bytes": 753370,
+   "bytes": 827411,
    "file": "ssd.json"
   },
   {
@@ -71,7 +71,7 @@
    "count": 1784,
    "makers": 14,
    "years": null,
-   "bytes": 312179,
+   "bytes": 340599,
    "file": "hdd.json"
   },
   {
@@ -82,7 +82,7 @@
    "count": 3438,
    "makers": 106,
    "years": null,
-   "bytes": 541918,
+   "bytes": 595915,
    "file": "power-supply.json"
   },
   {
@@ -93,7 +93,7 @@
    "count": 2851,
    "makers": 107,
    "years": null,
-   "bytes": 399895,
+   "bytes": 444500,
    "file": "cpu-cooler.json"
   },
   {
@@ -104,7 +104,7 @@
    "count": 6626,
    "makers": 160,
    "years": null,
-   "bytes": 1181227,
+   "bytes": 1286232,
    "file": "case.json"
   },
   {
@@ -115,7 +115,7 @@
    "count": 2744,
    "makers": 99,
    "years": null,
-   "bytes": 478814,
+   "bytes": 521707,
    "file": "case-fan.json"
   },
   {
@@ -126,7 +126,7 @@
    "count": 54,
    "makers": 16,
    "years": null,
-   "bytes": 7956,
+   "bytes": 8799,
    "file": "fan-controller.json"
   },
   {
@@ -137,7 +137,7 @@
    "count": 210,
    "makers": 44,
    "years": null,
-   "bytes": 20247,
+   "bytes": 23385,
    "file": "thermal-paste.json"
   },
   {
@@ -148,7 +148,7 @@
    "count": 77,
    "makers": 15,
    "years": null,
-   "bytes": 14200,
+   "bytes": 15365,
    "file": "sound-card.json"
   },
   {
@@ -159,7 +159,7 @@
    "count": 157,
    "makers": 27,
    "years": null,
-   "bytes": 16682,
+   "bytes": 19025,
    "file": "network-card.json"
   },
   {
@@ -170,7 +170,7 @@
    "count": 376,
    "makers": 43,
    "years": null,
-   "bytes": 47229,
+   "bytes": 52857,
    "file": "wifi-card.json"
   },
   {
@@ -181,7 +181,7 @@
    "count": 231,
    "makers": 21,
    "years": null,
-   "bytes": 31589,
+   "bytes": 35042,
    "file": "optical-drive.json"
   },
   {
@@ -192,7 +192,7 @@
    "count": 8,
    "makers": 4,
    "years": null,
-   "bytes": 1240,
+   "bytes": 1440,
    "file": "case-accessory.json"
   },
   {
@@ -203,7 +203,7 @@
    "count": 702,
    "makers": 13,
    "years": null,
-   "bytes": 76650,
+   "bytes": 87168,
    "file": "ups.json"
   },
   {
@@ -214,7 +214,7 @@
    "count": 62,
    "makers": 1,
    "years": null,
-   "bytes": 9769,
+   "bytes": 10724,
    "file": "os.json"
   },
   {
@@ -225,7 +225,7 @@
    "count": 5074,
    "makers": 72,
    "years": null,
-   "bytes": 1101239,
+   "bytes": 1181412,
    "file": "monitor.json"
   },
   {
@@ -236,7 +236,7 @@
    "count": 4310,
    "makers": 194,
    "years": null,
-   "bytes": 848617,
+   "bytes": 916566,
    "file": "keyboard.json"
   },
   {
@@ -247,7 +247,7 @@
    "count": 2806,
    "makers": 159,
    "years": null,
-   "bytes": 535654,
+   "bytes": 579539,
    "file": "mouse.json"
   },
   {
@@ -258,7 +258,7 @@
    "count": 2946,
    "makers": 154,
    "years": null,
-   "bytes": 617649,
+   "bytes": 663774,
    "file": "headphones.json"
   },
   {
@@ -269,7 +269,7 @@
    "count": 302,
    "makers": 45,
    "years": null,
-   "bytes": 45918,
+   "bytes": 50436,
    "file": "speakers.json"
   },
   {
@@ -280,7 +280,7 @@
    "count": 78,
    "makers": 17,
    "years": null,
-   "bytes": 15067,
+   "bytes": 16246,
    "file": "webcam.json"
   },
   {
@@ -291,8 +291,19 @@
    "count": 690,
    "makers": 34,
    "years": null,
-   "bytes": 112989,
+   "bytes": 123327,
    "file": "external-storage.json"
+  },
+  {
+   "id": "vr-headset",
+   "name": "VR headsets",
+   "group": "peripherals",
+   "description": "PC VR headsets, with how many Steam VR users have each one.",
+   "count": 42,
+   "makers": 18,
+   "years": null,
+   "bytes": 5615,
+   "file": "vr-headset.json"
   },
   {
    "id": "chipset",
@@ -302,7 +313,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 349,
+   "bytes": 360,
    "file": "chipset.json"
   },
   {
@@ -313,7 +324,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 348,
+   "bytes": 359,
    "file": "capture-card.json"
   },
   {
@@ -324,7 +335,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 361,
+   "bytes": 372,
    "file": "cooling-custom.json"
   },
   {
@@ -335,7 +346,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 353,
+   "bytes": 364,
    "file": "microphone.json"
   },
   {
@@ -346,7 +357,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 360,
+   "bytes": 371,
    "file": "controller.json"
   },
   {
@@ -357,19 +368,8 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 335,
+   "bytes": 346,
    "file": "mousepad.json"
-  },
-  {
-   "id": "vr-headset",
-   "name": "VR headsets",
-   "group": "peripherals",
-   "description": "PC virtual reality headsets.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 333,
-   "file": "vr-headset.json"
   },
   {
    "id": "printer",
@@ -379,7 +379,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 354,
+   "bytes": 365,
    "file": "printer.json"
   },
   {
@@ -390,7 +390,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 351,
+   "bytes": 362,
    "file": "router.json"
   },
   {
@@ -401,7 +401,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 342,
+   "bytes": 353,
    "file": "drawing-tablet.json"
   },
   {
@@ -412,7 +412,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 349,
+   "bytes": 360,
    "file": "streaming.json"
   }
  ]
