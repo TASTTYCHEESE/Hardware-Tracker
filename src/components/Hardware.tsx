@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../lib/platform';
 import {
   fmtBytes,
@@ -53,7 +53,7 @@ export function Hardware({ group, jump, onJumped }: { group: Group; jump?: { cat
     );
   if (!index) return <div className="page muted">Loading the hardware catalog…</div>;
 
-  const cats = index.categories.filter((c) => c.group === group);
+  const cats = index.categories.filter((c) => c.group === group).sort((a, b) => a.name.localeCompare(b.name));
   const info = catId ? index.categories.find((c) => c.id === catId) : undefined;
   if (catId && info)
     return (
@@ -164,7 +164,8 @@ function CategoryView({
       }
       if (m.size < 2) continue;
       const numeric = [...m.keys()].every((k) => /^[\d.]+$/.test(k));
-      out[key] = [...m.entries()].sort((a, b) => (key === 'maker' ? b[1] - a[1] || a[0].localeCompare(b[0]) : numeric ? Number(a[0]) - Number(b[0]) : a[0].localeCompare(b[0])));
+      // Alphabetical (numbers in numeric order).
+      out[key] = [...m.entries()].sort((a, b) => (numeric ? Number(a[0]) - Number(b[0]) : a[0].localeCompare(b[0], undefined, { numeric: true, sensitivity: 'base' })));
     }
     return out;
   }, [cat]);
@@ -195,7 +196,29 @@ function CategoryView({
   useEffect(() => setLimit(PAGE), [query, maker, from, to, extra, sort]);
 
   const selected = sel ? cat?.items.find((i) => i.id === sel) : undefined;
+  // The search bar and filters stay at the top while scrolling; the product panel sits just below them.
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const [stickyH, setStickyH] = useState(0);
+  useLayoutEffect(() => {
+    const el = stickyRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setStickyH(el.offsetHeight));
+    ro.observe(el);
+    setStickyH(el.offsetHeight);
+    return () => ro.disconnect();
+  }, [cat]);
   const cols = (cat?.fields ?? []).filter((f) => f.k !== 'date' && f.k !== 'color').slice(0, selected ? 2 : 4);
+  const extraSelect = (k: string, vals: [string, number][]) =>
+    cat && (
+      <select key={k} className="select" value={extra[k] ?? ''} onChange={(e) => setExtra((x) => ({ ...x, [k]: e.target.value }))}>
+        <option value="">{k === 'kind' ? 'All types' : `Any ${labelFor(cat, k).toLowerCase()}`}</option>
+        {vals.slice(0, 1500).map(([v, n]) => (
+          <option key={v} value={v}>
+            {formatValue(isNaN(Number(v)) ? v : Number(v), cat.fields.find((f) => f.k === k)?.unit)} ({n})
+          </option>
+        ))}
+      </select>
+    );
   const filtersOn = !!(q || maker || from || to || Object.values(extra).some(Boolean));
 
   return (
@@ -225,9 +248,11 @@ function CategoryView({
       )}
 
       {cat && cat.items.length > 0 && (
-        <>
+        <div style={{ ['--hw-sticky' as string]: `${stickyH}px` }}>
+          <div className="hw-sticky" ref={stickyRef}>
           <div className="hw-filters">
             <input className="search" placeholder={`Search ${info.count.toLocaleString()} ${info.name.toLowerCase()}…`} value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
+            {options.kind && extraSelect('kind', options.kind)}
             {options.maker && (
               <select className="select" value={maker} onChange={(e) => setMaker(e.target.value)}>
                 <option value="">All manufacturers</option>
@@ -259,17 +284,8 @@ function CategoryView({
               </span>
             )}
             {Object.entries(options)
-              .filter(([k]) => k !== 'maker')
-              .map(([k, vals]) => (
-                <select key={k} className="select" value={extra[k] ?? ''} onChange={(e) => setExtra((x) => ({ ...x, [k]: e.target.value }))}>
-                  <option value="">{`Any ${labelFor(cat, k).toLowerCase()}`}</option>
-                  {vals.slice(0, 300).map(([v, n]) => (
-                    <option key={v} value={v}>
-                      {formatValue(isNaN(Number(v)) ? v : Number(v), cat.fields.find((f) => f.k === k)?.unit)} ({n})
-                    </option>
-                  ))}
-                </select>
-              ))}
+              .filter(([k]) => k !== 'maker' && k !== 'kind')
+              .map(([k, vals]) => extraSelect(k, vals))}
             <select className="select" value={sort} onChange={(e) => setSort(e.target.value as Sort)} title="Sort">
               {years.length > 0 && <option value="new">Newest first</option>}
               {years.length > 0 && <option value="old">Oldest first</option>}
@@ -296,6 +312,7 @@ function CategoryView({
             {cat.stale ? ' · offline copy, will update when you are back online' : ''}
             {cat.note ? ` · ${cat.note}` : ''}
           </div>
+          </div>
 
           <div className={selected ? 'hw-split open' : 'hw-split'}>
             <div className="hw-list">
@@ -314,7 +331,10 @@ function CategoryView({
                     <tr key={it.id} className={it.id === sel ? 'hw-row on' : 'hw-row'} onClick={() => setSel(it.id === sel ? null : it.id)}>
                       <td className="hw-name">
                         <div>{it.name}</div>
-                        <div className="muted small">{it.maker}</div>
+                        <div className="muted small">
+                          {it.maker}
+                          {typeof it.chipset === 'string' && !it.name.toLowerCase().includes(it.chipset.toLowerCase()) ? ` · ${it.chipset}` : ''}
+                        </div>
                       </td>
                       {years.length > 0 && <td className="muted">{it.year ?? '–'}</td>}
                       {cols.map((c) => (
@@ -333,16 +353,37 @@ function CategoryView({
               )}
               {!filtered.length && <p className="muted">Nothing matches these filters.</p>}
             </div>
-            {selected && <Detail cat={cat} item={selected} close={() => setSel(null)} openOther={openOther} />}
+            {selected && <Detail cat={cat} item={selected} close={() => setSel(null)} select={setSel} openOther={openOther} />}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
 }
 
-function Detail({ cat, item, close, openOther }: { cat: CatalogCategory; item: CatalogItem; close: () => void; openOther: (cat: string, item?: string) => void }) {
+function Detail({
+  cat,
+  item,
+  close,
+  select,
+  openOther,
+}: {
+  cat: CatalogCategory;
+  item: CatalogItem;
+  close: () => void;
+  select: (id: string) => void;
+  openOther: (cat: string, item?: string) => void;
+}) {
   const rows = specRows(cat, item);
+  // Retail cards show the full specs of their GPU chip (same category).
+  const chip = typeof item.chip_id === 'string' ? cat.items.find((i) => i.id === item.chip_id) : undefined;
+  const chipRows = chip ? specRows(cat, chip).filter((r) => !rows.some((x) => x.label === r.label) && r.label !== 'Type') : [];
+  const fromPcpp = cat.sources.some((s) => s.name.startsWith('PCPartPicker'));
+  const online = item.link
+    ? { href: item.link, label: item.link.includes('techpowerup') ? 'Full specs on TechPowerUp' : item.link.includes('wikidata') ? 'More on Wikidata' : 'Source page' }
+    : fromPcpp
+      ? { href: `https://pcpartpicker.com/search/?q=${encodeURIComponent(item.name)}`, label: 'Look it up on PCPartPicker' }
+      : null;
   const wd = item.wd ? Object.entries(item.wd) : [];
   const released = item.date
     ? new Date(`${item.date.length === 7 ? `${item.date}-01` : item.date}T12:00:00`).toLocaleDateString(undefined, {
@@ -359,6 +400,7 @@ function Detail({ cat, item, close, openOther }: { cat: CatalogCategory; item: C
         <div>
           <div className="muted small">{item.maker}</div>
           <h2>{item.name}</h2>
+          {typeof item.chipset === 'string' && <div className="small">{item.chipset}</div>}
           {released && (
             <div className="muted small">
               Released {released}
@@ -370,11 +412,7 @@ function Detail({ cat, item, close, openOther }: { cat: CatalogCategory; item: C
           ✕
         </button>
       </div>
-      {typeof item.chip_id === 'string' && (
-        <button className="btn small" onClick={() => openOther('gpu', item.chip_id as string)}>
-          Full {String(item.chipset ?? 'GPU')} chip specs →
-        </button>
-      )}
+
       <table className="hw-specs">
         <tbody>
           {rows.map((r) => (
@@ -385,6 +423,26 @@ function Detail({ cat, item, close, openOther }: { cat: CatalogCategory; item: C
           ))}
         </tbody>
       </table>
+      {chip && (
+        <>
+          <h3 className="hw-sub">
+            {chip.name} chip specs{' '}
+            <button className="link small" onClick={() => select(chip.id)}>
+              open chip →
+            </button>
+          </h3>
+          <table className="hw-specs">
+            <tbody>
+              {chipRows.map((r) => (
+                <tr key={r.label}>
+                  <th>{r.label}</th>
+                  <td>{r.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
       {wd.length > 0 && (
         <>
           <h3 className="hw-sub">More details (Wikidata)</h3>
@@ -401,9 +459,9 @@ function Detail({ cat, item, close, openOther }: { cat: CatalogCategory; item: C
         </>
       )}
       {!rows.length && !wd.length && <p className="muted small">No specifications recorded yet.</p>}
-      {item.link && (
+      {online && (
         <p className="small">
-          <a href={item.link}>Source page</a>
+          <a href={online.href}>{online.label} →</a>
         </p>
       )}
     </aside>

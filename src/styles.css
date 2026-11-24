@@ -330,8 +330,12 @@ textarea {
 .hw-row.on td { background: rgba(90, 169, 255, .12); }
 .nowrap { white-space: nowrap; }
 .hw-more { margin: 12px 0; width: 100%; }
-.hw-detail { position: sticky; top: 0; max-height: calc(100vh - 140px); overflow: auto; display: flex; flex-direction: column; gap: 12px; }
+.hw-sticky { position: sticky; top: 0; z-index: 5; background: var(--bg); margin: 0 -12px; padding: 8px 12px 2px; border-bottom: 1px solid transparent; }
+.hw-sticky .hw-filters { margin-top: 6px; }
+.hw-detail { position: sticky; top: calc(var(--hw-sticky, 0px) + 12px); max-height: calc(100vh - var(--hw-sticky, 0px) - 110px); overflow: auto; display: flex; flex-direction: column; gap: 12px; padding-top: 0; }
+.hw-detail-head { position: sticky; top: 0; z-index: 2; background: var(--panel); padding-top: 18px; padding-bottom: 6px; }
 .hw-detail-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.hw-sub .link { font-weight: 400; margin-left: 6px; }
 .hw-detail h2 { font-size: 20px; line-height: 1.25; margin: 2px 0; }
 .hw-specs { width: 100%; border-collapse: collapse; font-size: 14px; }
 .hw-specs th { text-align: left; font-weight: 500; color: var(--muted); padding: 5px 12px 5px 0; width: 44%; vertical-align: top; }

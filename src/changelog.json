@@ -1,5 +1,19 @@
 [
   {
+    "version": "0.8.2",
+    "date": "2026-11-24",
+    "title": "PC Hardware improvements",
+    "notes": [
+      "Updates now has its own place in the left menu, under Settings.",
+      "Graphics chips and retail graphics cards are one section, with a Type filter.",
+      "Retail graphics cards show the full specs of their GPU chip.",
+      "Categories and every filter list are in alphabetical order.",
+      "The search bar, filters and the product panel (with its close button) stay visible while you scroll.",
+      "More specs: CPU socket, process, memory and PCIe support; motherboard chipset, memory type and Wi-Fi; monitor pixel density and resolution class; SSD protocol.",
+      "Every product has a link to its full spec page online."
+    ]
+  },
+  {
     "version": "0.8.1",
     "date": "2026-11-24",
     "title": "Updates page",

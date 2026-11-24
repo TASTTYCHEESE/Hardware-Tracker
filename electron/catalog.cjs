@@ -2,7 +2,7 @@
 // and keeps a copy in <data folder>/catalog so it also works offline. The repo
 // rebuilds the catalog twice a week; refresh() pulls new versions of every
 // category the user has opened, so the app updates itself.
-const { net } = require('electron');
+const { app, net } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs');
 
@@ -40,13 +40,15 @@ function create({ readSettings, patchSettings, dataDir }) {
   async function index(force = false) {
     const cached = readJson('index.json');
     const last = readSettings().catalogChecked || 0;
-    if (cached && !force && Date.now() - last < CHECK_EVERY) return { ...cached, offline: false };
+    // A new app version may expect a newer catalog layout: always re-check after an update.
+    const sameApp = readSettings().catalogAppVersion === app.getVersion();
+    if (cached && !force && sameApp && Date.now() - last < CHECK_EVERY) return { ...cached, offline: false };
     try {
       const text = await fetchText(`${base()}index.json`);
       const idx = JSON.parse(text);
       if (!Array.isArray(idx.categories)) throw new Error('Bad catalog index');
       fs.writeFileSync(path.join(dir(), 'index.json'), text);
-      patchSettings({ catalogChecked: Date.now(), catalogError: '' });
+      patchSettings({ catalogChecked: Date.now(), catalogError: '', catalogAppVersion: app.getVersion() });
       return { ...idx, offline: false };
     } catch (e) {
       patchSettings({ catalogError: String(e.message || e) });

@@ -108,6 +108,9 @@ def category(cid, name, group, desc, fields, filters, items, sources, note=""):
 
 
 # ---- GPUs (chips) ----------------------------------------------------------
+GPU_DATA: dict = {}
+
+
 def build_gpus():
     if os.environ.get("DBGPU_JSON"):  # local testing: a JSON export of the dbgpu data
         specs = json.load(open(os.environ["DBGPU_JSON"], encoding="utf-8"))
@@ -154,10 +157,9 @@ def build_gpus():
         }
         items.append({k: v for k, v in it.items() if v not in (None, "", 0)})
     log(f"GPUs: {len(items)}")
-    category(
-        "gpu", "Graphics chips (GPUs)", "hardware",
-        "Every desktop, laptop, workstation and console graphics chip since 1986, with full specifications.",
-        [("generation", "Generation", None), ("architecture", "Architecture", None), ("gpu_chip", "GPU chip", None),
+    for i in items:
+        i["kind"] = "GPU chip"
+    GPU_DATA["fields"] = [("generation", "Generation", None), ("architecture", "Architecture", None), ("gpu_chip", "GPU chip", None),
          ("date", "Release date", None), ("foundry", "Foundry", None), ("process_nm", "Process", "nm"),
          ("transistors_m", "Transistors", "million"), ("die_mm2", "Die size", "mm²"), ("bus", "Bus interface", None),
          ("base_clock", "Base clock", "MHz"), ("boost_clock", "Boost clock", "MHz"), ("memory", "Memory", None),
@@ -169,9 +171,8 @@ def build_gpus():
          ("texture_rate", "Texture rate", "GTexel/s"), ("tdp", "TDP", "W"), ("psu", "Suggested PSU", "W"),
          ("power_connectors", "Power connectors", None), ("outputs", "Outputs", None), ("slots", "Slot width", None),
          ("length_mm", "Board length", "mm"), ("directx", "DirectX", None), ("opengl", "OpenGL", None), ("vulkan", "Vulkan", None),
-         ("opencl", "OpenCL", None), ("cuda", "CUDA", None), ("shader_model", "Shader model", None)],
-        ["maker", "year", "generation", "architecture", "memory_type"], items, [SRC_TPU],
-    )
+         ("opencl", "OpenCL", None), ("cuda", "CUDA", None), ("shader_model", "Shader model", None)]
+    GPU_DATA["items"] = items
     return {norm(i["name"]): i for i in items}
 
 
@@ -380,6 +381,61 @@ def clean_wd(items):
     return out
 
 
+# Typical platform specs per CPU architecture (desktop parts). Shown with a note that they're per family.
+ARCH_SPECS = {
+    "Zen 5": ("AM5", "TSMC N4 (cores), N6 (I/O)", "DDR5", "PCIe 5.0"),
+    "Zen 4": ("AM5", "TSMC N5 (cores), N6 (I/O)", "DDR5", "PCIe 5.0"),
+    "Zen 3": ("AM4", "TSMC N7", "DDR4", "PCIe 4.0 (3.0 on APUs)"),
+    "Zen 2": ("AM4", "TSMC N7", "DDR4", "PCIe 4.0 (3.0 on APUs)"),
+    "Zen+": ("AM4", "GlobalFoundries 12 nm", "DDR4", "PCIe 3.0"),
+    "Zen": ("AM4", "GlobalFoundries 14 nm", "DDR4", "PCIe 3.0"),
+    "Excavator": ("AM4 / FM2+", "28 nm", "DDR4 / DDR3", "PCIe 3.0"),
+    "Steamroller": ("FM2+", "GlobalFoundries 28 nm", "DDR3", "PCIe 3.0"),
+    "Piledriver": ("AM3+ / FM2", "GlobalFoundries 32 nm", "DDR3", "PCIe 2.0"),
+    "Bulldozer": ("AM3+", "GlobalFoundries 32 nm", "DDR3", "PCIe 2.0"),
+    "Lynx": ("FM1", "GlobalFoundries 32 nm", "DDR3", "PCIe 2.0"),
+    "K10": ("AM2+ / AM3", "65 / 45 nm", "DDR2 / DDR3", "PCIe 2.0"),
+    "Jaguar": ("AM1", "TSMC 28 nm", "DDR3", "PCIe 2.0"),
+    "Arrow Lake": ("LGA 1851", "TSMC N3B (compute tile)", "DDR5", "PCIe 5.0"),
+    "Raptor Lake Refresh": ("LGA 1700", "Intel 7", "DDR5 / DDR4", "PCIe 5.0"),
+    "Raptor Lake": ("LGA 1700", "Intel 7", "DDR5 / DDR4", "PCIe 5.0"),
+    "Alder Lake": ("LGA 1700", "Intel 7", "DDR5 / DDR4", "PCIe 5.0"),
+    "Rocket Lake": ("LGA 1200", "Intel 14 nm", "DDR4", "PCIe 4.0"),
+    "Comet Lake": ("LGA 1200", "Intel 14 nm", "DDR4", "PCIe 3.0"),
+    "Coffee Lake Refresh": ("LGA 1151 (300 series)", "Intel 14 nm", "DDR4", "PCIe 3.0"),
+    "Coffee Lake": ("LGA 1151 (300 series)", "Intel 14 nm", "DDR4", "PCIe 3.0"),
+    "Kaby Lake": ("LGA 1151", "Intel 14 nm", "DDR4 / DDR3L", "PCIe 3.0"),
+    "Skylake": ("LGA 1151 / LGA 2066", "Intel 14 nm", "DDR4 / DDR3L", "PCIe 3.0"),
+    "Cascade Lake": ("LGA 2066", "Intel 14 nm", "DDR4", "PCIe 3.0"),
+    "Broadwell": ("LGA 1150 / LGA 2011-3", "Intel 14 nm", "DDR3 / DDR4", "PCIe 3.0"),
+    "Haswell Refresh": ("LGA 1150", "Intel 22 nm", "DDR3", "PCIe 3.0"),
+    "Haswell": ("LGA 1150 / LGA 2011-3", "Intel 22 nm", "DDR3 / DDR4", "PCIe 3.0"),
+    "Ivy Bridge": ("LGA 1155 / LGA 2011", "Intel 22 nm", "DDR3", "PCIe 3.0"),
+    "Sandy Bridge": ("LGA 1155 / LGA 2011", "Intel 32 nm", "DDR3", "PCIe 2.0"),
+    "Westmere": ("LGA 1156 / LGA 1366", "Intel 32 nm", "DDR3", "PCIe 2.0"),
+    "Nehalem": ("LGA 1156 / LGA 1366", "Intel 45 nm", "DDR3", "PCIe 2.0"),
+    "Wolfdale": ("LGA 775", "Intel 45 nm", "DDR2 / DDR3", "PCIe 2.0"),
+    "Yorkfield": ("LGA 775", "Intel 45 nm", "DDR2 / DDR3", "PCIe 2.0"),
+    "Core": ("LGA 775", "Intel 65 nm", "DDR2 / DDR3", "PCIe 1.1"),
+}
+
+
+def cpu_extras(name, arch):
+    out = {}
+    sp = ARCH_SPECS.get(arch or "")
+    if sp:
+        out.update({"socket": sp[0], "process": sp[1], "memory_support": sp[2], "pcie": sp[3],
+                    "platform_note": "Socket, process, memory and PCIe are typical for this architecture"})
+    n = name.upper()
+    if "INTEL" in n:
+        out["unlocked"] = "Yes" if re.search(r"\d{3,5}K(F|S)?\b", n) or "EXTREME" in n or re.search(r"\d{4,5}X(E)?\b", n) else "No"
+    elif "RYZEN" in n:
+        out["unlocked"] = "Yes"
+    if "X3D" in n:
+        out["cache_note"] = "3D V-Cache (stacked L3)"
+    return out
+
+
 def build_cpus(wd_items):
     wd_items = clean_wd(wd_items)
     rows = pcpp("cpu")
@@ -390,9 +446,10 @@ def build_cpus(wd_items):
             "microarchitecture": r.get("microarchitecture"), "cores": r.get("core_count"),
             "base_clock": r.get("core_clock"), "boost_clock": r.get("boost_clock"), "tdp": r.get("tdp"),
             "graphics": r.get("graphics"), "year": ARCH_YEAR.get(r.get("microarchitecture") or ""),
+            **cpu_extras(r["name"], r.get("microarchitecture")),
         })
         if it.get("year"):
-            it["year_note"] = "approx. (from architecture)"
+            it["year_note"] = "approx., from the architecture"
         items.append(it)
         seen.add(norm(r["name"]))
     # Wikidata adds history (8086 onwards) and fills release dates for matching chips.
@@ -417,10 +474,45 @@ def build_cpus(wd_items):
         [("microarchitecture", "Microarchitecture", None), ("cores", "Cores", None), ("threads", "Threads", None),
          ("base_clock", "Base clock", "GHz"), ("boost_clock", "Boost clock", "GHz"), ("socket", "Socket", None),
          ("tdp", "TDP", "W"), ("process", "Process", None), ("graphics", "Integrated graphics", None),
-         ("date", "Release date", None)],
+         ("memory_support", "Memory support", None), ("pcie", "PCIe", None), ("unlocked", "Unlocked multiplier", None),
+         ("cache_note", "Cache", None), ("date", "Release date", None), ("platform_note", "Note", None)],
         ["maker", "year", "microarchitecture", "socket", "cores"], items, [SRC_PCPP, SRC_WD],
         note="Release years marked approx. come from the chip's architecture.",
     )
+
+
+CHIPSETS = ["X870E", "X870", "B850", "B840", "X670E", "X670", "B650E", "B650", "A620", "X570", "B550", "A520", "X470", "B450",
+            "X370", "B350", "A320", "X300", "A300", "TRX50", "WRX90", "TRX40", "WRX80", "X399", "990FX", "990X", "970", "A88X",
+            "A85X", "A78", "A75", "A68H", "A58", "A55", "AM1", "Z890", "B860", "H810", "W880", "Z790", "B760", "H770", "H610",
+            "Z690", "B660", "H670", "W680", "Z590", "B560", "H570", "H510", "W580", "Z490", "B460", "H470", "H410", "W480", "Z390",
+            "B365", "B360", "H370", "H310", "Z370", "Q370", "Z270", "B250", "H270", "Q270", "Z170", "B150", "H170", "H110", "Q170",
+            "X299", "X99", "X79", "C612", "C602", "Z97", "H97", "Z87", "H87", "B85", "H81", "Q87", "Z77", "Z75", "H77", "B75",
+            "Z68", "P67", "H67", "H61", "Q67", "X58", "P55", "H57", "H55", "P45", "P43", "G41", "G31", "X48", "X38", "P35"]
+CHIPSET_RE = re.compile(r"(?<![A-Z0-9])(" + "|".join(CHIPSETS) + r")(?![0-9])")
+SOCKET_MEM = {"AM5": "DDR5", "AM4": "DDR4", "LGA1851": "DDR5", "LGA1200": "DDR4", "LGA1151": "DDR4", "LGA2066": "DDR4",
+              "sTRX4": "DDR4", "sWRX8": "DDR4", "TR4": "DDR4", "sTR5": "DDR5", "LGA1150": "DDR3", "LGA1155": "DDR3",
+              "LGA1156": "DDR3", "LGA1366": "DDR3", "LGA2011": "DDR3", "LGA2011-3": "DDR4", "AM3+": "DDR3", "AM3": "DDR3",
+              "FM2+": "DDR3", "FM2": "DDR3", "FM1": "DDR3", "AM1": "DDR3", "LGA775": "DDR2 / DDR3", "AM2+": "DDR2"}
+
+
+def board_extras(name, socket):
+    out = {}
+    n = name.upper()
+    m = CHIPSET_RE.search(n)
+    if m:
+        out["chipset"] = m.group(1)
+    sock = socket.replace(" ", "")
+    if re.search(r"/D3\b|\bD3\b|DDR3", n):
+        out["memory_type"] = "DDR3"
+    elif re.search(r"/D4\b|\bD4\b|DDR4", n):
+        out["memory_type"] = "DDR4"
+    elif sock == "LGA1700":
+        out["memory_type"] = "DDR4" if re.search(r"DDR4|\bD4\b|-D4\b", n) else ("DDR5" if "DDR5" in n else "DDR4 or DDR5 (check model)")
+    elif sock in SOCKET_MEM:
+        out["memory_type"] = SOCKET_MEM[sock]
+    if re.search(r"WI-?FI|\bAX\b|\bAC\b|WIRELESS", n):
+        out["wifi"] = "Yes"
+    return out
 
 
 def build_pcpp_categories(gpu_by_norm):
@@ -445,25 +537,38 @@ def build_pcpp_categories(gpu_by_norm):
     for r in rows:
         chip = r.get("chipset") or ""
         g = find_chip(chip)
-        items.append(mk(r["name"], {
-            "chipset": chip, "memory": f"{num(r['memory'])} GB" if r.get("memory") else None,
+        card = mk(r["name"], {
+            "kind": "Retail card", "chipset": chip, "memory": f"{num(r['memory'])} GB" if r.get("memory") else None,
             "core_clock": r.get("core_clock"), "boost_clock": r.get("boost_clock"), "length_mm": r.get("length"),
             "color": r.get("color"), "year": g.get("year") if g else None, "date": g.get("date") if g else None,
             "chip_id": g["id"] if g else None,
-        }))
-    category("graphics-card", "Graphics cards", "hardware",
-             "Retail graphics cards from MSI, Asus, Gigabyte, Sapphire and every other board partner.",
-             [("chipset", "GPU", None), ("memory", "Memory", None), ("core_clock", "Core clock", "MHz"),
-              ("boost_clock", "Boost clock", "MHz"), ("length_mm", "Length", "mm"), ("color", "Color", None)],
-             ["maker", "year", "chipset"], items, [SRC_PCPP, SRC_TPU])
+        })
+        if g:  # columns and filters come from the GPU chip; the app shows the chip's full specs too
+            for k in ("generation", "architecture", "memory_type", "memory_bus", "shaders", "tdp", "bus", "outputs"):
+                if g.get(k) and k not in card:
+                    card[k] = g[k]
+        items.append(card)
+    chip_fields = [tuple(f) for f in GPU_DATA.get("fields", [])]
+    first = ["generation", "architecture", "memory"]
+    gpu_fields = [("kind", "Type", None)] + [f for k in first for f in chip_fields if f[0] == k] + [("chipset", "GPU", None)]
+    gpu_fields += [f for f in chip_fields if f[0] not in first]
+    gpu_fields += [("core_clock", "Core clock", "MHz"), ("color", "Color", None)]
+    category("gpu", "Graphics cards & GPUs", "hardware",
+             "Every graphics chip since 1986 with full specifications, plus retail cards from MSI, Asus, Gigabyte, Sapphire and the other board partners.",
+             gpu_fields, ["kind", "maker", "year", "generation", "architecture", "memory_type"],
+             GPU_DATA.get("items", []) + items, [SRC_TPU, SRC_PCPP])
 
     rows = pcpp("motherboard")
+    boards = []
+    for r in rows:
+        it = mk(r["name"], {k: r.get(k) for k in ("socket", "form_factor", "memory_slots", "max_memory", "color")})
+        it.update(board_extras(r["name"], r.get("socket") or ""))
+        boards.append(it)
     category("motherboard", "Motherboards", "hardware", "Motherboards for every socket and form factor.",
-             [("socket", "Socket", None), ("form_factor", "Form factor", None), ("memory_slots", "Memory slots", None),
-              ("max_memory", "Max memory", "GB"), ("color", "Color", None)],
-             ["maker", "socket", "form_factor"],
-             [mk(r["name"], {k: r.get(k) for k in ("socket", "form_factor", "memory_slots", "max_memory", "color")}) for r in rows],
-             [SRC_PCPP])
+             [("socket", "Socket", None), ("chipset", "Chipset", None), ("form_factor", "Form factor", None),
+              ("memory_type", "Memory type", None), ("memory_slots", "Memory slots", None),
+              ("max_memory", "Max memory", "GB"), ("wifi", "Wi-Fi", None), ("color", "Color", None)],
+             ["maker", "socket", "chipset", "form_factor", "memory_type"], boards, [SRC_PCPP])
 
     rows = pcpp("memory")
     items = []
@@ -490,6 +595,11 @@ def build_pcpp_categories(gpu_by_norm):
             "form_factor": r.get("form_factor"), "interface": r.get("interface"),
             "cache": f"{num(r['cache'])} MB" if r.get("cache") else None,
         })
+        iface = r.get("interface") or ""
+        if r.get("type") == "SSD":
+            it["protocol"] = "NVMe" if "PCIe" in iface else ("SAS" if "SAS" in iface else "SATA" if ("SATA" in iface or "mSATA" in iface) else None)
+            if not it["protocol"]:
+                it.pop("protocol")
         if r.get("type") == "SSD":
             ssd.append(it)
         else:
@@ -497,7 +607,8 @@ def build_pcpp_categories(gpu_by_norm):
                 it["rpm"] = int(r["type"])
             hdd.append(it)
     flds = [("capacity", "Capacity", None), ("form_factor", "Form factor", None), ("interface", "Interface", None), ("cache", "Cache", None)]
-    category("ssd", "SSDs", "hardware", "Solid state drives: NVMe, SATA, M.2 and more.", flds, ["maker", "interface", "form_factor"], ssd, [SRC_PCPP])
+    category("ssd", "SSDs", "hardware", "Solid state drives: NVMe, SATA, M.2 and more.",
+             [flds[0], ("protocol", "Protocol", None)] + flds[1:], ["maker", "protocol", "interface", "form_factor"], ssd, [SRC_PCPP])
     category("hdd", "Hard drives (HDD)", "hardware", "Spinning hard drives for desktops, NAS and servers.",
              flds + [("rpm", "Spindle speed", "RPM")], ["maker", "rpm", "form_factor"], hdd, [SRC_PCPP])
 
@@ -580,7 +691,18 @@ def build_pcpp_categories(gpu_by_norm):
                 elif k == "efficiency" and isinstance(v, str):
                     v = "80 PLUS" if v == "plus" else f"80 PLUS {v.title()}"
                 ex[k] = v
-            items.append(mk(r["name"], ex))
+            it = mk(r["name"], ex)
+            if cid == "monitor":
+                res, size = r.get("resolution"), r.get("screen_size")
+                if isinstance(res, list) and size:
+                    it["ppi"] = round((res[0] ** 2 + res[1] ** 2) ** 0.5 / size)
+                    it["resolution_class"] = ("8K" if res[1] >= 4320 else "5K" if res[0] >= 5120 and res[1] >= 2880 else
+                                              "4K / UHD" if res[1] >= 2160 else "1440p" if res[1] >= 1440 else
+                                              "1080p" if res[1] >= 1080 else "720p" if res[1] >= 720 else "Below 720p")
+            items.append(it)
+        if cid == "monitor":
+            fields = fields[:2] + [("resolution_class", "Class", None), ("ppi", "Pixel density", "PPI")] + fields[2:]
+            filters = filters + ["resolution_class"]
         category(cid, name, group, desc, fields, filters, items, [SRC_PCPP])
 
 
