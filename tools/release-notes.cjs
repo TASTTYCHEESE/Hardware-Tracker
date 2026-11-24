@@ -14,4 +14,6 @@ if (!entry) {
 }
 const md = `**${entry.title}**\n\n${entry.notes.map((n) => `- ${n}`).join('\n')}\n`;
 fs.writeFileSync(path.join(root, 'build', 'release-notes.md'), md);
+// The GitHub release is named "<version>: <title>" (see the title job in .github/workflows/release.yml).
+fs.writeFileSync(path.join(root, 'build', 'release-title.txt'), `${version}: ${entry.title}`);
 console.log(md);

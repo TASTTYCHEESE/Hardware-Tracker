@@ -1,0 +1,20 @@
+# Renames the current version's GitHub release from src/changelog.json without rebuilding anything.
+name: Update release title
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - run: node tools/release-notes.cjs
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "v$(node -p "require('./package.json').version")" --title "$(cat build/release-title.txt)" --notes-file build/release-notes.md -R "$GITHUB_REPOSITORY"

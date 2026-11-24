@@ -6,3 +6,4 @@ __pycache__/
 
 # Graphify knowledge graph output (rebuild with /graphify)
 graphify-out/
+build/release-title.txt
