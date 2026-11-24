@@ -1,6 +1,6 @@
 {
- "version": "2026-11-24T1452",
- "updated": "2026-11-24T14:52Z",
+ "version": "2026-11-24T1519",
+ "updated": "2026-11-24T15:19Z",
  "categories": [
   {
    "id": "cpu",
@@ -298,11 +298,14 @@
    "id": "vr-headset",
    "name": "VR headsets",
    "group": "peripherals",
-   "description": "PC VR headsets, with how many Steam VR users have each one.",
-   "count": 42,
-   "makers": 18,
-   "years": null,
-   "bytes": 5615,
+   "description": "VR headsets used for PC gaming: display, resolution, refresh rate, field of view, tracking and more.",
+   "count": 35,
+   "makers": 15,
+   "years": [
+    2013,
+    2026
+   ],
+   "bytes": 14776,
    "file": "vr-headset.json"
   },
   {
@@ -313,7 +316,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 360,
+   "bytes": 353,
    "file": "chipset.json"
   },
   {
@@ -324,7 +327,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 359,
+   "bytes": 352,
    "file": "capture-card.json"
   },
   {
@@ -335,7 +338,7 @@
    "count": 0,
    "makers": 0,
    "years": null,
-   "bytes": 372,
+   "bytes": 365,
    "file": "cooling-custom.json"
   },
   {
@@ -343,10 +346,13 @@
    "name": "Microphones",
    "group": "peripherals",
    "description": "USB and XLR microphones for streaming and calls.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 364,
+   "count": 20,
+   "makers": 9,
+   "years": [
+    1966,
+    2024
+   ],
+   "bytes": 6392,
    "file": "microphone.json"
   },
   {
@@ -354,10 +360,13 @@
    "name": "Game controllers",
    "group": "peripherals",
    "description": "Gamepads, arcade sticks, wheels and flight sticks.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 371,
+   "count": 16,
+   "makers": 8,
+   "years": [
+    2010,
+    2023
+   ],
+   "bytes": 5366,
    "file": "controller.json"
   },
   {
@@ -365,10 +374,13 @@
    "name": "Mouse pads",
    "group": "peripherals",
    "description": "Cloth, hard and glass mouse pads.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 346,
+   "count": 11,
+   "makers": 6,
+   "years": [
+    2017,
+    2022
+   ],
+   "bytes": 3289,
    "file": "mousepad.json"
   },
   {
@@ -376,10 +388,13 @@
    "name": "Printers & scanners",
    "group": "peripherals",
    "description": "Inkjet, laser and 3D printers, and scanners.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 365,
+   "count": 13,
+   "makers": 8,
+   "years": [
+    2018,
+    2023
+   ],
+   "bytes": 4313,
    "file": "printer.json"
   },
   {
@@ -387,10 +402,13 @@
    "name": "Routers & networking",
    "group": "peripherals",
    "description": "Routers, mesh Wi-Fi and network switches.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 362,
+   "count": 13,
+   "makers": 4,
+   "years": [
+    2019,
+    2024
+   ],
+   "bytes": 4167,
    "file": "router.json"
   },
   {
@@ -398,10 +416,13 @@
    "name": "Drawing tablets",
    "group": "peripherals",
    "description": "Pen tablets and pen displays.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 353,
+   "count": 9,
+   "makers": 3,
+   "years": [
+    2017,
+    2022
+   ],
+   "bytes": 3050,
    "file": "drawing-tablet.json"
   },
   {
@@ -409,10 +430,13 @@
    "name": "Streaming gear",
    "group": "peripherals",
    "description": "Stream decks, lights and audio interfaces.",
-   "count": 0,
-   "makers": 0,
-   "years": null,
-   "bytes": 360,
+   "count": 12,
+   "makers": 4,
+   "years": [
+    2018,
+    2023
+   ],
+   "bytes": 3379,
    "file": "streaming.json"
   }
  ]
