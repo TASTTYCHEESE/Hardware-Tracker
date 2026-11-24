@@ -53,7 +53,7 @@ interface Settings {
 }
 
 export interface UpdateInfo {
-  state: 'idle' | 'checking' | 'none' | 'downloading' | 'ready' | 'error' | 'unsupported';
+  state: 'idle' | 'checking' | 'none' | 'available' | 'downloading' | 'ready' | 'error' | 'unsupported';
   current: string;
   version: string;
   releaseName: string;
@@ -92,6 +92,8 @@ interface HwtApi {
   catalogCategory(id: string): Promise<CatalogCategory>;
 }
 
+declare const __APP_VERSION__: string;
+
 declare global {
   interface Window {
     hwt?: HwtApi;
@@ -107,15 +109,92 @@ export function localDay(ts?: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+// The Android app runs this same web build inside Capacitor. Its native HTTP layer
+// (CapacitorHttp) handles fetch(), so sites that block browsers (CORS) still load.
+const native = !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
+const RECAPS_URL = 'https://raw.githubusercontent.com/TASTTYCHEESE/Hardware-Tracker/main/recaps/';
+const RELEASES_API = 'https://api.github.com/repos/TASTTYCHEESE/Hardware-Tracker/releases/latest';
+export const APP_VERSION: string = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '';
+
+// In a browser, news sites usually refuse direct requests (CORS). The web version is
+// published with a snapshot of the news feeds and exchange rates, refreshed every
+// ~20 minutes by GitHub Actions (tools/web/snapshot.mjs), and falls back to it.
+let snapshot: Promise<Record<string, string>> | null = null;
+const snapshotIndex = () =>
+  (snapshot ??= fetch(`snapshot/index.json?t=${Math.floor(Date.now() / 300e3)}`)
+    .then((r) => (r.ok ? r.json() : {}))
+    .then((j: { files?: Record<string, string> }) => (j && typeof j.files === 'object' ? j.files : {}))
+    .catch((): Record<string, string> => ({})));
+setInterval(() => (snapshot = null), 10 * 60e3);
+
+const newer = (a: string, b: string) => {
+  const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+  for (let i = 0; i < 3; i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) > (pb[i] || 0);
+  return false;
+};
+
+let lastUpdate: UpdateInfo | null = null;
+
 const webApi: HwtApi = {
-  platform: 'web',
+  platform: native ? 'android' : 'web',
   async fetchText(url) {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.text();
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.text();
+    } catch (e) {
+      if (native) throw e;
+      const file = (await snapshotIndex())[url];
+      if (!file) throw e;
+      const r = await fetch(`snapshot/${file}`);
+      if (!r.ok) throw e;
+      return r.text();
+    }
   },
   async readRecaps() {
-    return [];
+    // Recaps come straight from the GitHub repo (the same folder the desktop app syncs).
+    const s = await webApi.getSettings();
+    const root = (s.syncUrl || RECAPS_URL).replace(/\/?$/, '/');
+    try {
+      const idx = await (await fetch(`${root}index.json?t=${Math.floor(Date.now() / 600e3)}`)).json();
+      const files: string[] = (Array.isArray(idx) ? idx : idx.files || []).filter((f: string) => /^[\w.-]+\.json$/.test(f) && f !== 'index.json');
+      const out = await Promise.all(
+        files.map((f) =>
+          fetch(`${root}${f}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null),
+        ),
+      );
+      return out.filter(Boolean) as Recap[];
+    } catch {
+      return [];
+    }
+  },
+  async appInfo() {
+    return { version: APP_VERSION };
+  },
+  async updateInfo() {
+    if (!native) return { state: 'unsupported', current: APP_VERSION, version: '', releaseName: '', releaseDate: '', notes: '', percent: 0, message: 'The web version is always the newest one. Reload the page to get updates.', lastCheck: 0 };
+    return lastUpdate ?? webApi.checkForUpdates!();
+  },
+  async checkForUpdates() {
+    const base: UpdateInfo = { state: 'none', current: APP_VERSION, version: '', releaseName: '', releaseDate: '', notes: '', percent: 0, message: '', lastCheck: Date.now() };
+    if (!native) {
+      // The web version is always the latest one: reloading the page updates it.
+      lastUpdate = { ...base, message: 'The web version updates itself when you reload the page' };
+      return lastUpdate;
+    }
+    try {
+      const j = await (await fetch(RELEASES_API, { headers: { Accept: 'application/vnd.github+json' } })).json();
+      const v = String(j.tag_name || '').replace(/^v/, '');
+      lastUpdate =
+        v && newer(v, APP_VERSION)
+          ? { ...base, state: 'available', version: v, releaseName: j.name || '', releaseDate: j.published_at || '', notes: j.body || '', message: `Version ${v} is out` }
+          : { ...base, message: `You're up to date (version ${APP_VERSION})` };
+    } catch (e) {
+      lastUpdate = { ...base, state: 'error', message: `Update check failed: ${(e as Error).message}` };
+    }
+    return lastUpdate;
   },
   async importRecaps() {
     return 0;

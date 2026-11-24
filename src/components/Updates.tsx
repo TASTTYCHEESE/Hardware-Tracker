@@ -57,7 +57,7 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
   const current = info?.current ?? '';
   const mine = LOG.find((e) => e.version === current);
   const older = LOG.filter((e) => e.version !== current && (!info?.version || e.version !== info.version));
-  const pending = info && (info.state === 'ready' || info.state === 'downloading');
+  const pending = info && (info.state === 'ready' || info.state === 'downloading' || info.state === 'available');
   // Notes for the new version: from the release itself, or from our own changelog if we know it.
   const known = info?.version ? LOG.find((e) => e.version === info.version) : undefined;
 
@@ -79,10 +79,15 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
         <section className="card upd-hero">
           <div className="upd-head">
             <div>
-              <div className="muted small">{info.state === 'ready' ? 'Ready to install' : 'Downloading'}</div>
+              <div className="muted small">{info.state === 'ready' ? 'Ready to install' : info.state === 'available' ? 'New version' : 'Downloading'}</div>
               <h2>Version {info.version}</h2>
               {info.releaseDate && <div className="muted small">Released {fmtDay(info.releaseDate)}</div>}
             </div>
+            {info.state === 'available' && (
+              <a className="btn" href={`https://github.com/TASTTYCHEESE/Hardware-Tracker/releases/tag/v${info.version}`}>
+                Download
+              </a>
+            )}
             {info.state === 'ready' && (
               <button
                 className="btn"
@@ -108,7 +113,11 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
               ? auto
                 ? 'It also installs by itself the next time you quit the app. The app restarts in a few seconds and keeps all your settings.'
                 : "It won't install until you click Restart and update. The app restarts in a few seconds and keeps all your settings."
-              : 'You can keep using the app while it downloads.'}
+              : info.state === 'available'
+                ? api.platform === 'android'
+                  ? 'Download the .apk file from the release and open it to install the update. Your settings are kept.'
+                  : 'Mac apps from outside the App Store can\'t update themselves without a paid Apple certificate. Download the .dmg for your Mac (arm64 for Apple Silicon, x64 for Intel) and drag the app into Applications. Your settings are kept.'
+                : 'You can keep using the app while it downloads.'}
           </p>
         </section>
       ) : (
@@ -130,6 +139,7 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
         </section>
       )}
 
+      {api.platform === 'desktop' && info?.state !== 'unsupported' && (
       <section className="card">
         <h3>How to install updates</h3>
         <label className="check">
@@ -145,6 +155,7 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
         </label>
         <p className="muted small">The app checks GitHub for new versions when it starts and every 6 hours after that, and notifies you when one is ready.</p>
       </section>
+      )}
 
       <section className="card">
         <h3>Your version: {current || '…'}</h3>

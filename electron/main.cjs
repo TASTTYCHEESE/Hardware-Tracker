@@ -81,7 +81,7 @@ const isWindowVisible = () => !!(win && !win.isDestroyed() && win.isVisible() &&
 function applyLoginItem() {
   if (process.platform !== 'win32' && process.platform !== 'darwin') return;
   const s = readSettings();
-  app.setLoginItemSettings({ openAtLogin: s.startWithWindows !== false && app.isPackaged, args: ['--hidden'] });
+  app.setLoginItemSettings({ openAtLogin: s.startWithWindows !== false && app.isPackaged, openAsHidden: true, args: ['--hidden'] });
 }
 
 function createTray() {
@@ -372,6 +372,8 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.on('second-instance', () => showWindow());
+  // Mac: clicking the Dock icon brings the window back.
+  app.on('activate', () => showWindow());
   // Security: web pages (including articles in the viewer) get no camera, microphone,
   // location, notifications or other permissions, and can't open new app windows.
   app.on('web-contents-created', (_e, contents) => {
@@ -413,7 +415,8 @@ if (!app.requestSingleInstanceLock()) {
       },
     });
     // Started by Windows at login: stay in the tray until needed.
-    if (!process.argv.includes('--hidden')) createWindow();
+    const hidden = process.argv.includes('--hidden') || (process.platform === 'darwin' && app.getLoginItemSettings().wasOpenedAsHidden);
+    if (!hidden) createWindow();
   });
   app.on('before-quit', () => {
     quitting = true;

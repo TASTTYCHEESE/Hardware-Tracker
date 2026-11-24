@@ -1,7 +1,7 @@
-# Builds the Windows installer and publishes it as a GitHub Release.
+# Builds the Windows, Mac and Linux apps and publishes them as one GitHub Release.
 # Push a tag like v0.7.0 (matching package.json "version") to release;
 # installed apps pick the update up automatically (electron-updater).
-name: Release Windows app
+name: Release app
 
 on:
   push:
@@ -28,3 +28,82 @@ jobs:
       - run: npx electron-builder --win --x64 --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Mac and Linux run after Windows so they add their files to the release Windows created.
+  mac:
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run release-notes
+      # No paid Apple certificate: the app is ad-hoc signed (identity "-" in package.json).
+      - run: npx electron-builder --mac --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+  linux:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run release-notes
+      - run: npx electron-builder --linux --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Android app: the same web build inside Capacitor. Signed with the key in the
+  # ANDROID_SIGNING secret (first line: password, second line: the keystore in base64),
+  # so every new APK installs over the old one and keeps the user's settings.
+  android:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Signing key
+        env:
+          ANDROID_SIGNING: ${{ secrets.ANDROID_SIGNING }}
+        run: |
+          if [ -z "$ANDROID_SIGNING" ]; then echo "::warning::No ANDROID_SIGNING secret, so no APK is published"; exit 0; fi
+          printf '%s\n' "$ANDROID_SIGNING" | sed -n 2p | base64 -d > "$RUNNER_TEMP/hwt.jks"
+          echo "::add-mask::$(printf '%s\n' "$ANDROID_SIGNING" | sed -n 1p)"
+          echo "HWT_KEYSTORE=$RUNNER_TEMP/hwt.jks" >> "$GITHUB_ENV"
+          echo "HWT_KEYSTORE_PASSWORD=$(printf '%s\n' "$ANDROID_SIGNING" | sed -n 1p)" >> "$GITHUB_ENV"
+      - name: Build and publish the APK
+        if: env.HWT_KEYSTORE != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd android && chmod +x gradlew && ./gradlew --no-daemon assembleRelease && cd ..
+          VERSION=$(node -p "require('./package.json').version")
+          cp android/app/build/outputs/apk/release/app-release.apk "HardwareTracker-$VERSION-android.apk"
+          gh release upload "v$VERSION" "HardwareTracker-$VERSION-android.apk" --clobber -R "$GITHUB_REPOSITORY"

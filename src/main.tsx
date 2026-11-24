@@ -8,3 +8,8 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 );
+
+// Web version: a small service worker so it installs to the home screen and opens offline.
+if (!window.hwt && location.protocol === 'https:' && 'serviceWorker' in navigator && !(window as { Capacitor?: unknown }).Capacitor) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}

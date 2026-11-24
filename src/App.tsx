@@ -20,11 +20,11 @@ import type { UpdateInfo } from './lib/platform';
 
 type Section = 'today' | 'overview' | 'prices' | 'hardware' | 'settings' | 'updates';
 
-const NAV: { id: Section; label: string; icon: string }[] = [
+const NAV: { id: Section; label: string; icon: string; short?: string }[] = [
   { id: 'today', label: 'Today', icon: '★' },
   { id: 'overview', label: 'Overview', icon: '◎' },
   { id: 'prices', label: 'Prices', icon: '↗' },
-  { id: 'hardware', label: 'PC Hardware', icon: '▦' },
+  { id: 'hardware', label: 'PC Hardware', icon: '▦', short: 'Hardware' },
   { id: 'settings', label: 'Settings', icon: '⚙' },
   { id: 'updates', label: 'Updates', icon: '⟳' },
 ];
@@ -155,7 +155,7 @@ export default function App() {
   // Open every external link (news, sources, alerts) in the in-app reader.
   // Ctrl/Shift/middle-click still goes to the normal browser.
   useEffect(() => {
-    if (api.platform !== 'desktop') return;
+    if (api.platform === 'web') return; // a browser can't load other sites' pages for the reader
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey) return;
       const a = (e.target as HTMLElement).closest('a');
@@ -228,7 +228,8 @@ export default function App() {
               nav({ section: n.id, sub: sub[n.id], cat: null, item: null });
             }}>
             <span className="nav-icon">{n.icon}</span>
-            {n.label}
+            <span className="nav-label">{n.label}</span>
+            <span className="nav-short">{n.short ?? n.label}</span>
             {n.id === 'prices' && hitCount + dropCount > 0 && <span className="pill">{hitCount + dropCount}</span>}
             {n.id === 'overview' && newsUnread > 0 && <span className="pill alert" title="New keyword alerts in Live news">{newsUnread}</span>}
             {n.id === 'updates' && update?.state === 'ready' && <span className="pill" title="Update ready">New</span>}
@@ -259,7 +260,7 @@ export default function App() {
         <div className="content" ref={contentRef} key={nonce}>
           {section === 'today' && <Today data={data} go={go} offset={Number(current) || 0} />}
           {section === 'overview' && current === 'overview' && <Overview data={data} go={go} />}
-          {section === 'overview' && current === 'news' && <News data={data} openReader={api.platform === 'desktop' ? setReading : undefined} />}
+          {section === 'overview' && current === 'news' && <News data={data} openReader={api.platform !== 'web' ? setReading : undefined} />}
           {section === 'overview' && current === 'launches' && <Launches />}
           {section === 'overview' && current === 'archive' && <Archive data={data} selected={recapId} select={setRecapId} />}
           {section === 'prices' && current === 'prices' && <Prices data={data} />}

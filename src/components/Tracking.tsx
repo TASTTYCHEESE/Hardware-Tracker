@@ -29,7 +29,7 @@ export function Tracking({ data }: { data: AppData }) {
       <header className="page-head">
         <div>
           <h1>Tracking</h1>
-          <p className="muted">Pick a part, a country and the price you'd pay. You'll get a Windows notification when it drops to that price.</p>
+          <p className="muted">Pick a part, a country and the price you'd pay. You'll get a notification when it drops to that price.</p>
         </div>
       </header>
 

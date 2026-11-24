@@ -1,7 +1,7 @@
 # Hardware Tracker
 
-Desktop app (Windows first) for PC gaming hardware news and prices, focused on
-GPUs, CPUs and RAM.
+App for PC gaming hardware news, prices and specs, focused on GPUs, CPUs and RAM.
+Runs on Windows, Mac and Linux, on Android as an app, and on iPhone (or any browser) as a web app.
 
 - **Today**: today's recap (Summary / News / Prices tabs) and headlines, plus **Yesterday** and **Day before**.
 - **Overview**: price direction per country, biggest drops, headlines. Top tabs: **Overview / Live news / Archive** (every past day).
@@ -17,6 +17,30 @@ GPUs, CPUs and RAM.
 2. Windows SmartScreen may warn because the app isn't code-signed yet: click **More info → Run anyway**.
 3. New daily and weekly recaps download automatically every hour from `recaps/` in this repo. They're stored in `Documents\Hardware Tracker`.
 
+## Install (Mac)
+
+1. Download `HardwareTracker-<version>-mac-arm64.dmg` (Apple Silicon: M1 and newer) or `-mac-x64.dmg` (Intel Macs) from the [latest release](https://github.com/TASTTYCHEESE/Hardware-Tracker/releases/latest), open it and drag the app into Applications.
+2. The app isn't signed with a paid Apple certificate, so the first time macOS says it can't check it: open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** (on older macOS: right-click the app → Open).
+3. The app tells you when a new version is out (Updates page) and links the download; Mac apps can only update themselves when they're signed.
+
+## Install (Linux)
+
+Download `HardwareTracker-<version>-linux-x86_64.AppImage`, make it executable (`chmod +x`) and run it. The AppImage updates itself. A `.deb` (Debian, Ubuntu, Mint) is in the release too: `sudo apt install ./HardwareTracker-<version>-linux-amd64.deb` (updates by installing the new .deb).
+
+## Android
+
+Download `HardwareTracker-<version>-android.apk` from the latest release on the phone and open it. Android asks once to allow installs from your browser or Files app. New versions show up on the Updates page with a download link; installing the new APK keeps your settings.
+
+## iPhone, iPad and any browser (web app)
+
+Open **https://tasttycheese.github.io/Hardware-Tracker/** in Safari, tap **Share → Add to Home Screen**, and it opens like an app. On Android Chrome use **⋮ → Add to Home screen**. It's always the newest version. News comes from a snapshot GitHub refreshes every 20 minutes (browsers can't read news sites directly), and articles open in the browser instead of the in-app reader. Settings, favorites and the news archive are saved in the browser on that device.
+
+## Publishing (maintainer)
+
+- **Releases**: running the "Release app" workflow builds Windows, Mac, Linux and Android and attaches them all to one GitHub Release.
+- **Android signing**: the APK is signed with the key in the `ANDROID_SIGNING` repository secret (line 1: password, line 2: the keystore in base64). Keep the same key forever: Android only installs an update over the old app when it's signed with the same key. Without the secret, the release has no APK.
+- **Web app**: `.github/workflows/web.yml` publishes to GitHub Pages on every push and every 20 minutes. GitHub Pages must be turned on once: **Settings → Pages → Source: GitHub Actions**.
+
 ## Develop
 
 ```
@@ -25,18 +49,23 @@ npm run dev            # UI in a browser at http://localhost:5173 (uses the web 
 npm start              # build and run the desktop app
 npm run dist:win-zip   # Windows zip in release/ (any OS)
 npm run dist:win       # Windows installer + zip (needs Windows, or Wine)
+npm run dist:linux     # Linux AppImage
+npm run dist:mac       # Mac .dmg + .zip (needs a Mac)
+npm run android        # build the web files and copy them into android/ (then open android/ in Android Studio)
 ```
 
 ## Layout
 
 - `electron/` – desktop shell (window, file access, feed fetching without CORS, notifications).
-- `src/` – React UI. Talks to the platform only through `src/lib/platform.ts`, so the same UI can later be wrapped for phone (Capacitor) and served as a website.
+- `src/` – React UI. Talks to the platform only through `src/lib/platform.ts`; the same UI runs in Electron, in the Android app (`android/`, Capacitor) and as the web app.
+- `android/` – Android project (Capacitor). `capacitor.config.json` turns on native HTTP so feeds load without CORS limits.
+- `tools/web/snapshot.mjs` – saves the news feeds and exchange rates for the web app.
 - `src/data/` – bundled catch-up report.
 - `RECAP_FORMAT.md` – the JSON format the scheduled recaps write.
 
 ## Roadmap
 
-Phone app (Capacitor, same UI), browser version, GitHub repo + auto-sync of recaps (so recaps reach every device without copying files), code signing / installer.
+Code signing (Windows and Mac), phone notifications for price alerts, iOS App Store app (needs an Apple Developer account).
 
 ### Planned for 1.0.0: rename to "Hardware Hub"
 

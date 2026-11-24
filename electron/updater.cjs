@@ -28,8 +28,15 @@ function setup({ readSettings, onChange, showWindow, beforeRestart }) {
   };
   const api = (extra) => ({ check: async () => ({ ...info }), status: () => info.message, info: () => ({ ...info }), restart: () => false, applySettings() {}, ...extra });
 
-  if (!app.isPackaged || process.platform !== 'win32') {
-    set({ state: 'unsupported', message: 'Auto-updates work in the installed Windows app' });
+  // Windows installer and Linux AppImage update themselves. Mac apps can only install updates when they're
+  // signed with a paid Apple certificate, so on Mac we only check and offer the download.
+  const mac = process.platform === 'darwin';
+  const supported = process.platform === 'win32' || mac || (process.platform === 'linux' && !!process.env.APPIMAGE);
+  if (!app.isPackaged || !supported) {
+    set({
+      state: 'unsupported',
+      message: process.platform === 'linux' ? 'Auto-updates work in the AppImage version. Get new versions from the Releases page.' : 'Auto-updates work in the installed app',
+    });
     return api();
   }
   let autoUpdater;
@@ -39,7 +46,7 @@ function setup({ readSettings, onChange, showWindow, beforeRestart }) {
     set({ state: 'unsupported', message: 'Updater not available in this build' });
     return api();
   }
-  autoUpdater.autoDownload = true;
+  autoUpdater.autoDownload = !mac;
   const applySettings = () => {
     autoUpdater.autoInstallOnAppQuit = readSettings().autoInstallUpdates !== false;
   };
@@ -78,7 +85,9 @@ function setup({ readSettings, onChange, showWindow, beforeRestart }) {
     set({ state: 'none', message: `You're up to date (version ${info.current})`, lastCheck: Date.now() }),
   );
   autoUpdater.on('update-available', (u) =>
-    set({ ...fromInfo(u), state: 'downloading', percent: 0, message: `Downloading version ${u.version}…`, lastCheck: Date.now() }),
+    mac
+      ? set({ ...fromInfo(u), state: 'available', percent: 0, message: `Version ${u.version} is out. Download it and drag it into Applications.`, lastCheck: Date.now() })
+      : set({ ...fromInfo(u), state: 'downloading', percent: 0, message: `Downloading version ${u.version}…`, lastCheck: Date.now() }),
   );
   autoUpdater.on('download-progress', (p) =>
     set({ state: 'downloading', percent: Math.round(p.percent), message: `Downloading version ${info.version}… ${Math.round(p.percent)}%` }),
@@ -110,10 +119,11 @@ function setup({ readSettings, onChange, showWindow, beforeRestart }) {
 
   const check = async () => {
     if (!ensureFeed()) {
-      set({ state: 'unsupported', message: 'Auto-updates work in the installed version (HardwareTracker-Setup.exe)' });
+      set({ state: 'unsupported', message: 'Auto-updates work in the installed version' });
       return { ...info };
     }
     if (info.state === 'downloading') return { ...info };
+    if (info.state === 'available') set({ state: 'checking' });
     try {
       await autoUpdater.checkForUpdates();
     } catch (e) {

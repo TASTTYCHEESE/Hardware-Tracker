@@ -86,7 +86,7 @@ export function SettingsPage({ data }: { data: AppData }) {
           </label>
           <label className="check">
             <input type="checkbox" checked={s.startWithWindows !== false} onChange={(e) => data.setSettings({ startWithWindows: e.target.checked })} />
-            Start with Windows (quietly, in the tray)
+            Start when you sign in (quietly, in the tray)
           </label>
           <label className="check">
             <input type="checkbox" checked={s.autoQuitWhenBusy !== false} onChange={(e) => data.setSettings({ autoQuitWhenBusy: e.target.checked })} />
