@@ -8,7 +8,7 @@
       "Mac: a .dmg for Apple Silicon and one for Intel Macs. The app tells you when a new version is out and links the download (Mac apps can only update themselves with a paid Apple certificate).",
       "Linux: an AppImage that updates itself, and a .deb for Debian, Ubuntu and Mint.",
       "Android: an app (.apk) with the in-app reader, live news and everything else. The Updates page tells you when a new version is out.",
-      "iPhone, iPad and any browser: a web app at tasttycheese.github.io/Hardware-Tracker. Add it to your home screen and it opens like an app. News comes from a snapshot refreshed every 20 minutes.",
+      "iPhone, iPad and any browser: a web app at https://tasttycheese.github.io/Hardware-Tracker/ . Open it in Safari and tap Share → Add to Home Screen, and it opens like an app. News comes from a snapshot refreshed every 20 minutes.",
       "Phones get a new layout: the menu is a tab bar at the bottom, and the page tabs scroll sideways.",
       "\"Start with Windows\" is now \"Start when you sign in\", since it works on Mac too."
     ]

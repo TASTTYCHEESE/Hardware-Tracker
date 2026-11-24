@@ -3,6 +3,19 @@
 App for PC gaming hardware news, prices and specs, focused on GPUs, CPUs and RAM.
 Runs on Windows, Mac and Linux, on Android as an app, and on iPhone (or any browser) as a web app.
 
+## Get it
+
+| Device | Get it |
+| --- | --- |
+| **iPhone / iPad** | Open the web app **[tasttycheese.github.io/Hardware-Tracker](https://tasttycheese.github.io/Hardware-Tracker/)** in Safari, then Share → **Add to Home Screen** |
+| **Android** | `HardwareTracker-<version>-android.apk` from the [latest release](https://github.com/TASTTYCHEESE/Hardware-Tracker/releases/latest) (or use the [web app](https://tasttycheese.github.io/Hardware-Tracker/)) |
+| **Windows** | `HardwareTracker-Setup-<version>.exe` from the [latest release](https://github.com/TASTTYCHEESE/Hardware-Tracker/releases/latest) |
+| **Mac** | `HardwareTracker-<version>-mac-arm64.dmg` (Apple Silicon) or `-mac-x64.dmg` (Intel) from the [latest release](https://github.com/TASTTYCHEESE/Hardware-Tracker/releases/latest) |
+| **Linux** | `HardwareTracker-<version>-linux-x86_64.AppImage` or `.deb` from the [latest release](https://github.com/TASTTYCHEESE/Hardware-Tracker/releases/latest) |
+| **Any browser** | [tasttycheese.github.io/Hardware-Tracker](https://tasttycheese.github.io/Hardware-Tracker/) |
+
+Setup details for each one are further down.
+
 - **Today**: today's recap (Summary / News / Prices tabs) and headlines, plus **Yesterday** and **Day before**.
 - **Overview**: price direction per country, biggest drops, headlines. Top tabs: **Overview / Live news / Archive** (every past day).
 - **Prices**: tabs **Prices** (17 countries, any combination, optional single currency) / **Price alerts** / **Tracking** (watchlist with target prices; Windows notification when a target is hit).
@@ -33,7 +46,7 @@ Download `HardwareTracker-<version>-android.apk` from the latest release on the 
 
 ## iPhone, iPad and any browser (web app)
 
-Open **https://tasttycheese.github.io/Hardware-Tracker/** in Safari, tap **Share → Add to Home Screen**, and it opens like an app. On Android Chrome use **⋮ → Add to Home screen**. It's always the newest version. News comes from a snapshot GitHub refreshes every 20 minutes (browsers can't read news sites directly), and articles open in the browser instead of the in-app reader. Settings, favorites and the news archive are saved in the browser on that device.
+Open **[tasttycheese.github.io/Hardware-Tracker](https://tasttycheese.github.io/Hardware-Tracker/)** in Safari, tap **Share → Add to Home Screen**, and it opens like an app. On Android Chrome use **⋮ → Add to Home screen**. It's always the newest version. News comes from a snapshot GitHub refreshes every 20 minutes (browsers can't read news sites directly), and articles open in the browser instead of the in-app reader. Settings, favorites and the news archive are saved in the browser on that device.
 
 ## Publishing (maintainer)
 
