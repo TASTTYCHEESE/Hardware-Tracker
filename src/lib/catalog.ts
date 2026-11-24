@@ -78,6 +78,23 @@ export function formatValue(v: unknown, unit?: string): string {
 }
 
 /** Spec rows for an item: the category's fields in order, then anything else it has. */
+// GPU makers name the same things differently: CUDA cores (Nvidia), stream processors (AMD), Xe cores (Intel).
+function gpuVendor(item: CatalogItem): 'nvidia' | 'amd' | 'intel' | null {
+  const t = `${item.maker ?? ''} ${typeof item.chipset === 'string' ? item.chipset : ''} ${item.name}`;
+  if (/nvidia|geforce|quadro|tesla|titan|\brtx\b|\bgtx\b/i.test(t)) return 'nvidia';
+  if (/\bamd\b|\bati\b|radeon|firepro|instinct/i.test(t)) return 'amd';
+  if (/intel|\barc\b/i.test(t)) return 'intel';
+  return null;
+}
+
+export function gpuLabel(cat: CatalogCategory, item: CatalogItem, k: string): string | undefined {
+  if (cat.id !== 'gpu' || (k !== 'cores' && k !== 'sms' && k !== 'rt_cores')) return undefined;
+  const v = gpuVendor(item);
+  if (k === 'rt_cores') return v === 'amd' ? 'Ray accelerators' : v === 'intel' ? 'Ray tracing units' : undefined;
+  if (k === 'cores') return v === 'nvidia' ? 'CUDA cores' : v === 'amd' ? 'Stream processors' : 'Shading units (cores)';
+  return v === 'nvidia' ? 'Streaming multiprocessors (SMs)' : v === 'amd' ? 'Compute units (CUs)' : v === 'intel' ? 'Xe cores' : undefined;
+}
+
 export function specRows(cat: CatalogCategory, item: CatalogItem): { label: string; value: string }[] {
   const rows: { label: string; value: string }[] = [];
   const done = new Set<string>();
@@ -85,7 +102,7 @@ export function specRows(cat: CatalogCategory, item: CatalogItem): { label: stri
     done.add(f.k);
     if (f.k === 'date') continue; // shown in the header
     if (item[f.k] === undefined || item[f.k] === null || item[f.k] === '') continue;
-    rows.push({ label: f.label, value: formatValue(item[f.k], f.unit) });
+    rows.push({ label: gpuLabel(cat, item, f.k) ?? f.label, value: formatValue(item[f.k], f.unit) });
   }
   for (const [k, v] of Object.entries(item)) {
     if (done.has(k) || META_KEYS.has(k) || v === null || v === undefined || v === '') continue;

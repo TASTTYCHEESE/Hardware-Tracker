@@ -141,7 +141,7 @@ def build_gpus():
             "base_clock": num(g.get("base_clock_mhz")), "boost_clock": num(g.get("boost_clock_mhz")),
             "memory": mem_s, "memory_type": g.get("memory_type"), "memory_bus": g.get("memory_bus_bits"),
             "memory_clock": num(g.get("memory_clock_mhz")), "bandwidth": num(g.get("memory_bandwidth_gb_s")),
-            "shaders": g.get("shading_units") or None, "tmus": g.get("texture_mapping_units") or None,
+            "cores": g.get("shading_units") or None, "tmus": g.get("texture_mapping_units") or None,
             "rops": g.get("render_output_processors") or None, "sms": g.get("streaming_multiprocessors") or None,
             "tensor_cores": g.get("tensor_cores") or None, "rt_cores": g.get("ray_tracing_cores") or None,
             "l1_kb": num(g.get("l1_cache_kb")) or None, "l2_mb": num(g.get("l2_cache_mb")) or None,
@@ -155,6 +155,13 @@ def build_gpus():
             "cuda": ver("cuda"), "shader_model": ver("shader_model"),
             "link": g.get("tpu_url"),
         }
+        # TechPowerUp leaves AMD compute units and Intel Xe cores empty; they follow from the core count.
+        arch, sh = (g.get("architecture") or ""), g.get("shading_units") or 0
+        if not it["sms"] and sh:
+            if re.match(r"(GCN|RDNA|CDNA)", arch) and sh % 64 == 0:
+                it["sms"] = sh // 64
+            elif re.match(r"Xe2?-HPG", arch) and sh % 128 == 0:
+                it["sms"] = sh // 128
         items.append({k: v for k, v in it.items() if v not in (None, "", 0)})
     log(f"GPUs: {len(items)}")
     for i in items:
@@ -185,14 +192,14 @@ def build_gpus():
          ("transistors_m", "Transistors", "million"), ("die_mm2", "Die size", "mm²"), ("bus", "Bus interface", None),
          ("base_clock", "Base clock", "MHz"), ("boost_clock", "Boost clock", "MHz"), ("memory", "Memory", None),
          ("memory_type", "Memory type", None), ("memory_bus", "Memory bus", "bit"), ("memory_clock", "Memory clock", "MHz"),
-         ("bandwidth", "Bandwidth", "GB/s"), ("shaders", "Shading units", None), ("tmus", "TMUs", None), ("rops", "ROPs", None),
-         ("sms", "SM / CU count", None), ("tensor_cores", "Tensor cores", None), ("rt_cores", "RT cores", None),
+         ("bandwidth", "Bandwidth", "GB/s"), ("cores", "Cores (CUDA / stream processors)", None), ("tmus", "Texture units (TMUs)", None), ("rops", "Render output units (ROPs)", None),
+         ("sms", "Streaming multiprocessors / compute units", None), ("tensor_cores", "Tensor cores", None), ("rt_cores", "Ray tracing cores", None),
          ("l1_kb", "L1 cache", "KB"), ("l2_mb", "L2 cache", "MB"), ("fp32", "FP32 performance", "GFLOPS"),
          ("fp16", "FP16 performance", "GFLOPS"), ("fp64", "FP64 performance", "GFLOPS"), ("pixel_rate", "Pixel rate", "GPixel/s"),
          ("texture_rate", "Texture rate", "GTexel/s"), ("tdp", "TDP", "W"), ("psu", "Suggested PSU", "W"),
          ("power_connectors", "Power connectors", None), ("outputs", "Outputs", None), ("slots", "Slot width", None),
-         ("length_mm", "Board length", "mm"), ("directx", "DirectX", None), ("opengl", "OpenGL", None), ("vulkan", "Vulkan", None),
-         ("opencl", "OpenCL", None), ("cuda", "CUDA", None), ("shader_model", "Shader model", None)]
+         ("length_mm", "Board length", "mm"), ("directx", "DirectX version", None), ("opengl", "OpenGL version", None), ("vulkan", "Vulkan version", None),
+         ("opencl", "OpenCL version", None), ("cuda", "CUDA compute capability (version)", None), ("shader_model", "Shader model version", None)]
     GPU_DATA["items"] = items
     return {norm(i["name"]): i for i in items}
 
@@ -648,12 +655,12 @@ def build_pcpp_categories(gpu_by_norm):
             if card.get("pop_rank"):
                 g["pop_rank"] = min(g.get("pop_rank", 10**9), card["pop_rank"])
             # Steam usage stays on the chip (Steam counts chips, not retail cards); the card panel shows the chip's.
-            for k in ("generation", "architecture", "memory_type", "memory_bus", "shaders", "tdp", "bus", "outputs"):
+            for k in ("generation", "architecture", "memory_type", "memory_bus", "cores", "sms", "tensor_cores", "rt_cores", "tdp", "bus", "outputs"):
                 if g.get(k) and k not in card:
                     card[k] = g[k]
         items.append(card)
     chip_fields = [tuple(f) for f in GPU_DATA.get("fields", [])]
-    first = ["generation", "architecture", "memory"]
+    first = ["generation", "memory", "cores", "architecture"]
     gpu_fields = [("kind", "Type", None)] + [f for k in first for f in chip_fields if f[0] == k] + [("chipset", "GPU", None)]
     gpu_fields += [f for f in chip_fields if f[0] not in first]
     gpu_fields += [("core_clock", "Core clock", "MHz"), ("color", "Color", None)]
