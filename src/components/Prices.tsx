@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { convert, loadRates, type Currency, type Rates } from '../lib/fx';
 import type { AppData } from '../lib/useData';
 import type { Category, PricePoint, Region } from '../lib/types';
@@ -6,6 +6,8 @@ import { COUNTRIES, COUNTRY_CODES, CURRENCIES, GROUPS, type CountryCode } from '
 import { CatBadge, DirBadge, Sparkline, catLabel } from './Common';
 import { REGION_LABEL, fmtDate, fmtPct, money, pct } from '../lib/format';
 import { parseRam, ramLabel } from '../lib/ram';
+import { PERF_NOTE, perfFor } from '../lib/perf';
+import { saveElementAsImage } from '../lib/image';
 import { AddProducts, key as pkey, useProductList, type PriceProduct } from './PriceProducts';
 
 /** Product cell: memory kits by their specs (type, speed, size), everything else by model name. */
@@ -32,7 +34,7 @@ const shortDate = (d: string) =>
 const CAT_ORDER = ['GPU', 'CPU', 'RAM', 'Other'];
 const ORDER = COUNTRY_CODES as string[];
 
-type PSort = 'product' | 'high' | 'low' | 'recent' | 'past' | 'msrp';
+type PSort = 'product' | 'high' | 'low' | 'recent' | 'past' | 'msrp' | 'value';
 const PSORTS: [PSort, string][] = [
   ['product', 'Product (A–Z)'],
   ['high', 'Highest change (biggest rise)'],
@@ -40,6 +42,7 @@ const PSORTS: [PSort, string][] = [
   ['recent', 'Most recent change'],
   ['past', 'Oldest change'],
   ['msrp', 'Best deal vs MSRP'],
+  ['value', 'Best price to performance'],
 ];
 
 /** Everything the table shows about one product in one country. */
@@ -51,8 +54,14 @@ function summarize(s: PricePoint[]) {
   // When did the price last actually move?
   let changed: string | undefined;
   for (let i = s.length - 1; i > 0; i--) if (s[i].price !== s[i - 1].price) { changed = s[i].date; break; }
-  const msrp = s.find((p) => p.msrp)?.msrp;
+  const perf = perfFor(last.model, last.category);
+  const msrp = s.find((p) => p.msrp)?.msrp ?? (last.currency === 'USD' ? perf?.msrp : undefined);
+  const ram = last.category === 'RAM' ? parseRam(last.model) : null;
   return {
+    perf: perf?.score,
+    // Price per performance point (GPU/CPU) or per GB (memory).
+    value: perf ? last.price / perf.score : ram?.total ? last.price / ram.total : undefined,
+    valueUnit: perf ? 'pt' : ram?.total ? 'GB' : '',
     s, last, prev, first, msrp, changed,
     ch: prev ? pct(prev.price, last.price) : undefined,
     total: s.length > 1 ? pct(first.price, last.price) : undefined,
@@ -161,12 +170,23 @@ export function Prices({ data }: { data: AppData }) {
       recent: (a, b) => missingLast(a.changed, b.changed) || (b.changed ?? '').localeCompare(a.changed ?? '') || byName(a, b),
       past: (a, b) => missingLast(a.changed, b.changed) || (a.changed ?? '').localeCompare(b.changed ?? '') || byName(a, b),
       msrp: (a, b) => missingLast(a.vsMsrp, b.vsMsrp) || (a.vsMsrp ?? 0) - (b.vsMsrp ?? 0) || byName(a, b),
+      // Value is only comparable within a category (per point vs per GB), so group by category first.
+      value: (a, b) => CAT_ORDER.indexOf(a.last.category) - CAT_ORDER.indexOf(b.last.category) || missingLast(a.value, b.value) || (a.value ?? 0) - (b.value ?? 0) || byName(a, b),
     };
     return list.sort(cmp[sort] ?? byName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all, cat, q, sort, onlyMine, ramType, ramSize, ramSpeed, mine.length]);
   const waitingShown = waiting.filter((p) => (cat === 'All' || p.category === cat) && matches(p.model, p.category));
 
+  // Best price-to-performance per category and currency among the rows shown.
+  const bestValue = new Set<Row>();
+  for (const c of CAT_ORDER)
+    for (const cur of new Set(rows.map((x) => x.last.currency))) {
+      const xs = rows.filter((x) => x.last.category === c && x.last.currency === cur && x.value !== undefined);
+      if (xs.length > 1) bestValue.add(xs.reduce((m, x) => ((x.value as number) < (m.value as number) ? x : m)));
+    }
+  const tableRef = useRef<HTMLDivElement>(null);
+  const [imgMsg, setImgMsg] = useState('');
   const rising = rows.filter((r) => (r.ch ?? 0) > 0.5).length;
   const falling = rows.filter((r) => (r.ch ?? 0) < -0.5).length;
   const below = rows.filter((r) => r.vsMsrp !== undefined && r.vsMsrp < 0).length;
@@ -306,6 +326,7 @@ export function Prices({ data }: { data: AppData }) {
           No prices yet for {missing.map((r) => REGION_LABEL[r]).join(', ')}. They'll start appearing with the next weekly recap (Monday 8:00).
         </p>
       )}
+      <div ref={tableRef} className="export-box">
       {all.length > 0 && (
         <div className="p-stats">
           <div><b>{rows.length}</b><span className="muted small">{rows.length === 1 ? 'product shown' : 'products shown'}</span></div>
@@ -327,6 +348,7 @@ export function Prices({ data }: { data: AppData }) {
             <th>Change</th>
             <th>Since first</th>
             <th>Low / High</th>
+            <th title={PERF_NOTE}>Price / perf.</th>
             <th>History</th>
             <th>Last change</th>
             <th>As of</th>
@@ -363,6 +385,17 @@ export function Prices({ data }: { data: AppData }) {
                     <span className="muted">–</span>
                   )}
                 </td>
+                <td className="num small" title={r.perf ? `Performance index ${r.perf}. ${PERF_NOTE}` : PERF_NOTE}>
+                  {r.value !== undefined ? (
+                    <>
+                      {money2(r.value, last.currency)}
+                      <span className="muted">/{r.valueUnit}</span>
+                      {bestValue.has(r) && <div className="pos">best value</div>}
+                    </>
+                  ) : (
+                    <span className="muted">–</span>
+                  )}
+                </td>
                 <td title={`${s.length} data point${s.length === 1 ? '' : 's'}`}>
                   <Sparkline values={s.map((p) => p.price)} />
                   <div className="muted small">{s.length} {s.length === 1 ? "point" : "points"}</div>
@@ -380,7 +413,15 @@ export function Prices({ data }: { data: AppData }) {
                 <ProductName p={p} mine remove={() => setMine(mine.filter((x) => pkey(x.model) !== pkey(p.model)))} />
               </td>
               {regions.length > 1 && <td className="muted">–</td>}
-              <td colSpan={10} className="muted small">
+              <td colSpan={11} className="muted small">
+                {(() => {
+                  const pf = perfFor(p.model, p.category);
+                  return pf?.msrp ? (
+                    <div>
+                      Launch price (MSRP) {money2(pf.msrp, 'USD')} · {money2(pf.msrp / pf.score, 'USD')}/pt price to performance, until a shop price arrives.
+                    </div>
+                  ) : null;
+                })()}
                 {weekly?.some((w) => pkey(w.model) === pkey(p.model))
                   ? 'On the weekly price list: the first price arrives with the next weekly recap (Monday 8:00).'
                   : 'Not on the weekly price list yet. Use "+ Add products", then "Request prices", to add it.'}
@@ -390,9 +431,24 @@ export function Prices({ data }: { data: AppData }) {
         </tbody>
       </table>
       </div>
+      </div>
+      {rows.length > 0 && (
+        <div className="row export-row">
+          <button
+            className="btn small ghost"
+            onClick={async () => {
+              setImgMsg('Saving…');
+              setImgMsg(await saveElementAsImage(tableRef.current, `Price tracker ${new Date().toISOString().slice(0, 10)}`).catch((e) => `Couldn't save: ${e.message || e}`));
+            }}
+          >
+            Save table as image
+          </button>
+          {imgMsg && <span className="muted small">{imgMsg}</span>}
+        </div>
+      )}
       {!rows.length && !waitingShown.length && <p className="muted">{q.trim() ? `Nothing matches "${q.trim()}"${cat !== 'All' ? ` in ${catLabel(cat)}` : ''}.` : 'No prices for this filter yet.'}</p>}
       <p className="muted small">
-        "Change" compares the two most recent data points; "Since first" compares with the first price we recorded. "Last change" is the date the price last moved. Green on "vs MSRP" means below launch price. European, Japanese and most other prices include VAT; US and Canada prices don't include sales tax.
+        "Price / perf." is the price per point of approximate gaming performance (GPUs and CPUs) or per GB (memory); "best value" marks the cheapest per point in each category. "Change" compares the two most recent data points; "Since first" compares with the first price we recorded. "Last change" is the date the price last moved. Green on "vs MSRP" means below launch price. European, Japanese and most other prices include VAT; US and Canada prices don't include sales tax.
       </p>
     </div>
   );

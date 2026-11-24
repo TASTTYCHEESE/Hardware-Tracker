@@ -1,5 +1,20 @@
 [
   {
+    "version": "0.9.0",
+    "date": "2026-11-24",
+    "title": "The big one: Compare, Buy or wait?, Launch calendar and more",
+    "notes": [
+      "PC Hardware → Compare: put up to 4 products side by side (hardware with hardware, peripherals with peripherals). The best value in every row is highlighted in green, and GPUs and CPUs also show performance, price and price per performance.",
+      "PC Hardware → Buy or wait?: pick anything you're thinking of buying and get a verdict (good time to buy, fair, or better to wait) with the reasons: its price history, the market trend, newer models, upcoming launches, sales and the news.",
+      "Favorites: star any product. Favorites are pinned to the top of the list, with a filter for favorites first, only favorites, or not pinned.",
+      "Family trees: open a GPU or CPU to see the same tier across generations (e.g. GTX 1070 Ti → RTX 3070 Ti → RTX 4070 Ti → RTX 5070 Ti) and how much faster each one got.",
+      "Price tracker: new price-to-performance column with a \"best value\" tag and a \"Best price to performance\" sort. Products without a shop price yet use their launch price (MSRP).",
+      "Overview → Launch calendar: upcoming launches, events and rumored dates with countdowns, kept up to date by the daily recap.",
+      "Live news keyword alerts: add words you care about. New matching headlines light up a 🔔 with a red badge on Overview and Live news, like notifications in a social app.",
+      "Save as image: export a comparison or the price table as a PNG."
+    ]
+  },
+  {
     "version": "0.8.4",
     "date": "2026-11-24",
     "title": "Live filter counts, back / forward, add products to the price tracker",

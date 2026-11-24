@@ -302,6 +302,20 @@ ipcMain.handle('choose-folder', async () => {
 });
 
 ipcMain.handle('open-folder', async () => shell.openPath(dataDir()));
+// "Save as image": the renderer draws the element to a PNG; ask where to save it.
+ipcMain.handle('save-image', async (e, dataUrl, name) => {
+  const w = BrowserWindow.fromWebContents(e.sender);
+  if (!w || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/png;base64,')) return { ok: false };
+  const safe = String(name || 'hardware-tracker').replace(/[^\w\- ]+/g, '').trim().slice(0, 80) || 'hardware-tracker';
+  const res = await dialog.showSaveDialog(w, {
+    title: 'Save as image',
+    defaultPath: require('node:path').join(app.getPath('pictures'), `${safe}.png`),
+    filters: [{ name: 'PNG image', extensions: ['png'] }],
+  });
+  if (res.canceled || !res.filePath) return { ok: false };
+  require('node:fs').writeFileSync(res.filePath, Buffer.from(dataUrl.split(',')[1], 'base64'));
+  return { ok: true, path: res.filePath };
+});
 
 ipcMain.handle('app-info', async () => ({ version: app.getVersion(), updateStatus: upd ? upd.status() : '' }));
 ipcMain.handle('check-updates', async () => (upd ? upd.check() : null));

@@ -1,5 +1,7 @@
 import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../lib/platform';
+import type { AppData } from '../lib/useData';
+import { familyOf } from '../lib/family';
 import {
   fmtBytes,
   formatValue,
@@ -41,11 +43,15 @@ export function Hardware({
   cat: catId,
   item,
   navigate,
+  data,
+  onCompare,
 }: {
   group: Group;
   cat: string | null;
   item: string | null;
   navigate: (cat: string | null, item: string | null, group?: Group) => void;
+  data: AppData;
+  onCompare: (cat: string, id: string) => void;
 }) {
   const [index, setIndex] = useState<CatalogIndex | null>(null);
   const [error, setError] = useState('');
@@ -82,6 +88,8 @@ export function Hardware({
         version={index.version}
         sel={item}
         setSel={(id) => navigate(catId, id)}
+        data={data}
+        onCompare={(id) => onCompare(catId, id)}
         back={() => navigate(null, null)}
         openOther={(cat, it) => {
           const g = index.categories.find((c) => c.id === cat)?.group;
@@ -129,6 +137,8 @@ function CategoryView({
   version,
   sel,
   setSel,
+  data,
+  onCompare,
   back,
   openOther,
 }: {
@@ -136,12 +146,22 @@ function CategoryView({
   version: string;
   sel: string | null;
   setSel: (id: string | null) => void;
+  data: AppData;
+  onCompare: (id: string) => void;
   back: () => void;
   openOther: (cat: string, item?: string) => void;
 }) {
   const [cat, setCat] = useState<CatalogCategory | null>(memo.get(`${info.id}@${version}`) ?? null);
   const [error, setError] = useState('');
   const saved = views.get(info.id);
+  // Favorites (starred products) are kept in settings, per category.
+  const favs = useMemo(() => new Set(data.settings.favorites?.[info.id] ?? []), [data.settings.favorites, info.id]);
+  const favMode = data.settings.favMode ?? 'top';
+  const toggleFav = (id: string) => {
+    const cur = data.settings.favorites ?? {};
+    const list = cur[info.id] ?? [];
+    data.setSettings({ favorites: { ...cur, [info.id]: list.includes(id) ? list.filter((x) => x !== id) : [...list, id] } });
+  };
   const [q, setQ] = useState(saved?.q ?? '');
   const query = useDeferredValue(q);
   const [maker, setMaker] = useState(saved?.maker ?? '');
@@ -250,7 +270,7 @@ function CategoryView({
     if (!cat) return [];
     // Search and filters must both match. The search decides the order: best name matches first.
     const score = textScore ?? new Map<CatalogItem, number>();
-    const list = cat.items.filter((it) => passes(it));
+    const list = cat.items.filter((it) => passes(it) && (favMode !== 'only' || favs.has(it.id)));
     // Items without data go last in every direction.
     const ranked = (v: (i: CatalogItem) => number | undefined, dir: 1 | -1) => (a: CatalogItem, b: CatalogItem) => {
       const x = v(a), y = v(b);
@@ -270,9 +290,10 @@ function CategoryView({
       unused: ranked(usage, 1),
     };
     const cmp = by[sort];
-    return list.sort((a, b) => (score.get(a) ?? 0) - (score.get(b) ?? 0) || cmp(a, b));
+    const pin = (i: CatalogItem) => (favMode === 'top' && favs.has(i.id) ? 0 : 1);
+    return list.sort((a, b) => pin(a) - pin(b) || (score.get(a) ?? 0) - (score.get(b) ?? 0) || cmp(a, b));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cat, textScore, maker, from, to, extra, sort]);
+  }, [cat, textScore, maker, from, to, extra, sort, favs, favMode]);
 
   useEffect(() => setLimit(PAGE), [query, maker, from, to, extra, sort]);
 
@@ -372,6 +393,11 @@ function CategoryView({
             {Object.entries(options)
               .filter(([k]) => k !== 'maker' && k !== 'kind')
               .map(([k, vals]) => extraSelect(k, vals))}
+            <select className="select" value={favMode} onChange={(e) => data.setSettings({ favMode: e.target.value as 'top' | 'only' | 'off' })} title="Favorites">
+              <option value="top">★ Favorites first ({favs.size})</option>
+              <option value="only">★ Only favorites ({favs.size})</option>
+              <option value="off">Don't pin favorites</option>
+            </select>
             <select className="select" value={sort} onChange={(e) => setSort(e.target.value as Sort)} title="Sort">
               {years.length > 0 && <option value="new">Newest first</option>}
               {years.length > 0 && <option value="old">Oldest first</option>}
@@ -420,7 +446,19 @@ function CategoryView({
                   {filtered.slice(0, limit).map((it) => (
                     <tr key={it.id} className={it.id === sel ? 'hw-row on' : 'hw-row'} onClick={() => setSel(it.id === sel ? null : it.id)}>
                       <td className="hw-name">
-                        <div>{it.name}</div>
+                        <div>
+                          <button
+                            className={favs.has(it.id) ? 'fav on' : 'fav'}
+                            title={favs.has(it.id) ? 'Remove from favorites' : 'Add to favorites'}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFav(it.id);
+                            }}
+                          >
+                            {favs.has(it.id) ? '★' : '☆'}
+                          </button>
+                          {it.name}
+                        </div>
                         <div className="muted small">
                           {it.maker}
                           {typeof it.chipset === 'string' && !it.name.toLowerCase().includes(it.chipset.toLowerCase()) ? ` · ${it.chipset}` : ''}
@@ -464,7 +502,18 @@ function CategoryView({
                 </div>
               )}
             </div>
-            {selected && <Detail cat={cat} item={selected} close={() => setSel(null)} select={setSel} openOther={openOther} />}
+            {selected && (
+              <Detail
+                cat={cat}
+                item={selected}
+                close={() => setSel(null)}
+                select={setSel}
+                openOther={openOther}
+                fav={favs.has(selected.id)}
+                toggleFav={() => toggleFav(selected.id)}
+                compare={() => onCompare(selected.id)}
+              />
+            )}
           </div>
         </div>
       )}
@@ -478,12 +527,18 @@ function Detail({
   close,
   select,
   openOther,
+  fav,
+  toggleFav,
+  compare,
 }: {
   cat: CatalogCategory;
   item: CatalogItem;
   close: () => void;
   select: (id: string) => void;
   openOther: (cat: string, item?: string) => void;
+  fav: boolean;
+  toggleFav: () => void;
+  compare: () => void;
 }) {
   const rows = specRows(cat, item);
   // Retail cards show the full specs of their GPU chip (same category).
@@ -496,6 +551,8 @@ function Detail({
       ? { href: `https://pcpartpicker.com/search/?q=${encodeURIComponent(item.name)}`, label: 'Look it up on PCPartPicker' }
       : null;
   const wd = item.wd ? Object.entries(item.wd) : [];
+  // Family tree: the same tier across generations (for a retail card, its GPU chip's family).
+  const family = useMemo(() => familyOf(chip ?? item, cat.items, cat.id), [chip, item, cat]);
   const released = item.date
     ? new Date(`${item.date.length === 7 ? `${item.date}-01` : item.date}T12:00:00`).toLocaleDateString(undefined, {
         year: 'numeric',
@@ -521,6 +578,14 @@ function Detail({
         </div>
         <button className="btn small ghost" onClick={close} title="Close">
           ✕
+        </button>
+      </div>
+      <div className="hw-actions">
+        <button className={fav ? 'btn small fav-btn on' : 'btn small ghost fav-btn'} onClick={toggleFav}>
+          {fav ? '★ Favorite' : '☆ Add to favorites'}
+        </button>
+        <button className="btn small ghost" onClick={compare}>
+          ⇄ Compare
         </button>
       </div>
 
@@ -567,6 +632,35 @@ function Detail({
               ))}
             </tbody>
           </table>
+        </>
+      )}
+      {family.length > 1 && (
+        <>
+          <h3 className="hw-sub">Family tree</h3>
+          <p className="muted small">The same tier across generations, oldest first. FP32 compute is a rough guide to raw power.</p>
+          <ol className="family">
+            {family.map((f, i) => {
+              const prev = family[i - 1];
+              const tf = typeof f.fp32 === 'number' ? f.fp32 : undefined;
+              const ptf = prev && typeof prev.fp32 === 'number' ? prev.fp32 : undefined;
+              const gain = tf && ptf ? Math.round((tf / ptf - 1) * 100) : undefined;
+              const isMe = f.id === (chip ?? item).id;
+              return (
+                <li key={f.id} className={isMe ? 'on' : ''}>
+                  <button className="link" onClick={() => select(f.id)} disabled={isMe}>
+                    {f.name}
+                  </button>
+                  <span className="muted small">
+                    {' '}
+                    {[f.year, f.memory, typeof f.cores === 'number' ? `${f.cores} cores` : '', f.socket, tf ? `${formatValue(tf)} GFLOPS` : '']
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
+                  {gain !== undefined && <span className={gain >= 0 ? 'pos small' : 'neg small'}> {gain >= 0 ? '+' : ''}{gain}%</span>}
+                </li>
+              );
+            })}
+          </ol>
         </>
       )}
       {!rows.length && !wd.length && <p className="muted small">No specifications recorded yet.</p>}

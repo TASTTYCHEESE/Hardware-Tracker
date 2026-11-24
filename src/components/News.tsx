@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { keywordHits } from '../lib/newsAlerts';
 import type { AppData } from '../lib/useData';
 import type { Category } from '../lib/types';
 import { CatBadge, catLabel } from './Common';
@@ -6,9 +7,25 @@ import { ago } from '../lib/format';
 
 const FILTERS: (Category | 'All')[] = ['All', 'GPU', 'CPU', 'RAM', 'Industry', 'Other'];
 
-export function News({ data }: { data: AppData }) {
+export function News({ data, openReader }: { data: AppData; openReader?: (url: string) => void }) {
   const [cat, setCat] = useState<Category | 'All'>('All');
   const [q, setQ] = useState('');
+  const [bell, setBell] = useState(false);
+  const [kw, setKw] = useState('');
+  const keywords = data.settings.newsKeywords ?? [];
+  const seen = useMemo(() => new Set(data.settings.newsSeen ?? []), [data.settings.newsSeen]);
+  const hits = useMemo(() => keywordHits(data.feed.articles, keywords), [data.feed.articles, keywords.join('|')]);
+  const unread = hits.filter((h) => !seen.has(h.a.id));
+  const markSeen = (ids: string[]) =>
+    data.setSettings({ newsSeen: [...new Set([...(data.settings.newsSeen ?? []), ...ids])].slice(-2000) });
+  const addKw = () => {
+    const k = kw.trim();
+    if (!k || keywords.some((x) => x.toLowerCase() === k.toLowerCase())) return setKw('');
+    // Articles already in the feed when you add a keyword don't count as new.
+    const old = keywordHits(data.feed.articles, [k]).map((h) => h.a.id);
+    data.setSettings({ newsKeywords: [...keywords, k], newsSeen: [...new Set([...(data.settings.newsSeen ?? []), ...old])].slice(-2000) });
+    setKw('');
+  };
   const list = data.feed.articles.filter(
     (a) => (cat === 'All' || a.category === cat) && (!q || `${a.title} ${a.summary}`.toLowerCase().includes(q.toLowerCase())),
   );
@@ -17,6 +34,64 @@ export function News({ data }: { data: AppData }) {
       <div className="section-head">
         <h1>Live news</h1>
         <div className="row">
+          <div className="bell-wrap">
+            <button className={bell ? 'bell on' : 'bell'} onClick={() => setBell((b) => !b)} title="Keyword alerts">
+              🔔{unread.length > 0 && <span className="bell-count">{unread.length > 99 ? '99+' : unread.length}</span>}
+            </button>
+            {bell && (
+              <div className="bell-panel card">
+                <div className="bell-head">
+                  <strong>Keyword alerts</strong>
+                  {unread.length > 0 && (
+                    <button className="link small" onClick={() => markSeen(unread.map((h) => h.a.id))}>
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
+                <div className="bell-kws">
+                  {keywords.map((k) => (
+                    <span key={k} className="chip on">
+                      {k}
+                      <button className="chip-x" title={`Stop alerts for "${k}"`} onClick={() => data.setSettings({ newsKeywords: keywords.filter((x) => x !== k) })}>
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      addKw();
+                    }}
+                  >
+                    <input className="search small-input" placeholder={keywords.length ? 'Add a keyword…' : 'Add a keyword, e.g. RTX 5070 Super'} value={kw} onChange={(e) => setKw(e.target.value)} />
+                  </form>
+                </div>
+                <div className="bell-list">
+                  {!keywords.length && <p className="muted small">Add words you care about. When a new headline mentions one, it shows up here and the bell lights up.</p>}
+                  {keywords.length > 0 && !hits.length && <p className="muted small">No headlines mention your keywords right now. New ones will show up here.</p>}
+                  {hits.slice(0, 40).map((h) => (
+                    <button
+                      key={h.a.id}
+                      className={seen.has(h.a.id) ? 'bell-item' : 'bell-item unread'}
+                      onClick={() => {
+                        markSeen([h.a.id]);
+                        if (openReader) openReader(h.a.link);
+                        else window.open(h.a.link, '_blank');
+                      }}
+                    >
+                      {!seen.has(h.a.id) && <span className="dot" />}
+                      <span>
+                        <span className="bell-title">{h.a.title}</span>
+                        <span className="muted small">
+                          "{h.kw}" · {h.a.source} · {ago(h.a.date)}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
           <span className="muted small">{data.feedUpdated ? `Updated ${ago(data.feedUpdated)}` : ''}</span>
           <button className="btn small" onClick={data.refreshFeeds} disabled={data.feedLoading}>
             {data.feedLoading ? 'Refreshing…' : 'Refresh'}

@@ -14,6 +14,18 @@ interface Settings {
   /** countries shown on the Prices page (default US) */
   priceRegions?: string[];
   priceSort?: string;
+  /** PC Hardware favorites: category id -> item ids */
+  favorites?: Record<string, string[]>;
+  /** how favorites show in lists */
+  favMode?: 'top' | 'only' | 'off';
+  /** products being compared */
+  compare?: { cat: string; ids: string[] };
+  /** products on the "Buy or wait?" list */
+  buyList?: { cat: string; id: string; name: string }[];
+  /** Live news keyword alerts */
+  newsKeywords?: string[];
+  /** ids of keyword-alert articles already seen */
+  newsSeen?: string[];
   /** products the user added to the price tracker */
   priceProducts?: { model: string; category: 'GPU' | 'CPU' | 'RAM' }[];
   /** 'local' or a currency code to convert all prices into */
@@ -59,6 +71,8 @@ interface HwtApi {
   setSettings(patch: Partial<Settings>): Promise<Settings>;
   chooseFolder(): Promise<string | null>;
   openFolder(): Promise<void>;
+  /** Desktop only: save part of the window as a PNG (asks where). */
+  saveImage?(dataUrl: string, name: string): Promise<{ ok: boolean; path?: string }>;
   notify(title: string, body: string): Promise<void>;
   archiveArticles(list: FeedArticle[]): Promise<void>;
   listArchiveDays(): Promise<string[]>;

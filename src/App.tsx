@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Reader } from './components/Reader';
 import { api } from './lib/platform';
 import { useData } from './lib/useData';
@@ -12,6 +12,10 @@ import { Tracking } from './components/Tracking';
 import { SettingsPage } from './components/Settings';
 import { Hardware, resetHardwareViews } from './components/Hardware';
 import { Updates } from './components/Updates';
+import { Compare } from './components/Compare';
+import { BuyAdvisor } from './components/BuyAdvisor';
+import { Launches } from './components/Launches';
+import { keywordHits } from './lib/newsAlerts';
 import type { UpdateInfo } from './lib/platform';
 
 type Section = 'today' | 'overview' | 'prices' | 'hardware' | 'settings' | 'updates';
@@ -35,6 +39,7 @@ const SUBTABS: Record<Section, { id: string; label: string }[]> = {
   overview: [
     { id: 'overview', label: 'Overview' },
     { id: 'news', label: 'Live news' },
+    { id: 'launches', label: 'Launch calendar' },
     { id: 'archive', label: 'Archive' },
   ],
   prices: [
@@ -45,6 +50,8 @@ const SUBTABS: Record<Section, { id: string; label: string }[]> = {
   hardware: [
     { id: 'hardware', label: 'Hardware' },
     { id: 'peripherals', label: 'Peripherals' },
+    { id: 'compare', label: 'Compare' },
+    { id: 'buy', label: 'Buy or wait?' },
   ],
   settings: [],
   updates: [],
@@ -164,6 +171,11 @@ export default function App() {
   useEffect(() => window.hwt?.onNavigate?.((target: string) => go(target)), []);
 
   const dropCount = data.alerts.filter((a) => a.to < a.from).length;
+  // Unread keyword alerts in Live news (shown like notifications on the menu and tab).
+  const newsUnread = useMemo(() => {
+    const seen = new Set(data.settings.newsSeen ?? []);
+    return keywordHits(data.feed.articles, data.settings.newsKeywords ?? []).filter((h) => !seen.has(h.a.id)).length;
+  }, [data.feed.articles, data.settings.newsKeywords, data.settings.newsSeen]);
   const hitCount = data.watchHits.length;
 
   /** Navigate by old-style page id ("news", "alerts", "recap:<id>", ...). */
@@ -182,6 +194,9 @@ export default function App() {
       alerts: ['prices', 'alerts'],
       tracking: ['prices', 'tracking'],
       hardware: ['hardware', 'hardware'],
+      compare: ['hardware', 'compare'],
+      buy: ['hardware', 'buy'],
+      launches: ['overview', 'launches'],
       peripherals: ['hardware', 'peripherals'],
       settings: ['settings', ''],
       updates: ['updates', ''],
@@ -215,6 +230,7 @@ export default function App() {
             <span className="nav-icon">{n.icon}</span>
             {n.label}
             {n.id === 'prices' && hitCount + dropCount > 0 && <span className="pill">{hitCount + dropCount}</span>}
+            {n.id === 'overview' && newsUnread > 0 && <span className="pill alert" title="New keyword alerts in Live news">{newsUnread}</span>}
             {n.id === 'updates' && update?.state === 'ready' && <span className="pill" title="Update ready">New</span>}
           </button>
         ))}
@@ -234,6 +250,7 @@ export default function App() {
                   {t.label}
                   {t.id === 'alerts' && dropCount > 0 && <span className="seg-count good">{dropCount}</span>}
                   {t.id === 'tracking' && hitCount > 0 && <span className="seg-count good">{hitCount}</span>}
+                  {t.id === 'news' && newsUnread > 0 && <span className="seg-count alert">{newsUnread}</span>}
                 </button>
               ))}
             </div>
@@ -242,17 +259,27 @@ export default function App() {
         <div className="content" ref={contentRef} key={nonce}>
           {section === 'today' && <Today data={data} go={go} offset={Number(current) || 0} />}
           {section === 'overview' && current === 'overview' && <Overview data={data} go={go} />}
-          {section === 'overview' && current === 'news' && <News data={data} />}
+          {section === 'overview' && current === 'news' && <News data={data} openReader={api.platform === 'desktop' ? setReading : undefined} />}
+          {section === 'overview' && current === 'launches' && <Launches />}
           {section === 'overview' && current === 'archive' && <Archive data={data} selected={recapId} select={setRecapId} />}
           {section === 'prices' && current === 'prices' && <Prices data={data} />}
           {section === 'prices' && current === 'alerts' && <Alerts data={data} />}
           {section === 'prices' && current === 'tracking' && <Tracking data={data} />}
-          {section === 'hardware' && <Hardware
+          {section === 'hardware' && current === 'compare' && <Compare data={data} />}
+          {section === 'hardware' && current === 'buy' && <BuyAdvisor data={data} />}
+          {section === 'hardware' && (current === 'hardware' || current === 'peripherals') && <Hardware
               key={current}
               group={current === 'peripherals' ? 'peripherals' : 'hardware'}
               cat={loc.cat}
               item={loc.item}
               navigate={(cat, item, group) => nav({ cat, item, ...(group ? { sub: group } : {}) })}
+              data={data}
+              onCompare={(cat, id) => {
+                const cur = data.settings.compare;
+                const ids = cur && cur.cat === cat ? cur.ids.filter((x) => x !== id) : [];
+                data.setSettings({ compare: { cat, ids: [...ids, id].slice(-4) } });
+                nav({ sub: 'compare', cat: null, item: null });
+              }}
             />}
           {section === 'settings' && <SettingsPage data={data} />}
           {section === 'updates' && <Updates data={data} info={update} setInfo={setUpdate} />}

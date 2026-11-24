@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('hwt', {
     return () => ipcRenderer.removeListener('update-status', h);
   },
   syncNow: () => ipcRenderer.invoke('sync-now'),
+  saveImage: (dataUrl, name) => ipcRenderer.invoke('save-image', dataUrl, name),
   catalogIndex: (force) => ipcRenderer.invoke('catalog-index', force),
   catalogCategory: (id) => ipcRenderer.invoke('catalog-category', id),
   onNavigate: (cb) => {
