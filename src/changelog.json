@@ -2,8 +2,9 @@
   {
     "version": "0.9.4",
     "date": "2026-11-24",
-    "title": "Mac, Linux, Android and a web app for iPhone",
+    "title": "The Mobile App Update",
     "notes": [
+      "Hardware Tracker now runs on Mac, Linux, Android and iPhone, not just Windows.",
       "Mac: a .dmg for Apple Silicon and one for Intel Macs. The app tells you when a new version is out and links the download (Mac apps can only update themselves with a paid Apple certificate).",
       "Linux: an AppImage that updates itself, and a .deb for Debian, Ubuntu and Mint.",
       "Android: an app (.apk) with the in-app reader, live news and everything else. The Updates page tells you when a new version is out.",
