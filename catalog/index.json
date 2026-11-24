@@ -1,6 +1,6 @@
 {
  "version": "2026-11-24",
- "updated": "2026-11-24T12:59Z",
+ "updated": "2026-11-24T13:28Z",
  "categories": [
   {
    "id": "gpu",
@@ -21,13 +21,13 @@
    "name": "Processors (CPUs)",
    "group": "hardware",
    "description": "Desktop, laptop and server processors, from early chips to the newest releases.",
-   "count": 1413,
-   "makers": 2,
+   "count": 12884,
+   "makers": 87,
    "years": [
-    2006,
-    2024
+    1954,
+    2025
    ],
-   "bytes": 310551,
+   "bytes": 4140475,
    "file": "cpu.json"
   },
   {
