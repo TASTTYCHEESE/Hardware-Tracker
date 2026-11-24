@@ -1,7 +1,7 @@
 {
   "name": "hardware-tracker",
   "productName": "Hardware Tracker",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "PC gaming hardware news, price trends and daily/weekly recaps (GPU, CPU, RAM).",
   "author": "Hardware Tracker",
   "private": true,
@@ -12,7 +12,8 @@
     "start": "npm run build && electron .",
     "dist:win": "npm run build && electron-builder --win --x64",
     "dist:linux": "npm run build && electron-builder --linux dir",
-    "dist:win-zip": "npm run build && electron-builder --win zip --x64 --publish never"
+    "dist:win-zip": "npm run build && electron-builder --win zip --x64 --publish never",
+    "release-notes": "node tools/release-notes.cjs"
   },
   "dependencies": {
     "@mozilla/readability": "0.6.0",
@@ -68,7 +69,10 @@
         "repo": "Hardware-Tracker",
         "releaseType": "release"
       }
-    ]
+    ],
+    "releaseInfo": {
+      "releaseNotesFile": "build/release-notes.md"
+    }
   },
   "repository": {
     "type": "git",

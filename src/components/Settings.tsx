@@ -11,7 +11,6 @@ export function SettingsPage({ data }: { data: AppData }) {
   }, [s.feeds]);
   const desktop = api.platform === 'desktop';
   const [syncMsg, setSyncMsg] = useState('');
-  const [updMsg, setUpdMsg] = useState('');
   const [info, setInfo] = useState<{ version: string; updateStatus?: string } | null>(null);
   useEffect(() => {
     api.appInfo?.().then(setInfo).catch(() => {});
@@ -118,20 +117,6 @@ export function SettingsPage({ data }: { data: AppData }) {
             <span className="muted small">
               {syncMsg || (s.lastSync ? `Last sync ${new Date(s.lastSync).toLocaleString()}${s.lastSyncError ? ` (failed: ${s.lastSyncError})` : ''}` : '')}
             </span>
-          </div>
-        </section>
-      )}
-
-      {desktop && (
-        <section className="card">
-          <h3>Updates</h3>
-          <p className="muted small">The installed app checks GitHub for new versions every 6 hours, downloads them in the background and installs them when you quit.</p>
-          <div className="row">
-            <span>Version {info?.version ?? '…'}</span>
-            <button className="btn small ghost" onClick={async () => setUpdMsg((await api.checkForUpdates?.()) ?? '')}>
-              Check for updates
-            </button>
-            <span className="muted small">{updMsg || info?.updateStatus}</span>
           </div>
         </section>
       )}

@@ -287,6 +287,7 @@ ipcMain.handle('set-settings', async (_e, patch) => {
     watchDataDir();
   }
   if ('startWithWindows' in patch) applyLoginItem();
+  if ('autoInstallUpdates' in patch && upd) upd.applySettings();
   return { ...next, dataDir: dataDir() };
 });
 
@@ -298,7 +299,9 @@ ipcMain.handle('choose-folder', async () => {
 ipcMain.handle('open-folder', async () => shell.openPath(dataDir()));
 
 ipcMain.handle('app-info', async () => ({ version: app.getVersion(), updateStatus: upd ? upd.status() : '' }));
-ipcMain.handle('check-updates', async () => (upd ? upd.check() : 'Updater not ready'));
+ipcMain.handle('check-updates', async () => (upd ? upd.check() : null));
+ipcMain.handle('update-info', async () => (upd ? upd.info() : null));
+ipcMain.handle('update-restart', async () => (upd ? upd.restart() : false));
 ipcMain.handle('sync-now', async () => {
   const r = await bg.sync();
   if (r.added) notifyRenderer();
@@ -334,7 +337,14 @@ if (!app.requestSingleInstanceLock()) {
       isWindowVisible,
       onRecapsChanged: notifyRenderer,
     });
-    upd = updater.setup(readSettings);
+    upd = updater.setup({
+      readSettings,
+      showWindow,
+      onChange: (info) => win && !win.isDestroyed() && win.webContents.send('update-status', info),
+      beforeRestart: () => {
+        quitting = true;
+      },
+    });
     // Started by Windows at login: stay in the tray until needed.
     if (!process.argv.includes('--hidden')) createWindow();
   });

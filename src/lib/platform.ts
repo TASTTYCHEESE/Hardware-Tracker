@@ -27,10 +27,24 @@ interface Settings {
   lastSyncError?: string;
   lastAutoQuit?: number;
   lastAutoQuitReason?: string;
+  /** install downloaded updates on quit by themselves (default) or only via the Restart button */
+  autoInstallUpdates?: boolean;
   catalogUrl?: string;
   catalogChecked?: number;
   catalogError?: string;
   fxRates?: { rates: Record<string, number>; date: string; source: string; fetchedAt?: number };
+}
+
+export interface UpdateInfo {
+  state: 'idle' | 'checking' | 'none' | 'downloading' | 'ready' | 'error' | 'unsupported';
+  current: string;
+  version: string;
+  releaseName: string;
+  releaseDate: string;
+  notes: string;
+  percent: number;
+  message: string;
+  lastCheck: number;
 }
 
 interface HwtApi {
@@ -49,7 +63,10 @@ interface HwtApi {
   onDataChanged(cb: () => void): () => void;
   onNavigate?(cb: (target: string) => void): () => void;
   appInfo?(): Promise<{ version: string; updateStatus?: string }>;
-  checkForUpdates?(): Promise<string>;
+  checkForUpdates?(): Promise<UpdateInfo | null>;
+  updateInfo?(): Promise<UpdateInfo | null>;
+  restartToUpdate?(): Promise<boolean>;
+  onUpdateStatus?(cb: (info: UpdateInfo) => void): () => void;
   syncNow?(): Promise<{ added: number; error?: string }>;
   catalogIndex(force?: boolean): Promise<CatalogIndex>;
   catalogCategory(id: string): Promise<CatalogCategory>;

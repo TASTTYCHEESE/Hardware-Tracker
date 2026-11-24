@@ -15,6 +15,13 @@ contextBridge.exposeInMainWorld('hwt', {
   notify: (title, body) => ipcRenderer.invoke('notify', { title, body }),
   appInfo: () => ipcRenderer.invoke('app-info'),
   checkForUpdates: () => ipcRenderer.invoke('check-updates'),
+  updateInfo: () => ipcRenderer.invoke('update-info'),
+  restartToUpdate: () => ipcRenderer.invoke('update-restart'),
+  onUpdateStatus: (cb) => {
+    const h = (_e, info) => cb(info);
+    ipcRenderer.on('update-status', h);
+    return () => ipcRenderer.removeListener('update-status', h);
+  },
   syncNow: () => ipcRenderer.invoke('sync-now'),
   catalogIndex: (force) => ipcRenderer.invoke('catalog-index', force),
   catalogCategory: (id) => ipcRenderer.invoke('catalog-category', id),

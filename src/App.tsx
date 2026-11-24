@@ -11,6 +11,8 @@ import { Alerts } from './components/Alerts';
 import { Tracking } from './components/Tracking';
 import { SettingsPage } from './components/Settings';
 import { Hardware } from './components/Hardware';
+import { Updates } from './components/Updates';
+import type { UpdateInfo } from './lib/platform';
 
 type Section = 'today' | 'overview' | 'prices' | 'hardware' | 'settings';
 
@@ -43,13 +45,21 @@ const SUBTABS: Record<Section, { id: string; label: string }[]> = {
     { id: 'hardware', label: 'Hardware' },
     { id: 'peripherals', label: 'Peripherals' },
   ],
-  settings: [],
+  settings: [
+    { id: 'general', label: 'General' },
+    { id: 'updates', label: 'Updates' },
+  ],
 };
 
 export default function App() {
   const data = useData();
   const [section, setSection] = useState<Section>('today');
-  const [sub, setSub] = useState<Record<Section, string>>({ today: '0', overview: 'overview', prices: 'prices', hardware: 'hardware', settings: '' });
+  const [sub, setSub] = useState<Record<Section, string>>({ today: '0', overview: 'overview', prices: 'prices', hardware: 'hardware', settings: 'general' });
+  const [update, setUpdate] = useState<UpdateInfo | null>(null);
+  useEffect(() => {
+    api.updateInfo?.().then((i) => i && setUpdate(i)).catch(() => {});
+    return api.onUpdateStatus?.(setUpdate);
+  }, []);
   const [recapId, setRecapId] = useState<string>();
   const [reading, setReading] = useState<string | null>(null);
 
@@ -91,7 +101,8 @@ export default function App() {
       tracking: ['prices', 'tracking'],
       hardware: ['hardware', 'hardware'],
       peripherals: ['hardware', 'peripherals'],
-      settings: ['settings', ''],
+      settings: ['settings', 'general'],
+      updates: ['settings', 'updates'],
     };
     const [s, t] = map[v] ?? ['today', '0'];
     open(s, t);
@@ -119,6 +130,7 @@ export default function App() {
             <span className="nav-icon">{n.icon}</span>
             {n.label}
             {n.id === 'prices' && hitCount + dropCount > 0 && <span className="pill">{hitCount + dropCount}</span>}
+            {n.id === 'settings' && update?.state === 'ready' && <span className="pill" title="Update ready">1</span>}
           </button>
         ))}
         <div className="sidebar-foot muted small">
@@ -137,6 +149,7 @@ export default function App() {
                   {t.label}
                   {t.id === 'alerts' && dropCount > 0 && <span className="seg-count good">{dropCount}</span>}
                   {t.id === 'tracking' && hitCount > 0 && <span className="seg-count good">{hitCount}</span>}
+                  {t.id === 'updates' && update?.state === 'ready' && <span className="seg-count good">New</span>}
                 </button>
               ))}
             </div>
@@ -151,7 +164,8 @@ export default function App() {
           {section === 'prices' && current === 'alerts' && <Alerts data={data} />}
           {section === 'prices' && current === 'tracking' && <Tracking data={data} />}
           {section === 'hardware' && <Hardware key={current} group={current === 'peripherals' ? 'peripherals' : 'hardware'} />}
-          {section === 'settings' && <SettingsPage data={data} />}
+          {section === 'settings' && current !== 'updates' && <SettingsPage data={data} />}
+          {section === 'settings' && current === 'updates' && <Updates data={data} info={update} setInfo={setUpdate} />}
         </div>
       </main>
     </div>

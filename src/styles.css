@@ -338,3 +338,17 @@ textarea {
 .hw-specs td { padding: 5px 0; border-bottom: 1px solid var(--line); }
 .hw-specs th { border-bottom: 1px solid var(--line); }
 .hw-sub { margin: 6px 0 0; color: var(--muted); font-weight: 600; }
+
+/* ---- Updates ---- */
+.upd-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.upd-head h2 { font-size: 22px; margin: 2px 0; }
+.upd-hero { border-color: rgba(61, 220, 151, .45); }
+.upd-sub { margin: 18px 0 6px; color: var(--muted); font-weight: 600; }
+.upd-notes p { margin: 0 0 6px; }
+.upd-notes ul { margin: 4px 0 12px; padding-left: 20px; }
+.upd-notes li { margin: 3px 0; }
+.upd-bar { height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; margin: 14px 0 4px; }
+.upd-bar > div { height: 100%; background: var(--down); transition: width .3s; }
+.upd-older { margin-top: 10px; }
+.upd-older summary { cursor: pointer; }
+.upd-older h4 { margin: 14px 0 4px; }

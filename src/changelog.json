@@ -1,0 +1,36 @@
+[
+  {
+    "version": "0.8.1",
+    "date": "2026-11-24",
+    "title": "Updates page",
+    "notes": [
+      "New Updates tab under Settings: see your version, what the next update adds, and how far the download is.",
+      "\"Restart and update\" button to install a downloaded update right away.",
+      "New checkbox to choose: install updates automatically when you quit, or only when you click Restart.",
+      "The update notification now opens the Updates tab."
+    ]
+  },
+  {
+    "version": "0.8.0",
+    "date": "2026-11-24",
+    "title": "PC Hardware section",
+    "notes": [
+      "New PC Hardware section (between Prices and Settings) with Hardware and Peripherals tabs.",
+      "About 70,000 products in 38 categories: GPU chips since 1986, graphics cards, CPUs, motherboards, RAM, SSDs, hard drives, PSUs, coolers, cases, monitors, keyboards, mice, headsets and more.",
+      "Search and filter by manufacturer, year range and category specs; click a product for its full specifications.",
+      "The catalog updates itself twice a week and works offline once a category has been opened."
+    ]
+  },
+  {
+    "version": "0.7.0",
+    "date": "2026-11-24",
+    "title": "Tray mode, tracking and auto-updates",
+    "notes": [
+      "New menu: Today, Overview, Prices and Settings, with tabs along the top.",
+      "Tracking tab: watch products with a target price and get notified when they hit it.",
+      "Runs quietly in the tray, starts with Windows, and closes itself when the PC is busy.",
+      "Daily and weekly recaps download automatically from GitHub every hour.",
+      "Installs from a setup file and updates itself."
+    ]
+  }
+]
