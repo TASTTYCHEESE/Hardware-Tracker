@@ -1,0 +1,433 @@
+{
+ "version": "2026-11-24",
+ "updated": "2026-11-24T12:59Z",
+ "categories": [
+  {
+   "id": "gpu",
+   "name": "Graphics chips (GPUs)",
+   "group": "hardware",
+   "description": "Every desktop, laptop, workstation and console graphics chip since 1986, with full specifications.",
+   "count": 2824,
+   "makers": 8,
+   "years": [
+    1986,
+    2025
+   ],
+   "bytes": 2027171,
+   "file": "gpu.json"
+  },
+  {
+   "id": "cpu",
+   "name": "Processors (CPUs)",
+   "group": "hardware",
+   "description": "Desktop, laptop and server processors, from early chips to the newest releases.",
+   "count": 1413,
+   "makers": 2,
+   "years": [
+    2006,
+    2024
+   ],
+   "bytes": 310551,
+   "file": "cpu.json"
+  },
+  {
+   "id": "graphics-card",
+   "name": "Graphics cards",
+   "group": "hardware",
+   "description": "Retail graphics cards from MSI, Asus, Gigabyte, Sapphire and every other board partner.",
+   "count": 6636,
+   "makers": 43,
+   "years": [
+    2003,
+    2025
+   ],
+   "bytes": 1689010,
+   "file": "graphics-card.json"
+  },
+  {
+   "id": "motherboard",
+   "name": "Motherboards",
+   "group": "hardware",
+   "description": "Motherboards for every socket and form factor.",
+   "count": 4973,
+   "makers": 17,
+   "years": null,
+   "bytes": 862871,
+   "file": "motherboard.json"
+  },
+  {
+   "id": "memory",
+   "name": "Memory (RAM)",
+   "group": "hardware",
+   "description": "Desktop memory kits, DDR to DDR5.",
+   "count": 13553,
+   "makers": 54,
+   "years": null,
+   "bytes": 2994192,
+   "file": "memory.json"
+  },
+  {
+   "id": "ssd",
+   "name": "SSDs",
+   "group": "hardware",
+   "description": "Solid state drives: NVMe, SATA, M.2 and more.",
+   "count": 4677,
+   "makers": 93,
+   "years": null,
+   "bytes": 669758,
+   "file": "ssd.json"
+  },
+  {
+   "id": "hdd",
+   "name": "Hard drives (HDD)",
+   "group": "hardware",
+   "description": "Spinning hard drives for desktops, NAS and servers.",
+   "count": 1784,
+   "makers": 14,
+   "years": null,
+   "bytes": 312179,
+   "file": "hdd.json"
+  },
+  {
+   "id": "power-supply",
+   "name": "Power supplies (PSU)",
+   "group": "hardware",
+   "description": "ATX, SFX and other power supplies.",
+   "count": 3438,
+   "makers": 106,
+   "years": null,
+   "bytes": 541918,
+   "file": "power-supply.json"
+  },
+  {
+   "id": "cpu-cooler",
+   "name": "CPU coolers",
+   "group": "hardware",
+   "description": "Air coolers and all-in-one liquid coolers.",
+   "count": 2851,
+   "makers": 107,
+   "years": null,
+   "bytes": 399895,
+   "file": "cpu-cooler.json"
+  },
+  {
+   "id": "case",
+   "name": "Cases",
+   "group": "hardware",
+   "description": "PC cases from mini-ITX to full tower.",
+   "count": 6626,
+   "makers": 160,
+   "years": null,
+   "bytes": 1181227,
+   "file": "case.json"
+  },
+  {
+   "id": "case-fan",
+   "name": "Case fans",
+   "group": "hardware",
+   "description": "Case and radiator fans.",
+   "count": 2744,
+   "makers": 99,
+   "years": null,
+   "bytes": 478814,
+   "file": "case-fan.json"
+  },
+  {
+   "id": "fan-controller",
+   "name": "Fan controllers",
+   "group": "hardware",
+   "description": "Fan hubs and controllers.",
+   "count": 54,
+   "makers": 16,
+   "years": null,
+   "bytes": 7956,
+   "file": "fan-controller.json"
+  },
+  {
+   "id": "thermal-paste",
+   "name": "Thermal paste",
+   "group": "hardware",
+   "description": "Thermal compounds.",
+   "count": 210,
+   "makers": 44,
+   "years": null,
+   "bytes": 20247,
+   "file": "thermal-paste.json"
+  },
+  {
+   "id": "sound-card",
+   "name": "Sound cards",
+   "group": "hardware",
+   "description": "Internal sound cards.",
+   "count": 77,
+   "makers": 15,
+   "years": null,
+   "bytes": 14200,
+   "file": "sound-card.json"
+  },
+  {
+   "id": "network-card",
+   "name": "Network cards (wired)",
+   "group": "hardware",
+   "description": "Ethernet adapters.",
+   "count": 157,
+   "makers": 27,
+   "years": null,
+   "bytes": 16682,
+   "file": "network-card.json"
+  },
+  {
+   "id": "wifi-card",
+   "name": "Wi-Fi cards",
+   "group": "hardware",
+   "description": "Wireless network adapters.",
+   "count": 376,
+   "makers": 43,
+   "years": null,
+   "bytes": 47229,
+   "file": "wifi-card.json"
+  },
+  {
+   "id": "optical-drive",
+   "name": "Optical drives",
+   "group": "hardware",
+   "description": "CD, DVD and Blu-ray drives.",
+   "count": 231,
+   "makers": 21,
+   "years": null,
+   "bytes": 31589,
+   "file": "optical-drive.json"
+  },
+  {
+   "id": "case-accessory",
+   "name": "Case accessories",
+   "group": "hardware",
+   "description": "Lighting kits, card readers and other case add-ons.",
+   "count": 8,
+   "makers": 4,
+   "years": null,
+   "bytes": 1240,
+   "file": "case-accessory.json"
+  },
+  {
+   "id": "ups",
+   "name": "UPS (battery backup)",
+   "group": "hardware",
+   "description": "Uninterruptible power supplies.",
+   "count": 702,
+   "makers": 13,
+   "years": null,
+   "bytes": 76650,
+   "file": "ups.json"
+  },
+  {
+   "id": "os",
+   "name": "Operating systems",
+   "group": "hardware",
+   "description": "Retail and OEM operating system editions.",
+   "count": 62,
+   "makers": 1,
+   "years": null,
+   "bytes": 9769,
+   "file": "os.json"
+  },
+  {
+   "id": "monitor",
+   "name": "Monitors",
+   "group": "peripherals",
+   "description": "Gaming, office and professional monitors.",
+   "count": 5074,
+   "makers": 72,
+   "years": null,
+   "bytes": 915380,
+   "file": "monitor.json"
+  },
+  {
+   "id": "keyboard",
+   "name": "Keyboards",
+   "group": "peripherals",
+   "description": "Mechanical, membrane, wired and wireless keyboards.",
+   "count": 4310,
+   "makers": 194,
+   "years": null,
+   "bytes": 848617,
+   "file": "keyboard.json"
+  },
+  {
+   "id": "mouse",
+   "name": "Mice",
+   "group": "peripherals",
+   "description": "Gaming and office mice.",
+   "count": 2806,
+   "makers": 159,
+   "years": null,
+   "bytes": 535654,
+   "file": "mouse.json"
+  },
+  {
+   "id": "headphones",
+   "name": "Headphones & headsets",
+   "group": "peripherals",
+   "description": "Headphones, headsets and earbuds.",
+   "count": 2946,
+   "makers": 154,
+   "years": null,
+   "bytes": 617649,
+   "file": "headphones.json"
+  },
+  {
+   "id": "speakers",
+   "name": "Speakers",
+   "group": "peripherals",
+   "description": "Desktop speakers and sound bars.",
+   "count": 302,
+   "makers": 45,
+   "years": null,
+   "bytes": 45918,
+   "file": "speakers.json"
+  },
+  {
+   "id": "webcam",
+   "name": "Webcams",
+   "group": "peripherals",
+   "description": "Webcams and streaming cameras.",
+   "count": 78,
+   "makers": 17,
+   "years": null,
+   "bytes": 15067,
+   "file": "webcam.json"
+  },
+  {
+   "id": "external-storage",
+   "name": "External storage",
+   "group": "peripherals",
+   "description": "Portable and desktop external drives.",
+   "count": 690,
+   "makers": 34,
+   "years": null,
+   "bytes": 112989,
+   "file": "external-storage.json"
+  },
+  {
+   "id": "chipset",
+   "name": "Chipsets",
+   "group": "hardware",
+   "description": "Motherboard chipsets (Intel Z/B/H, AMD X/B/A series).",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 349,
+   "file": "chipset.json"
+  },
+  {
+   "id": "capture-card",
+   "name": "Capture cards",
+   "group": "hardware",
+   "description": "Internal and external video capture cards.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 348,
+   "file": "capture-card.json"
+  },
+  {
+   "id": "cooling-custom",
+   "name": "Custom water cooling",
+   "group": "hardware",
+   "description": "Water blocks, pumps, reservoirs and radiators.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 361,
+   "file": "cooling-custom.json"
+  },
+  {
+   "id": "microphone",
+   "name": "Microphones",
+   "group": "peripherals",
+   "description": "USB and XLR microphones for streaming and calls.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 353,
+   "file": "microphone.json"
+  },
+  {
+   "id": "controller",
+   "name": "Game controllers",
+   "group": "peripherals",
+   "description": "Gamepads, arcade sticks, wheels and flight sticks.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 360,
+   "file": "controller.json"
+  },
+  {
+   "id": "mousepad",
+   "name": "Mouse pads",
+   "group": "peripherals",
+   "description": "Cloth, hard and glass mouse pads.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 335,
+   "file": "mousepad.json"
+  },
+  {
+   "id": "vr-headset",
+   "name": "VR headsets",
+   "group": "peripherals",
+   "description": "PC virtual reality headsets.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 333,
+   "file": "vr-headset.json"
+  },
+  {
+   "id": "printer",
+   "name": "Printers & scanners",
+   "group": "peripherals",
+   "description": "Inkjet, laser and 3D printers, and scanners.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 354,
+   "file": "printer.json"
+  },
+  {
+   "id": "router",
+   "name": "Routers & networking",
+   "group": "peripherals",
+   "description": "Routers, mesh Wi-Fi and network switches.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 351,
+   "file": "router.json"
+  },
+  {
+   "id": "drawing-tablet",
+   "name": "Drawing tablets",
+   "group": "peripherals",
+   "description": "Pen tablets and pen displays.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 342,
+   "file": "drawing-tablet.json"
+  },
+  {
+   "id": "streaming",
+   "name": "Streaming gear",
+   "group": "peripherals",
+   "description": "Stream decks, lights and audio interfaces.",
+   "count": 0,
+   "makers": 0,
+   "years": null,
+   "bytes": 349,
+   "file": "streaming.json"
+  }
+ ]
+}

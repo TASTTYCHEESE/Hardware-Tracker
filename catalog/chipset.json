@@ -1,0 +1,1 @@
+{"id":"chipset","name":"Chipsets","group":"hardware","description":"Motherboard chipsets (Intel Z/B/H, AMD X/B/A series).","fields":[],"filters":["maker","year"],"sources":[{"name":"Hardware Tracker news recaps","url":"https://github.com/TASTTYCHEESE/Hardware-Tracker"}],"note":"New category: items are added as they appear in the news.","items":[]}

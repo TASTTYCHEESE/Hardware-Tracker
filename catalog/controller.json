@@ -1,0 +1,1 @@
+{"id":"controller","name":"Game controllers","group":"peripherals","description":"Gamepads, arcade sticks, wheels and flight sticks.","fields":[],"filters":["maker","year"],"sources":[{"name":"Hardware Tracker news recaps","url":"https://github.com/TASTTYCHEESE/Hardware-Tracker"}],"note":"New category: items are added as they appear in the news.","items":[]}
