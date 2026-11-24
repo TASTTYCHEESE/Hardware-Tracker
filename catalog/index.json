@@ -1,21 +1,7 @@
 {
- "version": "2026-11-24T1347",
- "updated": "2026-11-24T13:47Z",
+ "version": "2026-11-24T1400",
+ "updated": "2026-11-24T14:00Z",
  "categories": [
-  {
-   "id": "gpu",
-   "name": "Graphics chips (GPUs)",
-   "group": "hardware",
-   "description": "Every desktop, laptop, workstation and console graphics chip since 1986, with full specifications.",
-   "count": 2824,
-   "makers": 8,
-   "years": [
-    1986,
-    2025
-   ],
-   "bytes": 2027171,
-   "file": "gpu.json"
-  },
   {
    "id": "cpu",
    "name": "Processors (CPUs)",
@@ -27,22 +13,22 @@
     1971,
     2025
    ],
-   "bytes": 406630,
+   "bytes": 682982,
    "file": "cpu.json"
   },
   {
-   "id": "graphics-card",
-   "name": "Graphics cards",
+   "id": "gpu",
+   "name": "Graphics cards & GPUs",
    "group": "hardware",
-   "description": "Retail graphics cards from MSI, Asus, Gigabyte, Sapphire and every other board partner.",
-   "count": 6636,
-   "makers": 43,
+   "description": "Every graphics chip since 1986 with full specifications, plus retail cards from MSI, Asus, Gigabyte, Sapphire and the other board partners.",
+   "count": 9460,
+   "makers": 46,
    "years": [
-    2003,
+    1986,
     2025
    ],
-   "bytes": 1689010,
-   "file": "graphics-card.json"
+   "bytes": 5120210,
+   "file": "gpu.json"
   },
   {
    "id": "motherboard",
@@ -52,7 +38,7 @@
    "count": 4973,
    "makers": 17,
    "years": null,
-   "bytes": 862871,
+   "bytes": 1050800,
    "file": "motherboard.json"
   },
   {
@@ -74,7 +60,7 @@
    "count": 4677,
    "makers": 93,
    "years": null,
-   "bytes": 669758,
+   "bytes": 753370,
    "file": "ssd.json"
   },
   {
@@ -239,7 +225,7 @@
    "count": 5074,
    "makers": 72,
    "years": null,
-   "bytes": 915380,
+   "bytes": 1101239,
    "file": "monitor.json"
   },
   {
