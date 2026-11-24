@@ -649,7 +649,7 @@ def main():
                 c["sources"].append(SRC_EXTRA)
 
     today = dt.date.today().isoformat()
-    index = {"version": today, "updated": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"), "categories": []}
+    index = {"version": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H%M"), "updated": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"), "categories": []}
     for c in CATEGORIES:
         c["items"].sort(key=lambda i: (-(i.get("year") or 0), i["name"].lower()))
         # Make ids unique inside a category.
