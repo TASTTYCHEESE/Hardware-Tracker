@@ -1,5 +1,18 @@
 [
   {
+    "version": "0.9.7",
+    "date": "2026-11-25",
+    "title": "The Offline Update",
+    "notes": [
+      "Works without internet: the whole hardware catalog now ships inside the app, and recaps, prices, the launch calendar and exchange rates you've loaded are kept for offline use. An Offline badge shows when you're not connected; only live news, new recaps and updates need the internet.",
+      "Used prices by brand and model: about 3,100 models of graphics cards (every board partner version, from ASUS ROG Strix to Sapphire Pulse), processors, RAM kits, SSDs, motherboards, power supplies and cases, each with its own fair used price.",
+      "New \"Sell my whole PC\" tab: pick the parts in your PC and see what it's fairly worth as a whole, part by part, and for a quick sale.",
+      "Check a listing now recognises the exact model in the ad (for example \"MSI MAG B650 Tomahawk WiFi\" or \"Corsair RM850x\"), not just the kind of part.",
+      "Android updates itself: new versions download and install by themselves when you leave the app (Android 12 and newer, after you allow it once). Turn it off in Settings, App updates.",
+      "Every update now has a name, the older ones too."
+    ]
+  },
+  {
     "version": "0.9.6",
     "date": "2026-11-25",
     "title": "The Language Update",
@@ -41,8 +54,9 @@
   {
     "version": "0.9.3",
     "date": "2026-11-24",
-    "title": "GPU core counts",
+    "title": "The Core Count Update",
     "notes": [
+      "GPU core counts.",
       "Graphics cards now show how many cores they have, named the way each maker does: CUDA cores for Nvidia, stream processors for AMD and shading units for Intel. Core count is also a column in the GPU list, so you can sort by it.",
       "Nvidia cards show streaming multiprocessors (SMs), AMD cards show compute units (CUs) and Intel Arc cards show Xe cores. AMD and Intel counts were missing before and are now filled in. AMD's ray tracing units are labelled ray accelerators.",
       "DirectX, OpenGL, Vulkan, OpenCL and Shader model are now labelled as versions, and \"CUDA\" is labelled \"CUDA compute capability (version)\", so they aren't mistaken for counts. Texture units (TMUs) and render output units (ROPs) got clearer names too."
@@ -51,8 +65,9 @@
   {
     "version": "0.9.2",
     "date": "2026-11-24",
-    "title": "Sticky table headers, full-article translation and a full fact check",
+    "title": "The Fact Check Update",
     "notes": [
+      "Sticky table headers, full-article translation and a full fact check.",
       "Wide tables (PC Hardware lists and Prices) now have a horizontal scroll bar at the top that stays on screen while you scroll down, so you can move sideways without a tilt wheel or Shift+scroll. The column headers (Name, Year, Type…) also stay at the top while you scroll.",
       "Translated news now opens the whole article in English: the title and every paragraph are translated inside the reader, keeping names that can't be translated. \"Open in browser\" opens the translated page too, and \"Show original\" switches back.",
       "Fact check of every category: 67,000+ products checked for duplicates and impossible specs. About 4,200 duplicate listings were removed, same-named products now show what sets them apart (for example \"XFX Swift OC (Radeon RX 9060 XT, 16 GB, White, 290 mm)\" or \"ADATA Premier 16 GB (DDR3-1600, CL11, Blue)\"), boost clocks below the base clock were removed, and recent Ryzen and Intel Core CPUs now show their real launch year instead of the architecture's year.",
@@ -62,8 +77,9 @@
   {
     "version": "0.9.1",
     "date": "2026-11-24",
-    "title": "Chipsets, capture cards, water cooling, translated news and a security pass",
+    "title": "The Security Update",
     "notes": [
+      "Chipsets, capture cards, water cooling, translated news and a security pass.",
       "New PC Hardware categories: Chipsets (55 Intel and AMD desktop and workstation chipsets with socket, supported CPUs, memory, overclocking, PCIe generation for the graphics slot and M.2, chipset lanes and USB4/Thunderbolt), Capture cards, Custom water cooling (blocks, pumps, reservoirs, radiators, tubing, fittings, coolant) and AIO water coolers (1,293 coolers by radiator size).",
       "CPU coolers now have a Type filter: Air or AIO liquid.",
       "Buy or wait?: new Clear button, and a ☆ favorite on each item. Favorites stay at the top and are kept when you clear the list.",
@@ -76,7 +92,7 @@
   {
     "version": "0.9.0",
     "date": "2026-11-24",
-    "title": "The big one: Compare, Buy or wait?, Launch calendar and more",
+    "title": "The Big One",
     "notes": [
       "PC Hardware → Compare: put up to 4 products side by side (hardware with hardware, peripherals with peripherals). The best value in every row is highlighted in green, and GPUs and CPUs also show performance, price and price per performance.",
       "PC Hardware → Buy or wait?: pick anything you're thinking of buying and get a verdict (good time to buy, fair, or better to wait) with the reasons: its price history, the market trend, newer models, upcoming launches, sales and the news.",
@@ -91,8 +107,9 @@
   {
     "version": "0.8.4",
     "date": "2026-11-24",
-    "title": "Live filter counts, back / forward, add products to the price tracker",
+    "title": "The Navigation Update",
     "notes": [
+      "Live filter counts, back / forward, add products to the price tracker.",
       "Filter counts are live: the number next to each manufacturer, type or year shows how many products you'd get with your current search and other filters.",
       "Mouse back / forward buttons (buttons 4 and 5), and Alt+← / Alt+→, move through the pages and products you opened.",
       "Clicking the menu or tab you're already on takes you to its start page.",
@@ -107,8 +124,9 @@
   {
     "version": "0.8.3",
     "date": "2026-11-24",
-    "title": "Sorting, search and a better price tracker",
+    "title": "The Search Update",
     "notes": [
+      "Sorting, search and a better price tracker.",
       "PC Hardware: new sorts Most popular / Least popular (PCPartPicker ranking) and Most used / Least used (Steam hardware survey, for graphics cards and VR headsets).",
       "Search now comes first: results must match both your search and your filters, best name matches are listed first, and you get a clear message plus a one-click fix when nothing matches.",
       "The \"All categories\" button stays visible while you scroll.",
@@ -121,8 +139,9 @@
   {
     "version": "0.8.2",
     "date": "2026-11-24",
-    "title": "PC Hardware improvements",
+    "title": "The Polish Update",
     "notes": [
+      "PC Hardware improvements.",
       "Updates now has its own place in the left menu, under Settings.",
       "Graphics chips and retail graphics cards are one section, with a Type filter.",
       "Retail graphics cards show the full specs of their GPU chip.",
@@ -135,8 +154,9 @@
   {
     "version": "0.8.1",
     "date": "2026-11-24",
-    "title": "Updates page",
+    "title": "The Changelog Update",
     "notes": [
+      "Updates page.",
       "New Updates tab under Settings: see your version, what the next update adds, and how far the download is.",
       "\"Restart and update\" button to install a downloaded update right away.",
       "New checkbox to choose: install updates automatically when you quit, or only when you click Restart.",
@@ -146,8 +166,9 @@
   {
     "version": "0.8.0",
     "date": "2026-11-24",
-    "title": "PC Hardware section",
+    "title": "The PC Hardware Update",
     "notes": [
+      "PC Hardware section.",
       "New PC Hardware section (between Prices and Settings) with Hardware and Peripherals tabs.",
       "About 70,000 products in 38 categories: GPU chips since 1986, graphics cards, CPUs, motherboards, RAM, SSDs, hard drives, PSUs, coolers, cases, monitors, keyboards, mice, headsets and more.",
       "Search and filter by manufacturer, year range and category specs; click a product for its full specifications.",
@@ -157,8 +178,9 @@
   {
     "version": "0.7.0",
     "date": "2026-11-24",
-    "title": "Tray mode, tracking and auto-updates",
+    "title": "The Background Update",
     "notes": [
+      "Tray mode, tracking and auto-updates.",
       "New menu: Today, Overview, Prices and Settings, with tabs along the top.",
       "Tracking tab: watch products with a target price and get notified when they hit it.",
       "Runs quietly in the tray, starts with Windows, and closes itself when the PC is busy.",

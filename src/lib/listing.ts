@@ -1,21 +1,15 @@
 // "Check a listing": read a shop or classified-ad page (eBay, OLX, Bazar.bg, Amazon, ...), find the
 // title and price, and guess which part it is. Everything is a best guess the user can correct.
 import { api } from './platform';
-import { benchList, type BenchItem } from './bench';
-import { USED_PARTS, type UsedKind, type UsedPart } from './used';
-
-export type PartKind = 'gpu' | 'cpu' | UsedKind;
-export interface PartRef {
-  kind: PartKind;
-  name: string;
-}
+import type { BenchItem } from './bench';
+import { ALL_CPUS, ALL_GPUS, usedModels, type PartKind, type UsedModel } from './usedModels';
 export interface Listing {
   url: string;
   title: string;
   price?: number;
   currency?: string;
   image?: string;
-  part?: PartRef;
+  part?: UsedModel;
   /** the page couldn't be read (blocked, login needed, or the web app's browser limits) */
   error?: string;
 }
@@ -109,12 +103,13 @@ export function priceInText(text: string): { price?: number; currency?: string }
 
 // ---- Which part is it? ------------------------------------------------------------
 const squash = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const compact = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
 
-function matchBench(title: string, kind: 'gpu' | 'cpu'): BenchItem | undefined {
-  const t = ` ${squash(title).replace(/\b(nvidia|geforce|amd|radeon|intel|core|ryzen)\b/g, ' ').replace(/\s+/g, ' ')} `;
+function matchBench(title: string, list: BenchItem[]): BenchItem | undefined {
+  const t = ` ${squash(title).replace(/\b(nvidia|geforce|amd|radeon|intel|core|ryzen)\b/g, ' ').replace(/(\d+)\s?gb\b/g, '$1 gb').replace(/\s+/g, ' ')} `;
   let best: BenchItem | undefined;
   let bestLen = 0;
-  for (const b of benchList(kind)) {
+  for (const b of list) {
     const key = squash(b.name).replace(/\b(geforce|radeon|core|ryzen)\b/g, ' ').replace(/\s+/g, ' ').trim();
     const words = key.split(' ');
     // every word of the model, in order, as whole words ("rtx 4070 super", "9800x3d", "ultra 7 265k")
@@ -128,89 +123,173 @@ function matchBench(title: string, kind: 'gpu' | 'cpu'): BenchItem | undefined {
   return best;
 }
 
-function matchUsed(title: string): PartRef | undefined {
-  const t = title.toLowerCase();
-  const pick = (kind: UsedKind, f: (p: UsedPart) => number) => {
-    const scored = USED_PARTS[kind].map((p) => [f(p), p] as const).filter(([s]) => s > 0).sort((a, b) => b[0] - a[0]);
-    return scored[0] ? { kind, name: scored[0][1].name } : undefined;
-  };
-  // RAM
-  const ddr = t.match(/ddr\s?([45])/)?.[1];
-  if (ddr && /(ram|memory|памет|dimm|kit|\d+\s?gb)/.test(t) && !/gddr/.test(t)) {
-    const kit = t.match(/(\d)\s?x\s?(\d+)\s?gb/);
-    const total = kit ? +kit[1] * +kit[2] : +(t.match(/(\d+)\s?gb/)?.[1] ?? 0);
-    const speed = t.match(/(\d{4})\s?(mhz|mt\/s)?/)?.[1];
-    const sodimm = /so-?dimm|laptop|лаптоп/.test(t);
-    const cl = t.match(/\bcl\s?(\d{2})\b/)?.[1];
-    return pick('ram', (p) => {
-      const n = p.name.toLowerCase();
-      if (!n.startsWith(`ddr${ddr}`) || n.includes('so-dimm') !== sodimm) return 0;
-      const pk = n.match(/(\d)x(\d+)gb/);
-      const ptotal = pk ? +pk[1] * +pk[2] : 0;
-      return 10 - Math.abs(Math.log2((ptotal || 1) / (total || 32))) * 4 + (speed && n.includes(speed) ? 2 : 0) + (n.includes('cl') ? (cl && n.includes(`cl${cl}`) ? 1 : -0.5) : 0);
-    });
+const without = (name: string, maker: string) => (name.startsWith(maker) ? name.slice(maker.length) : name);
+
+/** Graphics card: the chip, then the board partner's version named in the title. */
+function matchGpu(title: string): UsedModel | undefined {
+  const chip = matchBench(title, ALL_GPUS);
+  if (!chip) return undefined;
+  const t = ` ${squash(title)} `;
+  const models = usedModels('gpu').filter((m) => m.group === chip.name);
+  let best: UsedModel | undefined;
+  let bestScore = 0;
+  for (const m of models) {
+    if (m.maker === 'Any brand') continue;
+    const makerHit = m.maker.split(/\s*\/\s*/).some((x) => t.includes(` ${squash(x)} `));
+    const lineWords = squash(m.short.split(' / ')[0]).split(' ').filter((w) => w.length > 1);
+    const lineHit = lineWords.length && lineWords.every((w) => t.includes(` ${w} `)) ? 2 + lineWords.length * 0.1 : 0;
+    const score = (makerHit ? 1 : 0) + lineHit;
+    if (score > bestScore) [best, bestScore] = [m, score];
   }
+  return bestScore >= 2 ? best : models.find((m) => m.maker === 'Any brand');
+}
+
+function matchCpu(title: string): UsedModel | undefined {
+  const b = matchBench(title, ALL_CPUS);
+  return b ? usedModels('cpu').find((m) => m.bench === b) : undefined;
+}
+
+/** Product names written out: "RM850x", "990 Pro 2TB", "MAG B650 Tomahawk WiFi", "Lancool 216". */
+function matchNamed(title: string, kind: PartKind): UsedModel | undefined {
+  const c = compact(title.replace(/(\d)\s+(tb|gb)\b/gi, '$1$2'));
+  let best: UsedModel | undefined;
+  let bestLen = 0;
+  for (const m of usedModels(kind)) {
+    if (/^(Any brand|Other)/.test(m.maker)) continue;
+    const key = compact(without(m.name, m.maker));
+    if (key.length >= 4 && c.includes(key) && key.length > bestLen) [best, bestLen] = [m, key.length];
+  }
+  if (best) return best;
+  // words in any order: every number-bearing word, and most of the others
+  const t = ` ${squash(title).replace(/(\d)\s+(tb|gb|w)\b/g, '$1$2')} `;
+  let bestScore = 0;
+  for (const m of usedModels(kind)) {
+    if (/^(Any brand|Other)/.test(m.maker)) continue;
+    const words = squash(without(m.name, m.maker).replace(/(\d)\s+(TB|GB|W)\b/g, '$1$2')).split(' ').filter(Boolean);
+    const nums = words.filter((w) => /\d/.test(w));
+    if (!nums.length || !nums.every((w) => t.includes(` ${w} `))) continue;
+    const hit = words.filter((w) => t.includes(` ${w} `)).length / words.length + (t.includes(` ${squash(m.maker)} `) ? 0.2 : 0);
+    if (hit > bestScore) [best, bestScore] = [m, hit];
+  }
+  return bestScore >= 0.75 ? best : undefined;
+}
+
+function matchRam(t: string): UsedModel | undefined {
+  const ddr = t.match(/ddr\s?([45])/)?.[1];
+  if (!ddr || !/(ram|memory|памет|dimm|kit|\d+\s?gb)/.test(t) || /gddr/.test(t)) return undefined;
+  const kit = t.match(/(\d)\s?x\s?(\d+)\s?gb/);
+  const total = kit ? +kit[1] * +kit[2] : +(t.match(/(\d+)\s?gb/)?.[1] ?? 0);
+  const mhz = t.match(/(\d{4})\s?(mhz|mt\/s)?/)?.[1];
+  const sodimm = /so-?dimm|laptop|лаптоп|notebook/.test(t);
+  const cl = t.match(/\bc[l]?\s?(\d{2})\b/)?.[1];
+  const type = `DDR${ddr}${sodimm ? ' laptop' : ''}`;
+  const all = usedModels('ram').filter((m) => (m.info ?? '').startsWith(`DDR${ddr}`) && (m.info ?? '').includes('laptop') === sodimm);
+  // the product line named in the title, longest first ("trident z5 neo" over "trident z5")
+  const st = ` ${squash(t)} `;
+  const lines = [...new Set(all.filter((m) => !/^Other/.test(m.maker)).map((m) => m.group))]
+    .map((g) => [g, squash(g.replace(/\s*\(.*\)$/, '').replace(/^Crucial (DDR5|SO-DIMM)$/, 'crucial'))] as const)
+    .filter(([, w]) => st.includes(` ${w} `))
+    .sort((a, b) => b[1].length - a[1].length);
+  const pool = lines.length ? all.filter((m) => m.group === lines[0][0]) : all.filter((m) => /^Other/.test(m.maker));
+  const score = (m: UsedModel) => {
+    const n = m.short.toLowerCase();
+    const pk = n.match(/(\d+)gb/);
+    const ptotal = pk ? +pk[1] : 1;
+    return 10 - Math.abs(Math.log2(ptotal / (total || 32))) * 4 + (mhz && n.includes(mhz) ? 2 : 0) + (cl && n.includes(`cl${cl}`) ? 1 : 0);
+  };
+  void type;
+  return pool.sort((a, b) => score(b) - score(a))[0];
+}
+
+/** Fallback when the exact model isn't in our list: a typical one of the same kind and size. */
+function matchGeneric(t: string): UsedModel | undefined {
+  const other = (kind: PartKind) => usedModels(kind).filter((m) => /^Other/.test(m.maker));
   // SSD
-  if (/\b(ssd|nvme|m\.2|sata ssd)\b/.test(t) || /\b(990 pro|980 pro|970 evo|9100 pro|sn850x?|sn7100|sn770|kc3000|nv3|mx500|870 evo|860 evo|t700|t705|firecuda|mp600|mp700|p3 plus|p5 plus)\b/.test(t)) {
+  if (/\b(ssd|nvme|m\.2|sata ssd)\b/.test(t)) {
     const tb = t.match(/(\d+(?:[.,]\d)?)\s?tb/)?.[1];
     const gb = t.match(/(\d{3,4})\s?gb/)?.[1];
     const size = tb ? parseFloat(tb.replace(',', '.')) * 1000 : gb ? +gb : 1000;
-    const iface = /gen\s?5|pcie\s?5|t700|t705|crucial t7|9100 pro/.test(t) ? 'gen 5' : /gen\s?4|pcie\s?4|990 pro|980 pro|sn850|sn7100|kc3000|nv3/.test(t) ? 'gen 4' : /gen\s?3|pcie\s?3|970 evo|sn570|p3\b/.test(t) ? 'gen 3' : /\bsata\b|870 evo|860 evo|mx500/.test(t) ? 'sata' : 'gen 4';
-    return pick('ssd', (p) => {
-      const g = p.group.toLowerCase();
-      if (!(iface === 'sata' ? g === 'sata' : g.endsWith(iface))) return 0;
-      const pt = p.name.match(/(\d+)\s?(tb|gb)/i)!;
-      const ps = +pt[1] * (pt[2].toLowerCase() === 'tb' ? 1000 : 1);
-      return 10 - Math.abs(Math.log2(ps / size)) * 3;
-    });
+    const tier = /gen\s?5|pcie\s?5/.test(t) ? 'NVMe PCIe 5.0' : /gen\s?3|pcie\s?3/.test(t) ? 'NVMe PCIe 3.0' : /\bsata\b|2\.5/.test(t) ? 'SATA' : 'NVMe PCIe 4.0';
+    return other('ssd')
+      .filter((m) => m.group === tier || (tier === 'NVMe PCIe 4.0' && m.group === 'NVMe PCIe 4.0') || (tier === 'SATA' && m.group.startsWith('SATA')) || (tier === 'NVMe PCIe 5.0' && m.group === 'NVMe PCIe 5.0'))
+      .map((m) => {
+        const p = m.short.match(/(\d+)\s?(TB|GB)/)!;
+        return [m, Math.abs(Math.log2((+p[1] * (p[2] === 'TB' ? 1000 : 1)) / size))] as const;
+      })
+      .sort((a, b) => a[1] - b[1])[0]?.[0];
   }
-  // Motherboard: chipset name
-  const chip = t.match(/\b(x870e|x870|b850|b650e?|a620|x570|b550|a520|z890|b860|z790|b760|z690|b660|z590|b560)\b/)?.[1];
-  if (chip) {
-    const c = chip.replace(/e$/, (e) => (chip.startsWith('x870') ? e : ''));
-    return pick('board', (p) => (p.name.toLowerCase().includes(c) ? 10 : 0));
-  }
-  // Power supply: wattage
+  // Motherboard: chipset
+  const chip = t.match(/\b(x870e|x870|b850|b650e|b650|a620|x570|b550|a520|x470|b450|z890|b860|z790|b760|z690|b660|h610|z590|b560|z490|z390|b365|b360)\b/)?.[1];
+  if (chip) return other('board').find((m) => m.group.toLowerCase().startsWith(`${chip} `));
+  // Power supply: wattage and rating
   const watts = t.match(/\b(\d{3,4})\s?w\b/)?.[1];
   if (watts && /(psu|power supply|захранване|80\s?\+|80 plus|bronze|gold|platinum|modular)/.test(t)) {
     const w = +watts;
     const rating = /platinum|titanium/.test(t) ? 'platinum' : /gold/.test(t) ? 'gold' : /bronze/.test(t) ? 'bronze' : '';
-    return pick('psu', (p) => {
-      const pw = +p.name.match(/(\d+) W/)![1];
-      return 10 - Math.abs(pw - w) / 50 + (rating && p.name.toLowerCase().includes(rating) ? 3 : 0);
-    });
+    return other('psu')
+      .map((m) => [m, 10 - Math.abs(+m.short.match(/(\d+) W/)![1] - w) / 50 + (rating && m.short.toLowerCase().includes(rating) ? 3 : 0)] as const)
+      .sort((a, b) => b[1] - a[1])[0]?.[0];
   }
   // Case
   if (/\b(case|chassis|кутия|tower|itx)\b/.test(t)) {
-    if (/mini.?itx|\bitx\b|sff/.test(t)) return { kind: 'case', name: 'Mini-ITX small form factor' };
-    if (/micro.?atx|matx|m-atx/.test(t)) return { kind: 'case', name: 'Micro-ATX case' };
-    if (/full.?tower/.test(t)) return { kind: 'case', name: 'Full tower' };
-    if (/lancool|north|4000d|airflow|pop air|meshify|focus/.test(t)) return { kind: 'case', name: 'Airflow mid-tower (e.g. Lancool 216, North)' };
-    if (/o11|h7|h9|evo|torrent|hyte|y60|5000d|6500x/.test(t)) return { kind: 'case', name: 'Premium mid-tower (e.g. O11 Dynamic EVO, H7 Flow)' };
-    return { kind: 'case', name: 'Airflow mid-tower (e.g. Lancool 216, North)' };
+    const c = other('case');
+    if (/mini.?itx|\bitx\b|sff/.test(t)) return c.find((m) => m.group === 'Mini-ITX');
+    if (/micro.?atx|matx|m-atx/.test(t)) return c.find((m) => m.group === 'Micro-ATX');
+    if (/full.?tower/.test(t)) return c.find((m) => m.group === 'Full tower');
+    return c.find((m) => m.short.startsWith('Airflow'));
   }
   return undefined;
 }
 
-/** Best guess of which part a listing title is about. */
-export function detectPart(title: string): PartRef | undefined {
+/** Best guess of which model a listing title is about. */
+export function detectPart(title: string): UsedModel | undefined {
+  if (!title.trim()) return undefined;
   const t = title.toLowerCase();
   const gpuHint = /\b(rtx|gtx|rx\s?\d|arc\s?[ab]\d|geforce|radeon|graphics|видеокарт|vga)\b/.test(t);
   const cpuHint = /\b(ryzen|core\s?(i\d|ultra)|i[3579][-\s]\d|процесор|cpu|xeon)\b/.test(t);
   if (gpuHint) {
-    const g = matchBench(title, 'gpu');
-    if (g) return { kind: 'gpu', name: g.name };
+    const g = matchGpu(title);
+    if (g) return g;
   }
   if (cpuHint) {
-    const c = matchBench(title, 'cpu');
-    if (c) return { kind: 'cpu', name: c.name };
+    const c = matchCpu(title);
+    if (c) return c;
   }
-  return matchUsed(title) ?? (matchBench(title, 'gpu') ? { kind: 'gpu', name: matchBench(title, 'gpu')!.name } : undefined);
+  const ram = matchRam(t);
+  if (ram) return ram;
+  for (const kind of ['ssd', 'psu', 'board', 'case'] as PartKind[]) {
+    const m = matchNamed(title, kind);
+    if (m) return m;
+  }
+  return matchGeneric(t) ?? matchGpu(title);
 }
 
 /** Read a listing page and pull out what we can. */
+/** Links to the user's own computer or local network (router pages, NAS...) are never fetched. */
+export function isLocalUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    if (!/^https?:$/.test(u.protocol) || u.username || u.password) return true;
+    const h = u.hostname.toLowerCase().replace(/^\[|\]$/g, '').replace(/\.$/, '');
+    if (h === 'localhost' || !h.includes('.') && !h.includes(':') || /\.(localhost|local|internal|lan|home|intranet|corp)$/.test(h)) return true;
+    const v4 = h.match(/^(\d+)\.(\d+)\.\d+\.\d+$/);
+    if (v4) {
+      const [a, b] = [+v4[1], +v4[2]];
+      return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224;
+    }
+    return h.includes(':') && (h === '::1' || h === '::' || /^(fc|fd|fe[89ab]|::ffff:)/.test(h));
+  } catch {
+    return true;
+  }
+}
+
 export async function readListing(url: string): Promise<Listing> {
   const out: Listing = { url, title: '' };
+  if (isLocalUrl(url)) {
+    out.error = 'local address';
+    out.part = undefined;
+    return out;
+  }
   try {
     const html = await api.fetchText(url);
     out.title = meta(html, ['og:title', 'twitter:title']) ?? decode(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? '');

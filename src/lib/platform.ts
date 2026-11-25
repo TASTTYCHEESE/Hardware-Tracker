@@ -140,6 +140,39 @@ const snapshotIndex = () =>
     .catch((): Record<string, string> => ({})));
 setInterval(() => (snapshot = null), 10 * 60e3);
 
+// ---- Offline use (web and Android) ------------------------------------------------------
+// The app's own data files are kept in the browser cache after each download and used when
+// there's no internet. The hardware catalog also ships inside the app (offline-catalog/), so it
+// works offline even before the first download.
+const OFFLINE_CACHE = 'hwt-offline-v1';
+const KEEP = /^https:\/\/(raw\.githubusercontent\.com\/TASTTYCHEESE\/|api\.github\.com\/repos\/TASTTYCHEESE\/|open\.er-api\.com\/|api\.frankfurter\.dev\/)/;
+const cacheKey = (url: string) => url.split('?')[0];
+async function openCache(): Promise<Cache | null> {
+  try {
+    return 'caches' in window ? await caches.open(OFFLINE_CACHE) : null;
+  } catch {
+    return null;
+  }
+}
+/** Network first; the last saved copy, then the copy bundled with the app, when offline. */
+async function offlineFirstText(url: string, bundled?: string, init?: RequestInit): Promise<{ text: string; offline: boolean }> {
+  try {
+    const r = await fetch(url, init);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const text = await r.text();
+    openCache().then((c) => c?.put(cacheKey(url), new Response(text, { headers: { 'content-type': 'text/plain' } })).catch(() => {}));
+    return { text, offline: false };
+  } catch (e) {
+    const hit = await (await openCache())?.match(cacheKey(url)).catch(() => undefined);
+    if (hit) return { text: await hit.text(), offline: true };
+    if (bundled) {
+      const b = await fetch(bundled).catch(() => null);
+      if (b?.ok) return { text: await b.text(), offline: true };
+    }
+    throw e;
+  }
+}
+
 const newer = (a: string, b: string) => {
   const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
   for (let i = 0; i < 3; i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) > (pb[i] || 0);
@@ -175,10 +208,92 @@ const phoneAlerts: HwtApi['phoneAlerts'] = {
   },
 };
 
+// ---- Android self-update (AppUpdaterPlugin.java) -------------------------------------
+type Updater = {
+  status(): Promise<{ canInstall: boolean; silent: boolean; busy: boolean; sdk: number }>;
+  install(o: { url: string }): Promise<{ started: boolean }>;
+  openInstallSettings(): Promise<void>;
+  addListener(ev: 'progress', cb: (p: { percent: number }) => void): Promise<unknown>;
+};
+const updater = (): Updater | undefined => (window as unknown as { Capacitor?: { Plugins?: { AppUpdater?: Updater } } }).Capacitor?.Plugins?.AppUpdater;
+let apkUrl = '';
+let installing = false;
+const updateListeners = new Set<(i: UpdateInfo) => void>();
+const emitUpdate = (patch: Partial<UpdateInfo>) => {
+  if (!lastUpdate) return;
+  lastUpdate = { ...lastUpdate, ...patch };
+  updateListeners.forEach((cb) => cb(lastUpdate!));
+};
+
+/** Android: download the new APK and hand it to the system installer. */
+export async function installAndroidUpdate(): Promise<string> {
+  const u = updater();
+  if (!u || !apkUrl) return 'unsupported';
+  if (installing) return 'busy';
+  const st = await u.status().catch(() => null);
+  if (st && !st.canInstall) {
+    emitUpdate({ message: 'Allow Hardware Tracker to install updates (Android asks once), then tap Install update again.' });
+    await u.openInstallSettings().catch(() => {});
+    return 'needs-permission';
+  }
+  installing = true;
+  emitUpdate({ state: 'downloading', percent: 0, message: 'Downloading the update…' });
+  try {
+    await u.install({ url: apkUrl });
+    emitUpdate({ state: 'ready', percent: 100, message: st?.silent ? 'Installing… the app restarts with the new version.' : 'Confirm the update in the Android prompt.' });
+    return 'started';
+  } catch (e) {
+    emitUpdate({ state: 'available', message: `Update failed: ${(e as Error).message || e}` });
+    return 'error';
+  } finally {
+    installing = false;
+  }
+}
+
+export async function androidUpdateStatus() {
+  return updater()?.status().catch(() => null) ?? null;
+}
+export async function openAndroidInstallSettings() {
+  await updater()?.openInstallSettings().catch(() => {});
+}
+
+let pendingSilent = false;
+/** With "Update automatically" on: when Android lets the app update itself without a prompt
+ *  (Android 12+, after the first update), install as soon as the app goes to the background,
+ *  so it never closes while you're using it. */
+async function androidAutoUpdate() {
+  const u = updater();
+  if (!u || !apkUrl) return;
+  const s = await webApi.getSettings();
+  if (s.autoInstallUpdates === false) return;
+  const st = await u.status().catch(() => null);
+  if (!st?.canInstall || !st.silent) return; // the user has to confirm: the Updates page shows the button
+  pendingSilent = true;
+  emitUpdate({ message: 'Installs by itself the next time you leave the app.' });
+}
+if (native) {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && pendingSilent) {
+      pendingSilent = false;
+      installAndroidUpdate();
+    }
+  });
+  updater()?.addListener('progress', (p) => emitUpdate({ percent: p.percent })).catch(() => {});
+  // Re-check every 6 hours while the app is open.
+  setInterval(() => webApi.checkForUpdates!().then((i) => i && updateListeners.forEach((cb) => cb(i))), 6 * 3600e3);
+}
+
 const webApi: HwtApi = {
   platform: native ? 'android' : 'web',
   phoneAlerts: native ? phoneAlerts : undefined,
   async fetchText(url) {
+    if (KEEP.test(url)) {
+      try {
+        return (await offlineFirstText(url)).text;
+      } catch {
+        /* fall through to the web snapshot */
+      }
+    }
     try {
       const r = await fetch(url);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -197,14 +312,20 @@ const webApi: HwtApi = {
     const s = await webApi.getSettings();
     const root = (s.syncUrl || RECAPS_URL).replace(/\/?$/, '/');
     try {
-      const idx = await (await fetch(`${root}index.json?t=${Math.floor(Date.now() / 600e3)}`)).json();
+      // Saved after each download, so recaps (and the prices in them) stay readable offline.
+      const idx = JSON.parse((await offlineFirstText(`${root}index.json?t=${Math.floor(Date.now() / 600e3)}`)).text);
       const files: string[] = (Array.isArray(idx) ? idx : idx.files || []).filter((f: string) => /^[\w.-]+\.json$/.test(f) && f !== 'index.json');
+      const c = await openCache();
       const out = await Promise.all(
-        files.map((f) =>
-          fetch(`${root}${f}`)
-            .then((r) => (r.ok ? r.json() : null))
-            .catch(() => null),
-        ),
+        files.map(async (f) => {
+          const url = `${root}${f}`;
+          // Recap files never change once written: use the saved copy when there is one.
+          const hit = await c?.match(url).catch(() => undefined);
+          if (hit) return hit.json().catch(() => null);
+          return offlineFirstText(url)
+            .then((r) => JSON.parse(r.text))
+            .catch(() => null);
+        }),
       );
       return out.filter(Boolean) as Recap[];
     } catch {
@@ -228,15 +349,24 @@ const webApi: HwtApi = {
     try {
       const j = await (await fetch(RELEASES_API, { headers: { Accept: 'application/vnd.github+json' } })).json();
       const v = String(j.tag_name || '').replace(/^v/, '');
+      const apk = (j.assets || []).find((a: { name?: string }) => /-android\.apk$/.test(a.name || ''));
+      apkUrl = apk?.browser_download_url || '';
       lastUpdate =
         v && newer(v, APP_VERSION)
           ? { ...base, state: 'available', version: v, releaseName: j.name || '', releaseDate: j.published_at || '', notes: j.body || '', message: `Version ${v} is out` }
           : { ...base, message: `You're up to date (version ${APP_VERSION})` };
+      if (lastUpdate.state === 'available') androidAutoUpdate();
     } catch (e) {
       lastUpdate = { ...base, state: 'error', message: `Update check failed: ${(e as Error).message}` };
     }
     return lastUpdate;
   },
+  onUpdateStatus: native
+    ? (cb) => {
+        updateListeners.add(cb);
+        return () => updateListeners.delete(cb);
+      }
+    : undefined,
   async importRecaps() {
     return 0;
   },
@@ -294,14 +424,17 @@ const webApi: HwtApi = {
     return () => {};
   },
   async catalogIndex() {
-    const r = await fetch(`${CATALOG_URL}index.json`, { cache: 'no-cache' });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
+    try {
+      const r = await offlineFirstText(`${CATALOG_URL}index.json`, 'offline-catalog/index.json', { cache: 'no-cache' });
+      return { ...JSON.parse(r.text), offline: r.offline };
+    } catch (e) {
+      throw new Error(`Couldn't download the hardware catalog (${(e as Error).message}). Check your internet connection.`);
+    }
   },
   async catalogCategory(id) {
-    const r = await fetch(`${CATALOG_URL}${id}.json`);
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
+    if (!/^[a-z0-9-]{1,40}$/.test(id)) throw new Error('Bad category');
+    const r = await offlineFirstText(`${CATALOG_URL}${id}.json`, `offline-catalog/${id}.json`);
+    return { ...JSON.parse(r.text), ...(r.offline ? { stale: true } : {}) };
   },
 };
 

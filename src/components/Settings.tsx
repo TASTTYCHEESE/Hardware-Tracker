@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { AppData } from '../lib/useData';
-import { api } from '../lib/platform';
+import { androidUpdateStatus, api, openAndroidInstallSettings } from '../lib/platform';
 import { DEFAULT_FEEDS } from '../lib/feeds';
 import { LanguagePicker } from './LanguagePicker';
 
@@ -22,6 +22,15 @@ export function SettingsPage({ data }: { data: AppData }) {
     api.phoneAlerts?.permission().then(setPerm);
   }, []);
   const askPerm = async () => setPerm((await api.phoneAlerts?.permission(true)) ?? '');
+  // Android: can the app install its own updates?
+  const [upd, setUpd] = useState<{ canInstall: boolean; silent: boolean; sdk: number } | null>(null);
+  useEffect(() => {
+    if (api.platform !== 'android') return;
+    const check = () => androidUpdateStatus().then(setUpd);
+    check();
+    document.addEventListener('visibilitychange', check);
+    return () => document.removeEventListener('visibilitychange', check);
+  }, []);
 
   return (
     <div className="page narrow">
@@ -59,6 +68,39 @@ export function SettingsPage({ data }: { data: AppData }) {
           </div>
         )}
       </section>
+
+      {api.platform === 'android' && (
+        <section className="card">
+          <h3>App updates</h3>
+          <label className="check">
+            <input type="checkbox" checked={s.autoInstallUpdates !== false} onChange={(e) => data.setSettings({ autoInstallUpdates: e.target.checked })} />
+            <span>
+              Update automatically
+              <div className="muted small">
+                {s.autoInstallUpdates !== false
+                  ? 'New versions download and install by themselves when you leave the app, and it keeps all your settings.'
+                  : 'New versions only install when you tap Install update on the Updates page.'}
+              </div>
+            </span>
+          </label>
+          {upd && !upd.canInstall && (
+            <p className="small">
+              Android needs your OK once before the app can install its own updates.{' '}
+              <button className="btn small" onClick={() => openAndroidInstallSettings()}>
+                Allow installing updates
+              </button>
+            </p>
+          )}
+          {upd?.canInstall && !upd.silent && (
+            <p className="muted small">
+              {upd.sdk >= 31
+                ? 'Android will ask you to confirm the next update once. After that, updates install without asking.'
+                : 'On Android 11 and older, Android asks you to confirm every update with one tap.'}
+            </p>
+          )}
+          {upd?.canInstall && upd.silent && <p className="muted small">✓ Updates install without asking.</p>}
+        </section>
+      )}
 
       <section className="card">
         <h3>Language</h3>

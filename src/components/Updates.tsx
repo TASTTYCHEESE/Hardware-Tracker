@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import DOMPurify from 'dompurify';
 import type { AppData } from '../lib/useData';
-import { api, type UpdateInfo } from '../lib/platform';
+import { api, installAndroidUpdate, type UpdateInfo } from '../lib/platform';
 import changelog from '../changelog.json';
 
 type Entry = { version: string; date: string; title: string; notes: string[] };
@@ -83,12 +83,17 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
               <h2>Version {info.version}</h2>
               {info.releaseDate && <div className="muted small">Released {fmtDay(info.releaseDate)}</div>}
             </div>
-            {info.state === 'available' && (
+            {info.state === 'available' && api.platform === 'android' && (
+              <button className="btn" onClick={() => installAndroidUpdate()}>
+                Install update
+              </button>
+            )}
+            {info.state === 'available' && api.platform !== 'android' && (
               <a className="btn" href={`https://github.com/TASTTYCHEESE/Hardware-Tracker/releases/tag/v${info.version}`}>
                 Download
               </a>
             )}
-            {info.state === 'ready' && (
+            {info.state === 'ready' && api.platform !== 'android' && (
               <button
                 className="btn"
                 disabled={restarting}
@@ -108,15 +113,18 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
           )}
           <h3 className="upd-sub">What this update adds</h3>
           {info.notes ? <Notes text={info.notes} /> : known ? <EntryNotes e={known} /> : <p className="muted small">No summary was published for this version.</p>}
+          {api.platform === 'android' && info.message && <p className="small upd-msg">{info.message}</p>}
           <p className="muted small">
-            {info.state === 'ready'
+            {api.platform === 'android'
+              ? auto
+                ? 'With Update automatically on, updates download and install by themselves when you leave the app (Android 12 and newer). Android asks you once to allow installing updates and to confirm the first one. Your settings are kept.'
+                : 'Tap Install update to download it and install it over this version. Your settings are kept.'
+              : info.state === 'ready'
               ? auto
                 ? 'It also installs by itself the next time you quit the app. The app restarts in a few seconds and keeps all your settings.'
                 : "It won't install until you click Restart and update. The app restarts in a few seconds and keeps all your settings."
               : info.state === 'available'
-                ? api.platform === 'android'
-                  ? 'Download the .apk file from the release and open it to install the update. Your settings are kept.'
-                  : 'Mac apps from outside the App Store can\'t update themselves without a paid Apple certificate. Download the .dmg for your Mac (arm64 for Apple Silicon, x64 for Intel) and drag the app into Applications. Your settings are kept.'
+                ? 'Mac apps from outside the App Store can\'t update themselves without a paid Apple certificate. Download the .dmg for your Mac (arm64 for Apple Silicon, x64 for Intel) and drag the app into Applications. Your settings are kept.'
                 : 'You can keep using the app while it downloads.'}
           </p>
         </section>
@@ -139,7 +147,7 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
         </section>
       )}
 
-      {api.platform === 'desktop' && info?.state !== 'unsupported' && (
+      {(api.platform === 'desktop' || api.platform === 'android') && info?.state !== 'unsupported' && (
       <section className="card">
         <h3>How to install updates</h3>
         <label className="check">
@@ -147,9 +155,13 @@ export function Updates({ data, info, setInfo }: { data: AppData; info: UpdateIn
           <span>
             Update automatically
             <div className="muted small">
-              {auto
-                ? 'New versions download in the background and install by themselves the next time you quit the app.'
-                : 'New versions download in the background, but only install when you click Restart and update here.'}
+              {api.platform === 'android'
+                ? auto
+                  ? 'New versions download and install by themselves when you leave the app. The first time, Android asks you to allow it and to confirm.'
+                  : 'New versions only install when you tap Install update here.'
+                : auto
+                  ? 'New versions download in the background and install by themselves the next time you quit the app.'
+                  : 'New versions download in the background, but only install when you click Restart and update here.'}
             </div>
           </span>
         </label>

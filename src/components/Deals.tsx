@@ -4,8 +4,9 @@ import { BENCH_NOTE, benchList, marketRate, usedRange, type BenchItem, type Kind
 import { convert, loadRates, type Rates } from '../lib/fx';
 import { money } from '../lib/format';
 import { COUNTRIES, CURRENCIES } from '../lib/regions';
-import { USED_PARTS, USED_TIPS, usedPartRange, type UsedKind } from '../lib/used';
-import { readListing, priceInText, type Listing, type PartKind, type PartRef } from '../lib/listing';
+import { readListing, priceInText, type Listing } from '../lib/listing';
+import { KIND_LIST, MODEL_TIPS, findModel, makersOf, modelRange, usedModels, type PartKind, type PriceCtx, type UsedModel } from '../lib/usedModels';
+import { BuildValue } from './BuildValue';
 
 // Prices outside the US include sales tax / VAT; US prices (and launch prices) don't.
 const TAX: Record<string, number> = { USD: 1, CAD: 1, BRL: 1, EUR: 1.21, GBP: 1.2, PLN: 1.23, JPY: 1.1, KRW: 1.1, TWD: 1.05, CNY: 1.13, INR: 1.18, AUD: 1.1 };
@@ -196,7 +197,7 @@ export function DealChecker({ data }: { data: AppData }) {
   );
 }
 
-const KIND_LABEL: Record<PartKind, string> = {
+export const KIND_LABEL: Record<PartKind, string> = {
   gpu: 'Graphics cards',
   cpu: 'Processors',
   ram: 'RAM',
@@ -205,58 +206,138 @@ const KIND_LABEL: Record<PartKind, string> = {
   psu: 'Power supplies',
   case: 'Cases',
 };
-const KINDS = Object.keys(KIND_LABEL) as PartKind[];
 const BGN_PER_EUR = 1.95583;
-
-/** Fair used value (USD, no tax) of any part, with a short note. */
-function fairUsed(data: AppData, ref: PartRef, rates: Record<'gpu' | 'cpu', number>): { low: number; high: number; mid: number; note: string } | null {
-  if (ref.kind === 'gpu' || ref.kind === 'cpu') {
-    const b = benchList(ref.kind).find((x) => x.name === ref.name);
-    return b ? usedRange(b, rates[ref.kind], usPrice(data, b)) : null;
-  }
-  const p = USED_PARTS[ref.kind].find((x) => x.name === ref.name);
-  if (!p) return null;
-  const latest = p.tracked ? latestUs(data, p.tracked) : undefined;
-  return { ...usedPartRange(p, latest), note: '' };
-}
 
 function latestUs(data: AppData, model: string): number | undefined {
   const pts = data.prices.filter((x) => x.region === 'US' && x.currency === 'USD' && x.model === model).sort((a, c) => a.date.localeCompare(c.date));
   return pts[pts.length - 1]?.price;
 }
 
-function PartPicker({ value, onChange }: { value: PartRef | null; onChange: (r: PartRef) => void }) {
+/** Everything the used-price math needs from the app's data (latest recorded prices). */
+export function usePriceCtx(data: AppData): PriceCtx {
+  return useMemo(
+    () => ({
+      rate: { gpu: marketRate('gpu', (x) => usPrice(data, x)), cpu: marketRate('cpu', (x) => usPrice(data, x)) },
+      usPrice: (b: BenchItem) => usPrice(data, b),
+      latest: (m: string) => latestUs(data, m),
+    }),
+    [data],
+  );
+}
+
+/** Money in the chosen currency (BGN is pegged to the euro). */
+export function useMoney(fx: Rates | null, cur: string) {
+  return (usd: number) => {
+    const c = cur === 'BGN' ? 'EUR' : cur;
+    let v = c === 'USD' ? usd : fx ? convert(usd, 'USD', c, fx) : null;
+    if (v === null) return money(Math.round(usd), 'USD', true);
+    if (cur === 'BGN') return `${Math.round(v * BGN_PER_EUR).toLocaleString()} лв.`;
+    return money(Math.round(v), c, true);
+  };
+}
+export { useRates, defaultCurrency };
+
+export function CurrencySelect({ value, onChange }: { value: string; onChange: (c: string) => void }) {
   return (
-    <select
-      className="select deal-part"
-      value={value ? `${value.kind}|${value.name}` : ''}
-      onChange={(e) => {
-        const [kind, ...rest] = e.target.value.split('|');
-        onChange({ kind: kind as PartKind, name: rest.join('|') });
-      }}
-    >
-      {!value && <option value="">Pick the part…</option>}
-      {KINDS.map((k) => (
-        <optgroup key={k} label={KIND_LABEL[k]}>
-          {(k === 'gpu' || k === 'cpu' ? [...benchList(k)].sort((a, b) => b.score - a.score) : USED_PARTS[k]).map((x) => (
-            <option key={x.name} value={`${k}|${x.name}`}>
-              {x.name}
-            </option>
-          ))}
-        </optgroup>
+    <select className="select" value={value} onChange={(e) => onChange(e.target.value)}>
+      {[...CURRENCIES, 'BGN'].map((c) => (
+        <option key={c} value={c}>
+          {c === 'BGN' ? 'BGN (лв.)' : c}
+        </option>
       ))}
     </select>
   );
 }
 
+/** Pick a part: brand → chip / series / line → model. `kinds` limits the kind (one kind hides the kind select). */
+export function ModelPicker({ kinds = KIND_LIST, value, onChange, allowNone }: { kinds?: PartKind[]; value: UsedModel | null; onChange: (m: UsedModel | null) => void; allowNone?: string }) {
+  const [kind, setKind] = useState<PartKind>(value?.kind ?? kinds[0]);
+  const [maker, setMaker] = useState(value?.maker ?? '');
+  const [group, setGroup] = useState(value?.group ?? '');
+  useEffect(() => {
+    if (!value) return;
+    setKind(value.kind);
+    setMaker(value.maker);
+    setGroup(value.group);
+  }, [value]);
+  const makers = useMemo(() => makersOf(kind), [kind]);
+  const inMaker = useMemo(() => usedModels(kind).filter((m) => m.maker === maker), [kind, maker]);
+  const groups = useMemo(() => {
+    const gs = [...new Set(inMaker.map((m) => m.group))];
+    // GPUs and CPUs: fastest first; the rest keep the list order
+    return gs;
+  }, [inMaker]);
+  const models = inMaker.filter((m) => m.group === group);
+  const pickKind = (k: PartKind) => {
+    setKind(k);
+    setMaker('');
+    setGroup('');
+    onChange(null);
+  };
+  const pickMaker = (mk: string) => {
+    setMaker(mk);
+    const first = usedModels(kind).find((m) => m.maker === mk);
+    const gs = usedModels(kind).filter((m) => m.maker === mk);
+    const keep = gs.find((m) => m.group === group);
+    const g = keep?.group ?? first?.group ?? '';
+    setGroup(g);
+    const pick = gs.find((m) => m.group === g);
+    onChange(pick ?? null);
+  };
+  const pickGroup = (g: string) => {
+    setGroup(g);
+    onChange(inMaker.find((m) => m.group === g) ?? null);
+  };
+  return (
+    <div className="model-picker">
+      {kinds.length > 1 && (
+        <select className="select" value={kind} onChange={(e) => pickKind(e.target.value as PartKind)} aria-label="Kind of part">
+          {kinds.map((k) => (
+            <option key={k} value={k}>
+              {KIND_LABEL[k]}
+            </option>
+          ))}
+        </select>
+      )}
+      <select className="select" value={maker} onChange={(e) => (e.target.value ? pickMaker(e.target.value) : (setMaker(''), setGroup(''), onChange(null)))} aria-label="Brand">
+        <option value="">{allowNone ?? 'Brand…'}</option>
+        {makers.map((m) => (
+          <option key={m} value={m} translate="no">
+            {m}
+          </option>
+        ))}
+      </select>
+      {maker && (
+        <select className="select" value={group} onChange={(e) => pickGroup(e.target.value)} aria-label="Series" translate="no">
+          {groups.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
+        </select>
+      )}
+      {maker && models.length > 1 && (
+        <select className="select" value={value?.id ?? ''} onChange={(e) => onChange(findModel(e.target.value) ?? null)} aria-label="Model" translate="no">
+          {models.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.short}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
+  );
+}
+
 /** Paste a link to a used part (eBay, OLX, Bazar.bg, a shop...) or type it in, and get a verdict. */
-function ListingCheck({ data, fx, rates }: { data: AppData; fx: Rates | null; rates: Record<'gpu' | 'cpu', number> }) {
+function ListingCheck({ data, fx, ctx }: { data: AppData; fx: Rates | null; ctx: PriceCtx }) {
   const [url, setUrl] = useState('');
   const [busy, setBusy] = useState(false);
   const [listing, setListing] = useState<Listing | null>(null);
-  const [part, setPart] = useState<PartRef | null>(null);
+  const [part, setPart] = useState<UsedModel | null>(null);
   const [price, setPrice] = useState('');
   const [cur, setCur] = useState(() => defaultCurrency(data));
+  const show = useMoney(fx, cur);
 
   const check = async () => {
     const u = url.trim();
@@ -271,21 +352,15 @@ function ListingCheck({ data, fx, rates }: { data: AppData; fx: Rates | null; ra
   };
 
   const amount = Number(price.replace(',', '.'));
-  const fair = part ? fairUsed(data, part, rates) : null;
+  const fair = part ? modelRange(part, ctx) : null;
   let usd: number | null = null;
   if (amount > 0) {
     const a = cur === 'BGN' ? amount / BGN_PER_EUR : amount;
     const c = cur === 'BGN' ? 'EUR' : cur;
     usd = c === 'USD' ? a : fx ? convert(a, c, 'USD', fx) : null;
   }
-  const show = (v: number) => {
-    const c = cur === 'BGN' ? 'EUR' : cur;
-    const x = c === 'USD' ? v : fx ? convert(v, 'USD', c, fx) : null;
-    return x === null ? money(Math.round(v), 'USD', true) : money(Math.round(x), c, true);
-  };
   const v = fair && usd ? verdictFor(usd / fair.mid) : null;
   const diff = fair && usd ? Math.round((usd / fair.mid - 1) * 100) : 0;
-  const kind = part?.kind;
 
   return (
     <div className="card deal-form listing-check">
@@ -304,19 +379,18 @@ function ListingCheck({ data, fx, rates }: { data: AppData; fx: Rates | null; ra
               {listing.title}
             </a>
           ) : (
-            <span className="muted">
-              {listing.error
-                ? api_hint()
-                : "Couldn't find a title on that page."}
-            </span>
+            <span className="muted">{listing.error ? (navigator.onLine === false ? "You're offline: pick the part and type the price instead." : "Couldn't open that page (the site blocks apps or needs a login). Pick the part and type the price instead.") : "Couldn't find a title on that page."}</span>
           )}
           {listing.title && !listing.price && <span className="muted"> · no price found on the page, type it below</span>}
           {!listing.part && <span className="muted"> · pick the part below</span>}
         </div>
       )}
-      <div className="deal-row">
-        <PartPicker value={part} onChange={setPart} />
-      </div>
+      <ModelPicker value={part} onChange={setPart} />
+      {part && (
+        <p className="small listing-model">
+          <strong translate="no">{part.name}</strong> {part.info && <span className="muted">· {part.info}</span>}
+        </p>
+      )}
       <div className="deal-row">
         <input
           className="search deal-price"
@@ -332,13 +406,7 @@ function ListingCheck({ data, fx, rates }: { data: AppData; fx: Rates | null; ra
             } else setPrice(t.replace(/[^0-9.,]/g, ''));
           }}
         />
-        <select className="select" value={cur} onChange={(e) => setCur(e.target.value)}>
-          {[...CURRENCIES, 'BGN'].map((c) => (
-            <option key={c} value={c}>
-              {c === 'BGN' ? 'BGN (лв.)' : c}
-            </option>
-          ))}
-        </select>
+        <CurrencySelect value={cur} onChange={setCur} />
       </div>
       {fair && (
         <p className="muted small">
@@ -358,120 +426,145 @@ function ListingCheck({ data, fx, rates }: { data: AppData; fx: Rates | null; ra
           {v.cls === 'v-bad' && <p className="small">Offer around {show(fair.mid)}, or look for another listing.</p>}
           {v.cls === 'v-fair' && <p className="small">A fair offer would be about {show(fair.mid)}.</p>}
           {(v.cls === 'v-great' || v.cls === 'v-good') && diff < -40 && <p className="small">Much cheaper than usual: make sure it's real (no "shipping only" scams) and test it before paying.</p>}
-          {kind && kind !== 'gpu' && kind !== 'cpu' && <p className="muted small">{USED_TIPS[kind as UsedKind]}</p>}
-          {(kind === 'gpu' || kind === 'cpu') && <p className="muted small">Ask how it was used (mining or heavy overclocking wears parts faster), test it before you pay, and check whether any warranty is left.</p>}
+          {part && <p className="muted small">{MODEL_TIPS[part.kind]}</p>}
         </div>
       )}
     </div>
   );
 }
 
-function api_hint() {
-  return "Couldn't open that page (the site blocks apps or needs a login). Pick the part and type the price instead.";
-}
+const PAGE = 120;
 
-export function UsedPrices({ data }: { data: AppData }) {
-  const fx = useRates(data);
+/** The used-price list: every brand and model of one kind of part. */
+function UsedList({ data, fx, ctx }: { data: AppData; fx: Rates | null; ctx: PriceCtx }) {
   const [kind, setKind] = useState<PartKind>('gpu');
+  const [maker, setMaker] = useState('');
   const [cur, setCur] = useState(() => defaultCurrency(data));
   const [q, setQ] = useState('');
-  const rates = useMemo(() => ({ gpu: marketRate('gpu', (x) => usPrice(data, x)), cpu: marketRate('cpu', (x) => usPrice(data, x)) }), [data]);
-  const show = (usd: number) => {
-    const v = cur === 'USD' ? usd : fx ? convert(usd, 'USD', cur, fx) : null;
-    return v === null ? money(Math.round(usd), 'USD', true) : money(Math.round(v), cur, true);
-  };
-  const now = new Date().getFullYear();
+  const [limit, setLimit] = useState(PAGE);
+  const show = useMoney(fx, cur);
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  const hit = (name: string) => words.every((w) => name.toLowerCase().includes(w));
+  const now = new Date().getFullYear();
+  const rows = useMemo(() => {
+    let list = usedModels(kind).filter((m) => (!maker || m.maker === maker) && words.every((w) => `${m.name} ${m.group} ${m.info ?? ''}`.toLowerCase().includes(w)));
+    // brand-new GPUs/CPUs (this year) have hardly any used market yet
+    if (kind === 'gpu' || kind === 'cpu') list = list.filter((m) => (m.bench?.year ?? 0) <= now - 1 || words.length > 0);
+    if (kind === 'cpu') list = [...list].sort((a, b) => (b.bench?.score ?? 0) - (a.bench?.score ?? 0));
+    return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kind, maker, q]);
+  useEffect(() => setLimit(PAGE), [kind, maker, q]);
+  const top = kind === 'gpu' || kind === 'cpu' ? Math.max(...usedModels(kind).map((m) => m.bench?.score ?? 0)) : 0;
+  const shown = rows.slice(0, limit);
 
   return (
-    <div className="used">
-      <ListingCheck data={data} fx={fx} rates={rates} />
-      <h3 className="used-h">Fair used prices</h3>
-      <p className="muted small">What a used part is fairly worth today: its price new now, minus a used discount for no warranty, wear and age. Use it before you buy or sell second-hand.</p>
+    <>
       <div className="seg used-kinds">
-        {KINDS.map((k) => (
-          <button key={k} className={kind === k ? 'seg-btn on' : 'seg-btn'} onClick={() => setKind(k)}>
+        {KIND_LIST.map((k) => (
+          <button
+            key={k}
+            className={kind === k ? 'seg-btn on' : 'seg-btn'}
+            onClick={() => {
+              setKind(k);
+              setMaker('');
+            }}
+          >
             {KIND_LABEL[k]}
           </button>
         ))}
       </div>
-      <div className="deal-row">
-        <select className="select" value={cur} onChange={(e) => setCur(e.target.value)}>
-          {CURRENCIES.map((c) => (
-            <option key={c}>{c}</option>
+      <div className="deal-row used-filters">
+        <select className="select" value={maker} onChange={(e) => setMaker(e.target.value)} aria-label="Brand">
+          <option value="">All brands</option>
+          {makersOf(kind).map((m) => (
+            <option key={m} value={m} translate="no">
+              {m}
+            </option>
           ))}
         </select>
-        <input className="search used-search" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <CurrencySelect value={cur} onChange={setCur} />
+        <input className="search used-search" placeholder={kind === 'gpu' ? 'Search, e.g. 4070 Strix' : 'Search…'} value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
-      {kind !== 'gpu' && kind !== 'cpu' && <p className="muted small used-tip">ⓘ {USED_TIPS[kind]}</p>}
+      <p className="muted small used-tip">ⓘ {MODEL_TIPS[kind]}</p>
+      <p className="muted small">{rows.length.toLocaleString()} models</p>
       <div className="card used-list">
-        {(kind === 'gpu' || kind === 'cpu') &&
-          (() => {
-            const top = Math.max(...benchList(kind).map((b) => b.score));
-            const rows = benchList(kind)
-              .filter((b) => b.year <= now - 1 && hit(b.name))
-              .sort((a, b) => b.score - a.score);
-            if (!rows.length) return <p className="muted">Nothing matches.</p>;
-            return rows.map((b) => {
-              const r = usedRange(b, rates[kind], usPrice(data, b));
-              return (
-                <div key={b.name} className="used-row">
-                  <div className="used-name">
-                    <strong translate="no">{b.name}</strong>
-                    <span className="muted small">
-                      {b.year}
-                      {b.vram ? ` · ${b.vram} GB` : ''}
-                      {b.cores ? ` · ${b.cores} cores` : ''}
-                      {b.msrp ? ` · launched at ${money(b.msrp, 'USD', true)}` : ''}
-                    </span>
+        {!rows.length && <p className="muted">Nothing matches.</p>}
+        {shown.map((m, i) => {
+          const r = modelRange(m, ctx);
+          const head = i === 0 || shown[i - 1].group !== m.group;
+          return (
+            <div key={m.id}>
+              {head && (
+                <div className="used-group muted small" translate="no">
+                  {m.group}
+                </div>
+              )}
+              <div className="used-row">
+                <div className="used-name">
+                  <strong translate="no">{m.name}</strong>
+                  <span className="muted small">
+                    {m.info}
+                    {r.newUsd ? ` · new now: about ${show(r.newUsd)}` : m.bench?.msrp ? ` · launched at ${money(m.bench.msrp, 'USD', true)}` : ''}
+                    {m.premium ? ` · ${m.premium > 0 ? '+' : ''}${Math.round(m.premium * 100)}% for this version` : ''}
+                  </span>
+                  {top > 0 && m.bench && head && (
                     <div className="bench-bar small-bar">
-                      <div style={{ width: `${(b.score / top) * 100}%` }} />
+                      <div style={{ width: `${(m.bench.score / top) * 100}%` }} />
                     </div>
-                  </div>
-                  <div className="used-price">
-                    <strong>
-                      {show(r.low)} – {show(r.high)}
-                    </strong>
-                    {r.note && <span className="muted small">{r.note}</span>}
-                  </div>
+                  )}
                 </div>
-              );
-            });
-          })()}
-        {kind !== 'gpu' &&
-          kind !== 'cpu' &&
-          (() => {
-            const parts = USED_PARTS[kind].filter((p) => hit(p.name) || hit(p.group));
-            if (!parts.length) return <p className="muted">Nothing matches.</p>;
-            return parts.map((p, i) => {
-              const latest = p.tracked ? latestUs(data, p.tracked) : undefined;
-              const r = usedPartRange(p, latest);
-              return (
-                <div key={p.name}>
-                  {(i === 0 || parts[i - 1].group !== p.group) && <div className="used-group muted small">{p.group}</div>}
-                  <div className="used-row">
-                    <div className="used-name">
-                      <strong>{p.name}</strong>
-                      <span className="muted small">
-                        New now: about {show(r.newUsd)}
-                        {latest ? ' (latest US price we recorded)' : ''}
-                      </span>
-                    </div>
-                    <div className="used-price">
-                      <strong>
-                        {show(r.low)} – {show(r.high)}
-                      </strong>
-                    </div>
-                  </div>
+                <div className="used-price">
+                  <strong>
+                    {show(r.low)} – {show(r.high)}
+                  </strong>
+                  {r.note && <span className="muted small">{r.note}</span>}
                 </div>
-              );
-            });
-          })()}
+              </div>
+            </div>
+          );
+        })}
+        {rows.length > limit && (
+          <button className="btn ghost small used-more" onClick={() => setLimit((l) => l + PAGE * 2)}>
+            Show more ({(rows.length - limit).toLocaleString()} left)
+          </button>
+        )}
       </div>
       <p className="muted small">
-        Estimates for private sales (no VAT added), based on new prices in November 2026. Prices vary with condition, region and demand; check what similar listings actually sold for. {kind === 'gpu' || kind === 'cpu' ? BENCH_NOTE : ''}
+        Estimates for private sales in good condition (no VAT added), based on new prices in November 2026. Prices vary with condition, region and demand; check what similar listings actually sold for. {kind === 'gpu' || kind === 'cpu' ? BENCH_NOTE : ''}
       </p>
+    </>
+  );
+}
+
+type UsedTab = 'prices' | 'listing' | 'build';
+
+export function UsedPrices({ data }: { data: AppData }) {
+  const fx = useRates(data);
+  const ctx = usePriceCtx(data);
+  const [tab, setTab] = useState<UsedTab>('prices');
+  return (
+    <div className="used">
+      <div className="seg used-tabs">
+        {(
+          [
+            ['prices', 'Fair used prices'],
+            ['listing', 'Check a listing'],
+            ['build', 'Sell my whole PC'],
+          ] as [UsedTab, string][]
+        ).map(([id, label]) => (
+          <button key={id} className={tab === id ? 'seg-btn on' : 'seg-btn'} onClick={() => setTab(id)}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {tab === 'prices' && (
+        <>
+          <p className="muted small">What a used part is fairly worth today, for every brand and model: its price new now, minus a used discount for no warranty, wear and age. Use it before you buy or sell second-hand.</p>
+          <UsedList data={data} fx={fx} ctx={ctx} />
+        </>
+      )}
+      {tab === 'listing' && <ListingCheck data={data} fx={fx} ctx={ctx} />}
+      {tab === 'build' && <BuildValue data={data} fx={fx} ctx={ctx} />}
     </div>
   );
 }

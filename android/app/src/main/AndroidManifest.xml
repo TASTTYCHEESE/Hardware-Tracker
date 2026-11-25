@@ -30,6 +30,11 @@
 
         </activity>
 
+        <!-- Result of installing an app update (AppUpdaterPlugin) -->
+        <receiver
+            android:name=".UpdateResultReceiver"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -44,4 +49,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Install app updates downloaded from the GitHub release -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 </manifest>

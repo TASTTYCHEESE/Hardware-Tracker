@@ -61,7 +61,7 @@ export function Reader({ url: rawUrl, onClose, onNavigate, translate = true }: {
           const th = d.querySelector('[data-hwt-title]');
           const title = th?.textContent?.trim() || article.title || '';
           th?.remove();
-          if (!cancelled) setTr(h.lang && h.lang !== 'en' ? { title, html: d.body.firstElementChild?.innerHTML ?? h.html, lang: h.lang } : null);
+          if (!cancelled) setTr(h.lang && h.lang !== 'en' ? { title, html: DOMPurify.sanitize(d.body.firstElementChild?.innerHTML ?? h.html, { FORBID_TAGS: ['style', 'form', 'iframe'], FORBID_ATTR: ['style'] }), lang: h.lang } : null);
         }
       } catch {
         if (!cancelled && wantTranslate && url !== rawUrl) setForeign(true);

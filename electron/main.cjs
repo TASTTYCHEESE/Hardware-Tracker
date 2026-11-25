@@ -5,6 +5,7 @@ const { app, BrowserWindow, ipcMain, dialog, Notification, net, shell, Tray, Men
 const background = require('./background.cjs');
 const updater = require('./updater.cjs');
 const catalogMod = require('./catalog.cjs');
+const { assertPublicUrl } = require('./nethost.cjs');
 const path = require('node:path');
 const fs = require('node:fs');
 
@@ -204,8 +205,32 @@ function createWindow() {
 // ---- IPC -------------------------------------------------------------------
 
 const MAX_FETCH = 15 * 1024 * 1024;
+// Offline use: the last copy of the app's own data files (price list, launch calendar, exchange
+// rates...) is kept on disk and used when there's no internet. News pages aren't kept.
+const OFFLINE_CACHE = /^https:\/\/(raw\.githubusercontent\.com\/TASTTYCHEESE\/|api\.github\.com\/repos\/TASTTYCHEESE\/|open\.er-api\.com\/|api\.frankfurter\.dev\/)/;
+const offlineFile = (url) => path.join(dataDir(), 'offline-cache', `${require('node:crypto').createHash('sha1').update(url.split('?')[0]).digest('hex')}.txt`);
 ipcMain.handle('fetch-text', async (_e, url) => {
   if (typeof url !== 'string' || url.length > 4000 || !/^https?:\/\//i.test(url)) throw new Error('Bad URL');
+  if (!OFFLINE_CACHE.test(url)) return fetchTextOnline(url);
+  try {
+    const text = await fetchTextOnline(url);
+    try {
+      fs.mkdirSync(path.dirname(offlineFile(url)), { recursive: true });
+      fs.writeFileSync(offlineFile(url), text);
+    } catch {
+      /* disk full or read-only: fine */
+    }
+    return text;
+  } catch (e) {
+    try {
+      return fs.readFileSync(offlineFile(url), 'utf8');
+    } catch {
+      throw e;
+    }
+  }
+});
+async function fetchTextOnline(url) {
+  await assertPublicUrl(url);
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 25000);
   try {
@@ -216,6 +241,7 @@ ipcMain.handle('fetch-text', async (_e, url) => {
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     if (!/^https?:/i.test(res.url || url)) throw new Error('Bad redirect');
+    if (res.url && res.url !== url) await assertPublicUrl(res.url); // redirected to a local address
     const len = Number(res.headers.get('content-length') || 0);
     if (len > MAX_FETCH) throw new Error('Too large');
     const text = await res.text();
@@ -224,7 +250,7 @@ ipcMain.handle('fetch-text', async (_e, url) => {
   } finally {
     clearTimeout(timer);
   }
-});
+}
 
 ipcMain.handle('read-recaps', async () => {
   const dir = path.join(dataDir(), 'recaps');

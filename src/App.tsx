@@ -16,6 +16,7 @@ import { Compare } from './components/Compare';
 import { BuyAdvisor } from './components/BuyAdvisor';
 import { Benchmarks } from './components/Benchmarks';
 import { LanguagePicker } from './components/LanguagePicker';
+import { OfflineBadge } from './components/OfflineBadge';
 import { setLanguage } from './lib/i18n';
 import { Launches } from './components/Launches';
 import { keywordHits } from './lib/newsAlerts';
@@ -249,6 +250,7 @@ export default function App() {
           </button>
         ))}
         <div className="sidebar-foot muted small">
+          <OfflineBadge />
           Daily recap 8:00 · Weekly recap Mon 8:00
           <br />
           (Sofia time)
@@ -261,6 +263,7 @@ export default function App() {
       </nav>
       <main className="main">
         {reading && <Reader url={reading} onClose={() => setReading(null)} onNavigate={setReading} translate={data.settings.translateNews !== false} />}
+        <OfflineBadge phone />
         <div className={tabs.length ? 'topbar' : 'topbar no-tabs'}>
           {tabs.length > 0 && (
             <div className="seg">
