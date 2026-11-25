@@ -96,15 +96,21 @@ jobs:
           ANDROID_SIGNING: ${{ secrets.ANDROID_SIGNING }}
         run: |
           if [ -z "$ANDROID_SIGNING" ]; then echo "::warning::No ANDROID_SIGNING secret, so no APK is published"; exit 0; fi
-          printf '%s\n' "$ANDROID_SIGNING" | sed -n 2p | base64 -d > "$RUNNER_TEMP/hwt.jks"
           echo "::add-mask::$(printf '%s\n' "$ANDROID_SIGNING" | sed -n 1p)"
+          (umask 077 && printf '%s\n' "$ANDROID_SIGNING" | sed -n 2p | base64 -d > "$RUNNER_TEMP/hwt.jks")
           echo "HWT_KEYSTORE=$RUNNER_TEMP/hwt.jks" >> "$GITHUB_ENV"
-          echo "HWT_KEYSTORE_PASSWORD=$(printf '%s\n' "$ANDROID_SIGNING" | sed -n 1p)" >> "$GITHUB_ENV"
+      # The password is only handed to the build step that needs it (not saved for every later step),
+      # and the key file is deleted as soon as the APK is signed.
       - name: Build and publish the APK
         if: env.HWT_KEYSTORE != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANDROID_SIGNING: ${{ secrets.ANDROID_SIGNING }}
         run: |
+          trap 'rm -f "$HWT_KEYSTORE"' EXIT
+          HWT_KEYSTORE_PASSWORD="$(printf '%s\n' "$ANDROID_SIGNING" | sed -n 1p)"
+          export HWT_KEYSTORE_PASSWORD
+          unset ANDROID_SIGNING
           cd android && chmod +x gradlew && ./gradlew --no-daemon assembleRelease && cd ..
           VERSION=$(node -p "require('./package.json').version")
           cp android/app/build/outputs/apk/release/app-release.apk "HardwareTracker-$VERSION-android.apk"

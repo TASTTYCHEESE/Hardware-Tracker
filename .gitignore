@@ -7,3 +7,12 @@ __pycache__/
 # Graphify knowledge graph output (rebuild with /graphify)
 graphify-out/
 build/release-title.txt
+
+# Never commit signing keys or passwords
+*.jks
+*.keystore
+*.p12
+*.pfx
+.env
+.env.*
+android-signing*

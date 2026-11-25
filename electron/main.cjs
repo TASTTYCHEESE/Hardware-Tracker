@@ -8,6 +8,7 @@ const catalogMod = require('./catalog.cjs');
 const { assertPublicUrl } = require('./nethost.cjs');
 const path = require('node:path');
 const fs = require('node:fs');
+const { pathToFileURL } = require('node:url');
 
 const SETTINGS_FILE = () => path.join(app.getPath('userData'), 'settings.json');
 
@@ -194,8 +195,10 @@ function createWindow() {
       return { action: 'deny' };
     });
   });
+  // The window only ever shows the app itself: not other files on this computer, not web pages.
+  const appUrl = pathToFileURL(path.join(__dirname, '..', 'dist', 'index.html')).href;
   win.webContents.on('will-navigate', (e, url) => {
-    if (!url.startsWith('file://') && !(devUrl && url.startsWith(devUrl))) {
+    if (url.split('#')[0] !== appUrl && !(devUrl && url.startsWith(devUrl))) {
       e.preventDefault();
       if (/^https?:\/\//.test(url)) shell.openExternal(url);
     }
@@ -331,12 +334,16 @@ ipcMain.handle('read-archive-day', async (_e, day) => (/^\d{4}-\d{2}-\d{2}$/.tes
 
 ipcMain.handle('get-settings', async () => ({ ...readSettings(), dataDir: dataDir() }));
 
+const MAIN_ONLY_SETTINGS = new Set(['updateUrl']);
 ipcMain.handle('set-settings', async (_e, patch) => {
   // Only plain settings objects; never prototype keys.
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw new Error('Bad settings');
   const clean = {};
   for (const [k, v] of Object.entries(patch)) {
     if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+    // The update server can only be changed by editing settings.json by hand, never from the
+    // window: a page that took over the window could otherwise point updates at its own installer.
+    if (MAIN_ONLY_SETTINGS.has(k)) continue;
     clean[k] = v;
   }
   if ('dataDir' in clean && clean.dataDir && (typeof clean.dataDir !== 'string' || !path.isAbsolute(clean.dataDir))) throw new Error('Bad folder');
