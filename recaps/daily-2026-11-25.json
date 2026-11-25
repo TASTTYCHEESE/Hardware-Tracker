@@ -1,0 +1,354 @@
+{
+  "id": "daily-2026-11-25",
+  "type": "daily",
+  "date": "2026-11-25",
+  "title": "US blacklists Megaspeed as Huang returns; Black Friday brings few real GPU deals",
+  "summary": "After Jensen Huang's return as Nvidia CEO, the US put Singapore's Megaspeed on its trade blacklist and keeps probing alleged AI-chip exports to China; analyst Ming-Chi Kuo warns of tighter GPU sales rules. On the PC side, Black Friday prices are barely moving: RTX 50 cards still sell far above MSRP in the US, while a few smaller cards, a Ryzen 7 9800X3D coupon and some DDR5 kits got real discounts. Nvidia also shipped a driver hotfix for excessive SSD writes.",
+  "takeaways": [
+    "Black Friday GPU prices are still about 1.5-2x MSRP in the US; only small discounts on RTX 5060 Ti 8GB and RX 9070 GRE so far.",
+    "Ryzen 7 9800X3D at $399 (Amazon coupon) is the best CPU deal right now.",
+    "32GB DDR5-6000 still costs about $440-480 even on sale; buy only if you must.",
+    "Update the Nvidia driver to 621.40 if your SSD shows heavy writes."
+  ],
+  "sections": [
+    {
+      "category": "Industry",
+      "items": [
+        {
+          "headline": "US blacklists Megaspeed; Nvidia export probe continues",
+          "detail": "After Huang's reinstatement, the US added Singapore-based Megaspeed (formerly led by Alice Huang) to its restricted-entity list. Treasury says Nvidia has not yet answered all compliance questions on alleged AI-chip shipments to China. New BIS rules (in force since Nov 19) require licences for exports to Singapore, Malaysia, Thailand, Indonesia and Brazil.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "VOA",
+              "url": "https://www.voanews.com/a/nvidia-reinstates-jensen-huang-as-ceo-as-us-probes-alleged-chip-exports-to-china/8227038.html"
+            },
+            {
+              "title": "KCLU/WBUR",
+              "url": "https://www.kclu.org/economy/2026-11-24/with-jensen-huang-back-at-nvidias-helm-whats-next-for-export-controls"
+            }
+          ]
+        },
+        {
+          "headline": "Kuo: Nvidia faces tighter sales rules and probes under Huang",
+          "detail": "Analyst Ming-Chi Kuo says Huang's return removes roadmap uncertainty but Nvidia may face tighter GPU sales restrictions, curtailed leasing, shipment investigations and lawsuits.",
+          "status": "rumor",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/nvidia-under-returning-ceo-jensen-huang-faces-tighter-gpu-sales-restrictions-curtailed-leasing-shipment-investigations-and-lawsuits-says-analyst-ming-chi-kuo/"
+            }
+          ]
+        },
+        {
+          "headline": "Samsung and SK hynix short of fab workers",
+          "detail": "Reports say Korea needs about 260,000 workers for the memory mega-fabs and may use retired soldiers, another drag on new memory supply.",
+          "status": "rumor",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/samsung-sk-hynix-face-labor-crunch-260000-workers-retired-soldiers/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "GPU",
+      "items": [
+        {
+          "headline": "Nvidia driver 621.40 fixes excessive SSD writes",
+          "detail": "A WHQL hotfix for the bug where recent GeForce drivers wrote heavily to SSDs (621.35 did not fully fix it).",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/nvidia-driver-621-40-whql-fixes-excessive-ssd-writes/"
+            }
+          ]
+        },
+        {
+          "headline": "Black Friday GPU prices barely move in the US",
+          "detail": "Lowest US prices on Nov 24: RTX 5080 $2,260, RTX 5070 Ti $1,480, RTX 5070 $900, RX 9070 XT $980, RX 9070 $750, RX 9060 XT 16GB $730, Arc B580 $330. RTX 5090 is hard to find from reputable sellers (about $6,449 at Newegg on Nov 23).",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "PC Gamer Black Friday live",
+              "url": "https://www.pcgamer.com/hardware/live/news/black-friday-live-2026/"
+            },
+            {
+              "title": "Tom's Hardware GPU price tracker",
+              "url": "https://www.tomshardware.com/pc-components/gpus/lowest-gpu-prices-tracking"
+            }
+          ]
+        },
+        {
+          "headline": "AMD's Jack Huynh pushes an RX 9060 XT to 4.837 GHz",
+          "detail": "A claimed GPU frequency world record with extreme cooling.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/amd-jack-huynh-breaks-gpu-world-record-by-pushing-radeon-rx-9060-xt-to-a-whopping-4-837-ghz/"
+            }
+          ]
+        },
+        {
+          "headline": "Single-slot INNO3D RTX 5060 Ti PRO listed in Japan at about $1,064",
+          "detail": "About twice a normal RTX 5060 Ti.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/inno3ds-single-slot-rtx-5060-ti-pro-hits-japanese-retailer-at-1064/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "CPU",
+      "items": [
+        {
+          "headline": "Ryzen 7 9800X3D drops to $399",
+          "detail": "Amazon Black Friday price with coupon, the best gaming CPU deal right now.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/amd-ryzen-7-9800x3d-black-friday-deal/"
+            }
+          ]
+        },
+        {
+          "headline": "Intel reportedly plans a next-gen desktop event for late February",
+          "detail": "VideoCardz says Intel plans a desktop event in late February 2027, likely for Nova Lake-S.",
+          "status": "rumor",
+          "sources": [
+            {
+              "title": "VideoCardz",
+              "url": "https://videocardz.com/newz/exclusive-intel-plans-next-gen-desktop-event-for-late-february"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "RAM",
+      "items": [
+        {
+          "headline": "Cheapest 32GB DDR5-6000 kit: $439.99",
+          "detail": "TeamGroup T-Force Delta RGB DDR5-6000 CL38 32GB at Newegg with a promo code (was $549.99). Still about 5x what the same kit cost a year ago.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Tom's Hardware: cheapest 32GB DDR5-6000 kit $439",
+              "url": "https://www.tomshardware.com/pc-components/ddr5/the-cheapest-32gb-ddr5-6000-ram-kit-on-the-market-is-on-sale-for-only-usd439-teams-32gb-ddr5-6000-cl38-t-force-delta-rgb-ram-kit-is-usd110-off-with-promo-code-no-bundle-deals-needed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Other",
+      "items": [
+        {
+          "headline": "Samsung Odyssey G6 (G60H): 1100 Hz monitor goes on sale",
+          "detail": "27-inch Fast IPS, 1100 Hz at 720p or about 600 Hz at 1440p, DisplayPort 2.1. $899.99 on Amazon.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/samsung-releases-worlds-first-1100-hz-gaming-monitor/"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "trends": [
+    {
+      "category": "GPU",
+      "region": "US",
+      "direction": "flat",
+      "change": "~0% DoD",
+      "note": "RTX 5070 Ti $1,459 → $1,480; most cards unchanged."
+    },
+    {
+      "category": "RAM",
+      "region": "US",
+      "direction": "flat",
+      "note": "Cheapest 32GB DDR5-6000 at $439.99 with a code (was $429 on Nov 16)."
+    }
+  ],
+  "alerts": [
+    {
+      "region": "US",
+      "item": "RTX 5060 Ti 8GB",
+      "category": "GPU",
+      "currency": "USD",
+      "from": 551.49,
+      "to": 479.99,
+      "note": "Gigabyte model at Newegg, -13%",
+      "source": {
+        "title": "PC Gamer Black Friday live",
+        "url": "https://www.pcgamer.com/hardware/live/news/black-friday-live-2026/"
+      }
+    },
+    {
+      "region": "US",
+      "item": "RX 9070 GRE",
+      "category": "GPU",
+      "currency": "USD",
+      "from": 826.99,
+      "to": 699.99,
+      "note": "Asus Prime at Newegg, -15%",
+      "source": {
+        "title": "PC Gamer Black Friday live",
+        "url": "https://www.pcgamer.com/hardware/live/news/black-friday-live-2026/"
+      }
+    },
+    {
+      "region": "US",
+      "item": "DDR5-6000 2x16GB (cheapest)",
+      "category": "RAM",
+      "currency": "USD",
+      "from": 549.99,
+      "to": 439.99,
+      "note": "TeamGroup T-Force Delta RGB CL38 at Newegg with promo code, -20% vs list",
+      "source": {
+        "title": "Tom's Hardware: cheapest 32GB DDR5-6000 kit $439",
+        "url": "https://www.tomshardware.com/pc-components/ddr5/the-cheapest-32gb-ddr5-6000-ram-kit-on-the-market-is-on-sale-for-only-usd439-teams-32gb-ddr5-6000-cl38-t-force-delta-rgb-ram-kit-is-usd110-off-with-promo-code-no-bundle-deals-needed"
+      }
+    }
+  ],
+  "prices": [
+    {
+      "model": "RTX 5080",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 2260,
+      "msrp": 999,
+      "date": "2026-11-24",
+      "source": "PC Gamer"
+    },
+    {
+      "model": "RTX 5070 Ti",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 1480,
+      "msrp": 749,
+      "date": "2026-11-24",
+      "source": "PC Gamer"
+    },
+    {
+      "model": "RTX 5070",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 900,
+      "msrp": 549,
+      "date": "2026-11-24",
+      "source": "PC Gamer"
+    },
+    {
+      "model": "RTX 5090",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 6449,
+      "msrp": 1999,
+      "date": "2026-11-23",
+      "source": "Tom's Hardware"
+    },
+    {
+      "model": "RTX 5060 Ti 8GB",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 479.99,
+      "msrp": 379,
+      "date": "2026-11-24",
+      "source": "PC Gamer"
+    },
+    {
+      "model": "RX 9070 XT",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 980,
+      "msrp": 599,
+      "date": "2026-11-24",
+      "source": "PC Gamer"
+    },
+    {
+      "model": "RX 9070",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 750,
+      "msrp": 549,
+      "date": "2026-11-24",
+      "source": "PC Gamer"
+    },
+    {
+      "model": "RX 9060 XT 16GB",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 730,
+      "msrp": 349,
+      "date": "2026-11-24",
+      "source": "PC Gamer"
+    },
+    {
+      "model": "Arc B580",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 330,
+      "msrp": 249,
+      "date": "2026-11-24",
+      "source": "PC Gamer"
+    },
+    {
+      "model": "Ryzen 7 9800X3D",
+      "category": "CPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 399,
+      "msrp": 479,
+      "date": "2026-11-24",
+      "source": "Wccftech (Amazon coupon)"
+    },
+    {
+      "model": "DDR5-6000 2x16GB (cheapest)",
+      "category": "RAM",
+      "region": "US",
+      "currency": "USD",
+      "price": 439.99,
+      "date": "2026-11-24",
+      "source": "Tom's Hardware (Newegg promo)"
+    }
+  ],
+  "sources": [
+    {
+      "title": "PC Gamer Black Friday live",
+      "url": "https://www.pcgamer.com/hardware/live/news/black-friday-live-2026/"
+    },
+    {
+      "title": "Tom's Hardware: cheapest 32GB DDR5-6000 kit $439",
+      "url": "https://www.tomshardware.com/pc-components/ddr5/the-cheapest-32gb-ddr5-6000-ram-kit-on-the-market-is-on-sale-for-only-usd439-teams-32gb-ddr5-6000-cl38-t-force-delta-rgb-ram-kit-is-usd110-off-with-promo-code-no-bundle-deals-needed"
+    },
+    {
+      "title": "Wccftech",
+      "url": "https://wccftech.com/"
+    },
+    {
+      "title": "VOA",
+      "url": "https://www.voanews.com/a/nvidia-reinstates-jensen-huang-as-ceo-as-us-probes-alleged-chip-exports-to-china/8227038.html"
+    }
+  ]
+}

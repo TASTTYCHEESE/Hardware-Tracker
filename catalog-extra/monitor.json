@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "id": "samsung-odyssey-g6-g60h",
+      "name": "Samsung Odyssey G6 G60H",
+      "maker": "Samsung",
+      "year": 2026,
+      "date": "2026-11-24",
+      "screen_size": 27,
+      "resolution": "2560 × 1440",
+      "refresh_rate": 600,
+      "response_time": 1,
+      "panel_type": "IPS",
+      "aspect_ratio": "16:9",
+      "ppi": 109,
+      "resolution_class": "1440p",
+      "max_refresh_rate_low_res": "1100 Hz at 1280 × 720",
+      "ports": "1x DisplayPort 2.1, 2x HDMI 2.1",
+      "price": "$899.99",
+      "sources": "https://wccftech.com/samsung-releases-worlds-first-1100-hz-gaming-monitor/"
+    }
+  ]
+}
