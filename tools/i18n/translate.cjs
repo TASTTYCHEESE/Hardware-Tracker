@@ -16,8 +16,8 @@ async function gt(text, to) {
       const j = await r.json();
       return j[0].map((p) => p[0]).join('');
     } catch (e) {
-      if (i >= 4) throw e;
-      await sleep(2000 * 2 ** i);
+      if (i >= 7) throw e;
+      await sleep(Math.min(60000, 3000 * 2 ** i)); // Google rate-limits busy clients (HTTP 429)
     }
   }
 }

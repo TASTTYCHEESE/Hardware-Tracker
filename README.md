@@ -20,7 +20,7 @@ Setup details for each one are further down.
 - **Overview**: price direction per country, biggest drops, headlines. Top tabs: **Overview / Live news / Archive** (every past day).
 - **Prices**: tabs **Prices** (17 countries, any combination, optional single currency) / **Price alerts** / **Tracking** (watchlist with target prices; Windows notification when a target is hit).
 - **Benchmarks**: gaming performance rankings for about 80 graphics cards and 50 processors, and a **bottleneck checker** (CPU + GPU + resolution → which part holds you back, and roughly how many fps).
-- **Buy or wait?**: your list with buy/wait verdicts, **Is this a good deal?** (type a part and a price, new or used, in any currency) and **Used prices** (fair second-hand value of older parts).
+- **Buy or wait?**: your list with buy/wait verdicts, **Is this a good deal?** (type a part and a price, new or used, in any currency) and **Used prices** (fair second-hand value of graphics cards, processors, RAM, SSDs, motherboards, power supplies and cases, plus a checker: paste a listing link and see if it's worth buying).
 - **PC Hardware**: a spec encyclopedia. Pick **Hardware** or **Peripherals**, then a category (GPU chips since 1986, graphics cards, CPUs, motherboards, RAM, SSDs, HDDs, PSUs, coolers, cases, monitors, keyboards, mice, headsets and more), filter by manufacturer, years and category-specific specs, and open any product for its full specifications.
 - **Languages**: 18 languages (English by default, Bulgarian included), from the menu at the top right on desktop or Settings → Language on phones.
 - **In-app reader** for every link (Reader view or full Web page; Ctrl-click opens your browser).
