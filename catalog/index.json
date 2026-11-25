@@ -1,6 +1,6 @@
 {
- "version": "2026-11-24T1731",
- "updated": "2026-11-24T17:31Z",
+ "version": "2026-11-25T0551",
+ "updated": "2026-11-25T05:51Z",
  "categories": [
   {
    "id": "cpu",
@@ -233,10 +233,13 @@
    "name": "Monitors",
    "group": "peripherals",
    "description": "Gaming, office and professional monitors.",
-   "count": 4928,
+   "count": 4929,
    "makers": 72,
-   "years": null,
-   "bytes": 1149105,
+   "years": [
+    2026,
+    2026
+   ],
+   "bytes": 1149677,
    "file": "monitor.json"
   },
   {
