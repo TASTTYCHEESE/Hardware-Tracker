@@ -2,10 +2,9 @@ import { useMemo, useState } from 'react';
 import type { AppData } from '../lib/useData';
 import { COUNTRIES } from '../lib/regions';
 import { REGION_LABEL, money, pct, fmtPct } from '../lib/format';
-import { historyFor, type WatchItem } from '../lib/watch';
+import { SUGGESTED_MODELS as SUGGESTED, historyFor, type WatchItem } from '../lib/watch';
 import { DirBadge, Sparkline } from './Common';
 
-const SUGGESTED = ['RTX 5090', 'RTX 5080', 'RTX 5070 Ti', 'RTX 5070', 'RTX 5060 Ti 16GB', 'RX 9070 XT', 'RX 9070', 'RX 9060 XT 16GB', 'Arc B580', 'DDR5-6000 2x16GB (cheapest)', 'DDR5 2x32GB (cheapest)', 'Ryzen 7 9850X3D', 'Ryzen 9 9950X3D2', 'Core Ultra 7 270K Plus'];
 
 /** Watchlist: pick a part + country + target price, get a notification when it drops to the target. */
 export function Tracking({ data }: { data: AppData }) {

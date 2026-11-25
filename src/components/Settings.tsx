@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { AppData } from '../lib/useData';
 import { api } from '../lib/platform';
 import { DEFAULT_FEEDS } from '../lib/feeds';
+import { LanguagePicker } from './LanguagePicker';
 
 export function SettingsPage({ data }: { data: AppData }) {
   const s = data.settings;
@@ -60,6 +61,12 @@ export function SettingsPage({ data }: { data: AppData }) {
       </section>
 
       <section className="card">
+        <h3>Language</h3>
+        <p className="muted small">The language of the whole app, including news and recaps (translated with Google Translate). Product names stay as they are.</p>
+        <LanguagePicker data={data} />
+      </section>
+
+      <section className="card">
         <h3>Notifications</h3>
         <label className="check">
           <input type="checkbox" checked={s.notify !== false} onChange={(e) => data.setSettings({ notify: e.target.checked })} />
@@ -68,6 +75,10 @@ export function SettingsPage({ data }: { data: AppData }) {
         <label className="check">
           <input type="checkbox" checked={s.morningSummary !== false} onChange={(e) => data.setSettings({ morningSummary: e.target.checked })} />
           Morning summary: a notification with today's TL;DR (after 8:10)
+        </label>
+        <label className="check">
+          <input type="checkbox" checked={!!s.dropWatchOn} onChange={(e) => data.setSettings({ dropWatchOn: e.target.checked })} />
+          My price-drop alerts: add the parts you're looking for in Prices → Price alerts, and get told when their price goes down
         </label>
         {api.phoneAlerts && (
           <div className="phone-alerts">
@@ -182,7 +193,7 @@ export function SettingsPage({ data }: { data: AppData }) {
       </section>
 
       <p className="app-version-line">
-        Hardware Tracker <strong>version {info?.version ?? ''}</strong>
+        <span translate="no">Hardware Tracker</span> <strong>version {info?.version ?? ''}</strong>
         <span className="muted"> · {api.platform === 'android' ? 'Android app' : api.platform === 'web' ? 'web app' : 'desktop app'}</span>
       </p>
     </div>

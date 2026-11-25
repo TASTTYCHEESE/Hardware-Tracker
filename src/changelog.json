@@ -1,5 +1,16 @@
 [
   {
+    "version": "0.9.6",
+    "date": "2026-11-25",
+    "title": "The Language Update",
+    "notes": [
+      "Choose the app's language: 18 languages, most spoken first, including Bulgarian. On Windows, Mac and Linux the menu is at the top right; on Android and phones it's in Settings → Language. English stays the default.",
+      "News, recaps and anything else new are translated too (with Google Translate). Product names and prices stay as they are.",
+      "My price-drop alerts: add the parts you're looking for in Prices → Price alerts and get told when their price goes down (any drop, or 5%, 10% or 20%). Turn it on in Settings → Notifications; it's off by default.",
+      "Laptop graphics chips are now called \"Laptop GPU\" instead of \"Mobile\" (just \"Laptop\" on phones)."
+    ]
+  },
+  {
     "version": "0.9.5",
     "date": "2026-11-24",
     "title": "The Benchmarking Update",

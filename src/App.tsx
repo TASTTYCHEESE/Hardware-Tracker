@@ -15,6 +15,8 @@ import { Updates } from './components/Updates';
 import { Compare } from './components/Compare';
 import { BuyAdvisor } from './components/BuyAdvisor';
 import { Benchmarks } from './components/Benchmarks';
+import { LanguagePicker } from './components/LanguagePicker';
+import { setLanguage } from './lib/i18n';
 import { Launches } from './components/Launches';
 import { keywordHits } from './lib/newsAlerts';
 import type { UpdateInfo } from './lib/platform';
@@ -183,6 +185,10 @@ export default function App() {
     return keywordHits(data.feed.articles, data.settings.newsKeywords ?? []).filter((h) => !seen.has(h.a.id)).length;
   }, [data.feed.articles, data.settings.newsKeywords, data.settings.newsSeen]);
   const hitCount = data.watchHits.length;
+  // App language: English unless chosen in the top-right menu (desktop) or in Settings (phones).
+  useEffect(() => {
+    if (data.settingsLoaded) setLanguage(data.settings.language ?? 'en');
+  }, [data.settingsLoaded, data.settings.language]);
 
   /** Navigate by old-style page id ("news", "alerts", "recap:<id>", ...). */
   function go(v: string) {
@@ -224,7 +230,7 @@ export default function App() {
         <div className="brand">
           <span className="logo">HT</span>
           <div>
-            <strong>Hardware Tracker</strong>
+            <strong translate="no">Hardware Tracker</strong>
             <div className="muted small">News · Prices · Specs</div>
           </div>
         </div>
@@ -255,8 +261,8 @@ export default function App() {
       </nav>
       <main className="main">
         {reading && <Reader url={reading} onClose={() => setReading(null)} onNavigate={setReading} translate={data.settings.translateNews !== false} />}
-        {tabs.length > 0 && (
-          <div className="topbar">
+        <div className={tabs.length ? 'topbar' : 'topbar no-tabs'}>
+          {tabs.length > 0 && (
             <div className="seg">
               {tabs.map((t) => (
                 <button key={t.id} className={current === t.id ? 'seg-btn on' : 'seg-btn'} onClick={() => (current === t.id ? goHome(section, t.id) : (setReading(null), open(section, t.id)))}>
@@ -267,8 +273,11 @@ export default function App() {
                 </button>
               ))}
             </div>
+          )}
+          <div className="topbar-right">
+            <LanguagePicker data={data} compact />
           </div>
-        )}
+        </div>
         <div className="content" ref={contentRef} key={nonce}>
           {section === 'today' && <Today data={data} go={go} offset={Number(current) || 0} />}
           {section === 'overview' && current === 'overview' && <Overview data={data} go={go} />}

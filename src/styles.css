@@ -540,3 +540,23 @@ textarea {
   .deal-row > .seg, .bn-form .seg { display: flex; }
 }
 .phone-alerts { margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+
+/* ---- Language menu (top right) and my price-drop alerts ---- */
+.topbar { position: relative; }
+.topbar-right { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+.topbar.no-tabs { justify-content: flex-end; min-height: 60px; }
+.topbar.no-tabs .topbar-right { position: static; transform: none; }
+.lang-pick { font-size: 13px; padding: 6px 8px; max-width: 200px; }
+@media (max-width: 1250px) {
+  .topbar:not(.no-tabs) { justify-content: flex-start; padding-right: 220px; }
+}
+@media (max-width: 760px) {
+  .topbar-right { display: none; }
+  .topbar.no-tabs { display: none; }
+  .topbar:not(.no-tabs) { padding-right: 10px; }
+}
+.my-drops { margin-top: 32px; }
+.my-drops h2 { margin-bottom: 4px; }
+.my-drops .watch-grid { margin: 12px 0 16px; }
+.card.alert.drop-hit { border-left: 4px solid #3fd08f; }
+.my-drops-hint { margin-top: 24px; }

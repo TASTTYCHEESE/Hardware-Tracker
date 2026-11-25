@@ -35,6 +35,12 @@ interface Settings {
   /** 'local' or a currency code to convert all prices into */
   priceCurrency?: string;
   watchlist?: import('./watch').WatchItem[];
+  /** My price-drop alerts (off by default; turned on in Settings) */
+  dropWatchOn?: boolean;
+  dropWatch?: import('./watch').DropWatch[];
+  dropNotified?: string[];
+  /** App language (LANGS in i18n.ts); English when unset */
+  language?: string;
   watchNotified?: string[];
   /** background mode */
   closeToTray?: boolean;
@@ -154,7 +160,7 @@ const phoneAlerts: HwtApi['phoneAlerts'] = {
   async sync(s) {
     const r = runner();
     if (!r) return;
-    const details = { notify: s.notify, morningSummary: s.morningSummary, watchlist: s.watchlist ?? [], newsKeywords: s.newsKeywords ?? [], syncUrl: s.syncUrl ?? '' };
+    const details = { notify: s.notify, morningSummary: s.morningSummary, watchlist: s.watchlist ?? [], dropWatchOn: !!s.dropWatchOn, dropWatch: s.dropWatch ?? [], newsKeywords: s.newsKeywords ?? [], syncUrl: s.syncUrl ?? '' };
     await r.dispatchEvent({ label: RUNNER_LABEL, event: 'syncSettings', details }).catch(() => {});
   },
   async permission(request) {

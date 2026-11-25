@@ -22,6 +22,7 @@ Setup details for each one are further down.
 - **Benchmarks**: gaming performance rankings for about 80 graphics cards and 50 processors, and a **bottleneck checker** (CPU + GPU + resolution → which part holds you back, and roughly how many fps).
 - **Buy or wait?**: your list with buy/wait verdicts, **Is this a good deal?** (type a part and a price, new or used, in any currency) and **Used prices** (fair second-hand value of older parts).
 - **PC Hardware**: a spec encyclopedia. Pick **Hardware** or **Peripherals**, then a category (GPU chips since 1986, graphics cards, CPUs, motherboards, RAM, SSDs, HDDs, PSUs, coolers, cases, monitors, keyboards, mice, headsets and more), filter by manufacturer, years and category-specific specs, and open any product for its full specifications.
+- **Languages**: 18 languages (English by default, Bulgarian included), from the menu at the top right on desktop or Settings → Language on phones.
 - **In-app reader** for every link (Reader view or full Web page; Ctrl-click opens your browser).
 - **Background mode**: tray icon, starts with Windows (hidden), morning summary notification, hourly recap sync. Closing the window unloads it completely (low memory). Auto-closes when the PC is busy (CPU > 85% or memory < 10% free for 3 minutes) while in the background.
 - **Auto-updates**: the installer build (made by GitHub Actions, `.github/workflows/release.yml`) updates itself from GitHub Releases.

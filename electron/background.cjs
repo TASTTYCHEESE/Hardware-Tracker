@@ -105,6 +105,25 @@ function start(ctx) {
       if (s.watchNotified !== undefined) notify(`Price target hit: ${w.model}`, `${p.price} ${p.currency} in ${w.region} (your target: ${w.target} ${w.currency})`, 'tracking');
     }
     if (newKeys.length || s.watchNotified === undefined) patchSettings({ watchNotified: [...done, ...newKeys] });
+
+    // My price-drop alerts (off unless turned on in Settings)
+    if (s.dropWatchOn) {
+      const seenDrops = new Set(s.dropNotified || []);
+      const fresh = [];
+      for (const w of s.dropWatch || []) {
+        const h = prices.filter((p) => p.model === w.model && p.region === w.region).sort((a, b) => a.date.localeCompare(b.date));
+        const last = h[h.length - 1];
+        const prev = last && [...h].reverse().find((p) => p.date < last.date && p.currency === last.currency);
+        if (!last || !prev || last.price >= prev.price) continue;
+        const pctDrop = ((prev.price - last.price) / prev.price) * 100;
+        if (pctDrop < (w.minPct || 0)) continue;
+        const key = `${w.id}|${last.date}|${last.price}`;
+        if (seenDrops.has(key)) continue;
+        fresh.push(key);
+        notify(`Price drop: ${w.model}`, `${prev.price} → ${last.price} ${last.currency} in ${w.region} (-${Math.round(pctDrop)}%)`, 'alerts');
+      }
+      if (fresh.length) patchSettings({ dropNotified: [...seenDrops, ...fresh].slice(-300) });
+    }
   }
 
   // ---- 3. morning summary ------------------------------------------------------
