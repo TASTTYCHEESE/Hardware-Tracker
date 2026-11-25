@@ -5,6 +5,7 @@ const { app, BrowserWindow, ipcMain, dialog, Notification, net, shell, Tray, Men
 const background = require('./background.cjs');
 const updater = require('./updater.cjs');
 const catalogMod = require('./catalog.cjs');
+const { assertPublicUrl } = require('./nethost.cjs');
 const path = require('node:path');
 const fs = require('node:fs');
 const { pathToFileURL } = require('node:url');
@@ -207,30 +208,32 @@ function createWindow() {
 // ---- IPC -------------------------------------------------------------------
 
 const MAX_FETCH = 15 * 1024 * 1024;
-// Security: the window may only ask for public web pages, never this computer or the home
-// network (router admin pages, local servers), even when a page or feed links there.
-function isLocalAddress(u) {
-  let host;
-  try {
-    host = new URL(u).hostname.toLowerCase().replace(/^\[|\]$/g, '');
-  } catch {
-    return true;
-  }
-  if (!host || host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host.endsWith('.internal') || host.endsWith('.lan') || host.endsWith('.home.arpa')) return true;
-  if (!host.includes('.') && !host.includes(':')) return true; // single-word names on the local network
-  const v4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
-  if (v4) {
-    const [a, b] = [Number(v4[1]), Number(v4[2])];
-    return a === 0 || a === 10 || a === 127 || (a === 100 && b >= 64 && b <= 127) || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || a >= 224;
-  }
-  if (/^\d+$/.test(host) || /^0x/i.test(host)) return true; // numeric tricks like http://2130706433/
-  if (host.includes(':')) return host === '::' || host === '::1' || /^f[cd]/.test(host) || /^fe[89ab]/.test(host) || host.startsWith('::ffff:');
-  return false;
-}
-
+// Offline use: the last copy of the app's own data files (price list, launch calendar, exchange
+// rates...) is kept on disk and used when there's no internet. News pages aren't kept.
+const OFFLINE_CACHE = /^https:\/\/(raw\.githubusercontent\.com\/TASTTYCHEESE\/|api\.github\.com\/repos\/TASTTYCHEESE\/|open\.er-api\.com\/|api\.frankfurter\.dev\/)/;
+const offlineFile = (url) => path.join(dataDir(), 'offline-cache', `${require('node:crypto').createHash('sha1').update(url.split('?')[0]).digest('hex')}.txt`);
 ipcMain.handle('fetch-text', async (_e, url) => {
   if (typeof url !== 'string' || url.length > 4000 || !/^https?:\/\//i.test(url)) throw new Error('Bad URL');
-  if (isLocalAddress(url)) throw new Error('Local addresses are blocked');
+  if (!OFFLINE_CACHE.test(url)) return fetchTextOnline(url);
+  try {
+    const text = await fetchTextOnline(url);
+    try {
+      fs.mkdirSync(path.dirname(offlineFile(url)), { recursive: true });
+      fs.writeFileSync(offlineFile(url), text);
+    } catch {
+      /* disk full or read-only: fine */
+    }
+    return text;
+  } catch (e) {
+    try {
+      return fs.readFileSync(offlineFile(url), 'utf8');
+    } catch {
+      throw e;
+    }
+  }
+});
+async function fetchTextOnline(url) {
+  await assertPublicUrl(url);
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 25000);
   try {
@@ -240,7 +243,8 @@ ipcMain.handle('fetch-text', async (_e, url) => {
       credentials: 'omit',
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    if (!/^https?:/i.test(res.url || url) || isLocalAddress(res.url || url)) throw new Error('Bad redirect');
+    if (!/^https?:/i.test(res.url || url)) throw new Error('Bad redirect');
+    if (res.url && res.url !== url) await assertPublicUrl(res.url); // redirected to a local address
     const len = Number(res.headers.get('content-length') || 0);
     if (len > MAX_FETCH) throw new Error('Too large');
     const text = await res.text();
@@ -249,7 +253,7 @@ ipcMain.handle('fetch-text', async (_e, url) => {
   } finally {
     clearTimeout(timer);
   }
-});
+}
 
 ipcMain.handle('read-recaps', async () => {
   const dir = path.join(dataDir(), 'recaps');

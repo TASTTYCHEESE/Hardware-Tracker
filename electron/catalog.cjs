@@ -9,6 +9,15 @@ const fs = require('node:fs');
 const DEFAULT_CATALOG_URL = 'https://raw.githubusercontent.com/TASTTYCHEESE/Hardware-Tracker/main/catalog/';
 const CHECK_EVERY = 12 * 3600e3;
 const SAFE_ID = /^[a-z0-9-]{1,40}$/;
+// A copy of the whole catalog ships inside the app, so PC Hardware works offline from the first start.
+const BUNDLED = path.join(__dirname, '..', 'dist', 'offline-catalog');
+const readBundled = (f) => {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(BUNDLED, f), 'utf8'));
+  } catch {
+    return null;
+  }
+};
 
 function create({ readSettings, patchSettings, dataDir }) {
   const dir = () => {
@@ -53,6 +62,8 @@ function create({ readSettings, patchSettings, dataDir }) {
     } catch (e) {
       patchSettings({ catalogError: String(e.message || e) });
       if (cached) return { ...cached, offline: true };
+      const b = readBundled('index.json');
+      if (b) return { ...b, offline: true };
       throw new Error(`Couldn't download the hardware catalog (${e.message || e}). Check your internet connection.`);
     }
   }
@@ -73,6 +84,8 @@ function create({ readSettings, patchSettings, dataDir }) {
       return data;
     } catch (e) {
       if (cached) return { ...cached, stale: true };
+      const b = readBundled(file);
+      if (b) return { ...b, stale: true };
       throw new Error(`Couldn't download this category (${e.message || e}).`);
     }
   }

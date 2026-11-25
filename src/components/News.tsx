@@ -6,8 +6,10 @@ import type { AppData } from '../lib/useData';
 import type { Category } from '../lib/types';
 import { CatBadge, catLabel } from './Common';
 import { ago } from '../lib/format';
+import { OfflineNote } from './OfflineBadge';
 
 const FILTERS: (Category | 'All' | 'Drivers')[] = ['All', 'GPU', 'CPU', 'RAM', 'Industry', 'Other', 'Drivers'];
+
 
 export function News({ data, openReader }: { data: AppData; openReader?: (url: string) => void }) {
   const [cat, setCat] = useState<Category | 'All' | 'Drivers'>('All');
@@ -33,6 +35,7 @@ export function News({ data, openReader }: { data: AppData; openReader?: (url: s
   );
   return (
     <div className="page">
+      <OfflineNote what="Live news" />
       <div className="section-head">
         <h1>Live news</h1>
         <div className="row">

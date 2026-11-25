@@ -945,6 +945,15 @@ def main():
 
     today = dt.date.today().isoformat()
     index = {"version": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H%M"), "updated": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"), "categories": []}
+    # Laptop chips: say "Laptop GPU" (what Nvidia, AMD and Intel call them now), not "Mobile". Ids stay the same.
+    for c in CATEGORIES:
+        if c["id"] in ("gpu", "graphics-card"):
+            for i in c["items"]:
+                for k in ("name", "chipset"):
+                    if isinstance(i.get(k), str):
+                        i[k] = re.sub(r"\bMobile\b", "Laptop GPU", i[k])
+                if isinstance(i.get("generation"), str):
+                    i["generation"] = re.sub(r"\bMobile\b", "Laptop", i["generation"])
     for c in CATEGORIES:
         disambiguate(c)
         c["items"].sort(key=lambda i: (-(i.get("year") or 0), i["name"].lower()))

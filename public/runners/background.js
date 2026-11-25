@@ -94,6 +94,27 @@ async function checkRecaps(s) {
   });
   if (added.length || firstW) kvSet('watchNotified', done.concat(added).slice(-300));
 
+  // 2b. my price-drop alerts (only when turned on in Settings)
+  if (s.dropWatchOn && s.notify !== false) {
+    var seenD = kvGet('dropNotified', []);
+    var freshD = [];
+    (s.dropWatch || []).forEach(function (w) {
+      var h = prices.filter(function (p) { return p.model === w.model && p.region === w.region; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+      var last = h[h.length - 1];
+      if (!last) return;
+      var prev = null;
+      for (var i = h.length - 2; i >= 0; i--) if (h[i].date < last.date && h[i].currency === last.currency) { prev = h[i]; break; }
+      if (!prev || last.price >= prev.price) return;
+      var pct = ((prev.price - last.price) / prev.price) * 100;
+      if (pct < (w.minPct || 0)) return;
+      var key = w.id + '|' + last.date + '|' + last.price;
+      if (seenD.indexOf(key) >= 0) return;
+      freshD.push(key);
+      notify('Price drop: ' + w.model, prev.price + ' → ' + last.price + ' ' + last.currency + ' in ' + w.region + ' (-' + Math.round(pct) + '%)');
+    });
+    if (freshD.length) kvSet('dropNotified', seenD.concat(freshD).slice(-300));
+  }
+
   // 3. morning summary
   var d = new Date();
   var mins = d.getHours() * 60 + d.getMinutes();

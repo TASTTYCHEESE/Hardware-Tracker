@@ -121,7 +121,7 @@ export function useData() {
         setSettings({ askedNotify: true });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settingsLoaded, settings.notify, settings.morningSummary, settings.watchlist, settings.newsKeywords, settings.syncUrl]);
+  }, [settingsLoaded, settings.notify, settings.morningSummary, settings.watchlist, settings.newsKeywords, settings.syncUrl, settings.dropWatchOn, settings.dropWatch]);
 
   async function setSettings(patch: Partial<Settings>) {
     setSettingsState(await api.setSettings(patch));
@@ -142,6 +142,7 @@ export function useData() {
     archiveVersion,
     watchlist,
     watchHits,
+    settingsLoaded,
   };
 }
 
