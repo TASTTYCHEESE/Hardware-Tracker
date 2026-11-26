@@ -1,0 +1,177 @@
+{
+ "id": "daily-2026-11-26",
+ "type": "daily",
+ "date": "2026-11-26",
+ "title": "RX 9060 XT hits 4.84 GHz record; Nvidia reportedly trims gaming GPU supply again",
+ "summary": "A quiet Black Friday-eve news day. AMD and overclocker Bill Alverson pushed a Radeon RX 9060 XT to a new GPU clock world record of 4,837 MHz. On the rumor side, Nvidia is said to be cutting gaming GPU supply to board partners by another 20-30%, Blackwell Ultra server lead times are said to reach 40 weeks, and new Nova Lake details leaked. No new verified GPU, CPU or RAM price drops since yesterday.",
+ "takeaways": [
+  "GPU prices are still far above MSRP and a reported supply cut could push them higher: don't wait for big Black Friday GPU drops.",
+  "Prebuilt PCs are where the real deals are this week (e.g. an RTX 5060 desktop for $749 at Walmart).",
+  "Nova Lake (Core Ultra 400) news is still leaks only; nothing official until CES."
+ ],
+ "sections": [
+  {
+   "category": "GPU",
+   "items": [
+    {
+     "headline": "Radeon RX 9060 XT sets GPU clock world record: 4,837 MHz",
+     "detail": "Overclocker Bill Alverson and AMD ran an RX 9060 XT at 4,837 MHz on liquid nitrogen (Micro Center, Austin), revealed by AMD's Jack Huynh with GPU-Z screenshots. The previous record was the same card at 4,769 MHz in February. (KitGuru calls the old record 4,789 MHz; February's reports say 4,769.)",
+     "status": "confirmed",
+     "sources": [
+      {
+       "title": "KitGuru",
+       "url": "https://www.kitguru.net/components/graphic-cards/joao-silva/radeon-rx-9060-xt-sets-new-gpu-frequency-world-record-at-4-8ghz/"
+      },
+      {
+       "title": "Wccftech (February record, 4,769 MHz)",
+       "url": "https://wccftech.com/amd-breaks-gpu-frequency-overlocking-world-record-by-pushing-radeon-rx-9060-xt-to-4-769-ghz/"
+      }
+     ]
+    },
+    {
+     "headline": "Nvidia reportedly cuts gaming GPU supply to partners by 20-30%",
+     "detail": "Board partners were reportedly told of a 20-30% cut in GeForce supply for Q4, which would push prices up further. Earlier cuts of up to 20% were reported in January.",
+     "status": "rumor",
+     "sources": [
+      {
+       "title": "Wccftech",
+       "url": "https://wccftech.com/nvidia-notifies-board-partners-of-20-30-reduction-in-gaming-gpu-supply/"
+      }
+     ]
+    },
+    {
+     "headline": "Cheapest RTX 5070 in Japan up 44% in four months",
+     "detail": "The lowest RTX 5070 listing in Japan reportedly rose from about $651 to $940; most models sell for over $1,100.",
+     "status": "rumor",
+     "sources": [
+      {
+       "title": "Wccftech",
+       "url": "https://wccftech.com/nvidia-rtx-5070s-cheapest-listing-in-japan-climbs-44-in-four-months/"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "category": "CPU",
+   "items": [
+    {
+     "headline": "Nova Lake: Core Ultra 9 4970K BFC reportedly boosts to 5.5 GHz",
+     "detail": "A new leak gives the flagship Nova Lake-S chip with big cache (BFC, up to 144 MB) a 5.5 GHz turbo and lists more SKUs. The 28-core 4970K BFC first leaked in October (Tom's Hardware, TechPowerUp).",
+     "status": "rumor",
+     "sources": [
+      {
+       "title": "Wccftech",
+       "url": "https://wccftech.com/intel-core-ultra-9-4970k-bfc-reportedly-gets-5-5-ghz-turbo-clock-alongside-144-mb-llc-cache/"
+      },
+      {
+       "title": "Tom's Hardware (October leak)",
+       "url": "https://www.tomshardware.com/pc-components/cpus/rumored-intel-nova-lake-table-lists-three-bfc-chips-with-up-to-144mb-of-l3-next-gen-cpu-lineup-takes-shape-with-up-to-28-cores-in-core-ultra-9-4970k-bfc"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "category": "Industry",
+   "items": [
+    {
+     "headline": "TSMC filings point to a $22.6B 2nm fab in Texas",
+     "detail": "Texas Comptroller filings reportedly describe a 2nm fab in Brazos County, built 2027-2031 with about 2,099 jobs. TSMC hasn't announced it, and other reports name different sites and amounts.",
+     "status": "rumor",
+     "sources": [
+      {
+       "title": "Wccftech",
+       "url": "https://wccftech.com/tsmc-plans-22-6-billion-chip-fab-with-2nm-tech-in-brazos-county-texas-with-construction-from-2027-to-2031-and-2099-jobs-filings-show/"
+      }
+     ]
+    },
+    {
+     "headline": "Nvidia B300 lead times reportedly up to 40 weeks",
+     "detail": "China Times, citing supply-chain sources: new B300 orders wait up to 40 weeks, GB300 14-26 weeks; it also says RTX 60 production could be delayed.",
+     "status": "rumor",
+     "sources": [
+      {
+       "title": "Wccftech (citing China Times)",
+       "url": "https://wccftech.com/nvidia-faces-booming-demand-despite-woes-as-b300-lead-times-reportedly-stretch-to-40-weeks-for-new-orders-gb300-buyers-now-face-14-to-26-weeks-says-report/"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "category": "Other",
+   "items": [
+    {
+     "headline": "Thermal Grizzly launches Delid-Heat-Mate and TG PadMate",
+     "detail": "Delid-Heat-Mate (€19.90) for AM5, LGA 1700, LGA 1851 and LGA 1954, and the TG PadMate kit (€2.90) for replacing thermal pads on graphics cards and SSDs.",
+     "status": "confirmed",
+     "sources": [
+      {
+       "title": "KitGuru",
+       "url": "https://www.kitguru.net/channel/generaltech/matthew-wilson/thermal-grizzly-expands-enthusiast-toolkit-with-new-delid-heat-mate-and-tg-padmate/"
+      },
+      {
+       "title": "TweakTown",
+       "url": "https://www.tweaktown.com/news/114731/thermal-grizzly-introduces-tgpadmate-kit-for-replacing-thermal-pads-on-graphics-cards-and-ssds/index.html"
+      }
+     ]
+    },
+    {
+     "headline": "RTX 5060 gaming PC for $749 at Walmart",
+     "detail": "ABS Cyclone M Aqua with RTX 5060, Core i5-14400F, 16GB DDR4 (one stick) and 1TB SSD, down from $1,399.99.",
+     "status": "confirmed",
+     "sources": [
+      {
+       "title": "Tom's Hardware",
+       "url": "https://www.tomshardware.com/desktops/gaming-pcs/get-an-rtx-5060-prebuilt-for-just-usd750-in-deal-that-seems-too-good-to-be-true-deep-usd650-discount-on-gaming-pc-offers-core-i5-14400f-16gb-ddr4-and-a-1tb-ssd"
+      },
+      {
+       "title": "PC Gamer Black Friday live",
+       "url": "https://www.pcgamer.com/hardware/live/news/black-friday-live-2026/"
+      }
+     ]
+    },
+    {
+     "headline": "Adobe Acrobat Chrome extension blamed for heavy SSD writes",
+     "detail": "A user measured over 300GB of writes in three days on an idle PC from the extension. One report so far.",
+     "status": "rumor",
+     "sources": [
+      {
+       "title": "Wccftech",
+       "url": "https://wccftech.com/your-chrome-extensions-could-be-silently-wearing-out-your-ssd-adobe-acrobat-extension-implicated-in-over-300gb-of-write-activity-in-just-three-days/"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "trends": [
+  {
+   "category": "GPU",
+   "region": "US",
+   "direction": "flat",
+   "note": "No newer standalone GPU prices than 24 Nov in the Black Friday trackers."
+  }
+ ],
+ "alerts": [],
+ "prices": [],
+ "sources": [
+  {
+   "title": "KitGuru",
+   "url": "https://www.kitguru.net/"
+  },
+  {
+   "title": "Wccftech",
+   "url": "https://wccftech.com/"
+  },
+  {
+   "title": "Tom's Hardware",
+   "url": "https://www.tomshardware.com/"
+  },
+  {
+   "title": "PC Gamer Black Friday live",
+   "url": "https://www.pcgamer.com/hardware/live/news/black-friday-live-2026/"
+  }
+ ]
+}

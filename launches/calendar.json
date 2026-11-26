@@ -1,105 +1,105 @@
 {
-  "about": "Upcoming launches and events for the Launch calendar. The daily recap adds, moves and removes entries. date is YYYY-MM-DD, or YYYY-MM when only the month is known. status: event, confirmed, rumor, delayed or cancelled.",
-  "updated": "2026-11-25",
-  "entries": [
-    {
-      "date": "2026-11-27",
-      "title": "Black Friday sales",
-      "category": "Other",
-      "status": "event",
-      "note": "Few real GPU discounts so far; best deals are the Ryzen 7 9800X3D ($399) and some DDR5 kits."
-    },
-    {
-      "date": "2026-11-30",
-      "title": "Cyber Monday sales",
-      "category": "Other",
-      "status": "event"
-    },
-    {
-      "date": "2026-12",
-      "title": "GeForce RTX 50 Super series",
-      "category": "GPU",
-      "maker": "NVIDIA",
-      "status": "cancelled",
-      "note": "Reportedly shelved: no new GeForce gaming cards in 2026."
-    },
-    {
-      "date": "2026-12",
-      "title": "RTX 5080 24GB",
-      "category": "GPU",
-      "maker": "NVIDIA",
-      "status": "cancelled",
-      "note": "Reportedly cancelled."
-    },
-    {
-      "date": "2027",
-      "title": "Intel Arc Celestial gaming cards",
-      "category": "GPU",
-      "maker": "Intel",
-      "status": "cancelled",
-      "note": "Reportedly cancelled; Battlemage stays on sale."
-    },
-    {
-      "date": "2027-01",
-      "title": "CES 2027 (Las Vegas)",
-      "category": "Other",
-      "status": "event",
-      "note": "The usual stage for new laptop chips and GPU announcements."
-    },
-    {
-      "date": "2027-01",
-      "title": "Intel Nova Lake (Core Ultra 400)",
-      "category": "CPU",
-      "maker": "Intel",
-      "status": "rumor",
-      "note": "Expected very late 2026 or at CES 2027."
-    },
-    {
-      "date": "2027-02",
-      "title": "Intel next-gen desktop event (likely Nova Lake-S)",
-      "category": "CPU",
-      "maker": "Intel",
-      "status": "rumor",
-      "note": "VideoCardz reports Intel plans a desktop event for late February 2027.",
-      "source": "https://videocardz.com/newz/exclusive-intel-plans-next-gen-desktop-event-for-late-february"
-    },
-    {
-      "date": "2027-03",
-      "title": "Nvidia GTC 2027",
-      "category": "Industry",
-      "maker": "NVIDIA",
-      "status": "event",
-      "note": "Nvidia's yearly AI and architecture conference (usually March)."
-    },
-    {
-      "date": "2027-06",
-      "title": "Computex 2027 (Taipei)",
-      "category": "Other",
-      "status": "event",
-      "note": "Usually early June."
-    },
-    {
-      "date": "2027-07",
-      "title": "AMD Zen 6 desktop CPUs (Olympic Ridge)",
-      "category": "CPU",
-      "maker": "AMD",
-      "status": "delayed",
-      "note": "Reportedly slipping, possibly past Computex 2027."
-    },
-    {
-      "date": "2027-10",
-      "title": "AMD RDNA 5 Radeon GPUs",
-      "category": "GPU",
-      "maker": "AMD",
-      "status": "rumor",
-      "note": "Not expected before late 2027."
-    },
-    {
-      "date": "2027-12",
-      "title": "Memory prices start to ease",
-      "category": "RAM",
-      "status": "rumor",
-      "note": "Memory makers are sold out into 2027-28; relief not expected before late 2027 or 2028."
-    }
-  ]
+ "about": "Upcoming launches and events for the Launch calendar. The daily recap adds, moves and removes entries. date is YYYY-MM-DD, or YYYY-MM when only the month is known. status: event, confirmed, rumor, delayed or cancelled.",
+ "updated": "2026-11-26",
+ "entries": [
+  {
+   "date": "2026-11-27",
+   "title": "Black Friday sales",
+   "category": "Other",
+   "status": "event",
+   "note": "Few real GPU discounts so far; best deals are the Ryzen 7 9800X3D ($399) and some DDR5 kits."
+  },
+  {
+   "date": "2026-11-30",
+   "title": "Cyber Monday sales",
+   "category": "Other",
+   "status": "event"
+  },
+  {
+   "date": "2026-12",
+   "title": "GeForce RTX 50 Super series",
+   "category": "GPU",
+   "maker": "NVIDIA",
+   "status": "cancelled",
+   "note": "Reportedly shelved: no new GeForce gaming cards in 2026."
+  },
+  {
+   "date": "2026-12",
+   "title": "RTX 5080 24GB",
+   "category": "GPU",
+   "maker": "NVIDIA",
+   "status": "cancelled",
+   "note": "Reportedly cancelled."
+  },
+  {
+   "date": "2027",
+   "title": "Intel Arc Celestial gaming cards",
+   "category": "GPU",
+   "maker": "Intel",
+   "status": "cancelled",
+   "note": "Reportedly cancelled; Battlemage stays on sale."
+  },
+  {
+   "date": "2027-01",
+   "title": "CES 2027 (Las Vegas)",
+   "category": "Other",
+   "status": "event",
+   "note": "The usual stage for new laptop chips and GPU announcements."
+  },
+  {
+   "date": "2027-01",
+   "title": "Intel Nova Lake (Core Ultra 400)",
+   "category": "CPU",
+   "maker": "Intel",
+   "status": "rumor",
+   "note": "Expected very late 2026 or at CES 2027."
+  },
+  {
+   "date": "2027-02",
+   "title": "Intel next-gen desktop event (likely Nova Lake-S)",
+   "category": "CPU",
+   "maker": "Intel",
+   "status": "rumor",
+   "note": "VideoCardz reports Intel plans a desktop event for late February 2027.",
+   "source": "https://videocardz.com/newz/exclusive-intel-plans-next-gen-desktop-event-for-late-february"
+  },
+  {
+   "date": "2027-03",
+   "title": "Nvidia GTC 2027",
+   "category": "Industry",
+   "maker": "NVIDIA",
+   "status": "event",
+   "note": "Nvidia's yearly AI and architecture conference (usually March)."
+  },
+  {
+   "date": "2027-06",
+   "title": "Computex 2027 (Taipei)",
+   "category": "Other",
+   "status": "event",
+   "note": "Usually early June."
+  },
+  {
+   "date": "2027-07",
+   "title": "AMD Zen 6 desktop CPUs (Olympic Ridge)",
+   "category": "CPU",
+   "maker": "AMD",
+   "status": "delayed",
+   "note": "Reportedly slipping, possibly past Computex 2027."
+  },
+  {
+   "date": "2027-10",
+   "title": "AMD RDNA 5 Radeon GPUs",
+   "category": "GPU",
+   "maker": "AMD",
+   "status": "rumor",
+   "note": "Not expected before late 2027."
+  },
+  {
+   "date": "2027-12",
+   "title": "Memory prices start to ease",
+   "category": "RAM",
+   "status": "rumor",
+   "note": "Memory makers are sold out into 2027-28; relief not expected before late 2027 or 2028."
+  }
+ ]
 }
