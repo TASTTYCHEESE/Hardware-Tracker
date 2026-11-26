@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.9.8",
+    "date": "2026-11-26",
+    "title": "The Startup Fix",
+    "notes": [
+      "Fixed: the Android app stayed on an empty screen after updating to 0.9.7.",
+      "If the app ever can't start, it now shows what went wrong with buttons to reload or reset its saved settings, instead of a blank screen."
+    ]
+  },
+  {
     "version": "0.9.7",
     "date": "2026-11-25",
     "title": "The Offline Update",

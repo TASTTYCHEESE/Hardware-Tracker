@@ -213,7 +213,8 @@ type Updater = {
   status(): Promise<{ canInstall: boolean; silent: boolean; busy: boolean; sdk: number }>;
   install(o: { url: string }): Promise<{ started: boolean }>;
   openInstallSettings(): Promise<void>;
-  addListener(ev: 'progress', cb: (p: { percent: number }) => void): Promise<unknown>;
+  /** On Android this returns a plain { remove } object, not a promise (Capacitor's native bridge). */
+  addListener(ev: 'progress', cb: (p: { percent: number }) => void): unknown;
 };
 const updater = (): Updater | undefined => (window as unknown as { Capacitor?: { Plugins?: { AppUpdater?: Updater } } }).Capacitor?.Plugins?.AppUpdater;
 let apkUrl = '';
@@ -278,7 +279,13 @@ if (native) {
       installAndroidUpdate();
     }
   });
-  updater()?.addListener('progress', (p) => emitUpdate({ percent: p.percent })).catch(() => {});
+  // Never let a plugin problem stop the app from starting: in 0.9.7 a .catch() on this call threw
+  // (the bridge returns a plain object) and the Android app stayed on an empty screen.
+  try {
+    Promise.resolve(updater()?.addListener('progress', (p) => emitUpdate({ percent: p.percent }))).catch(() => {});
+  } catch {
+    /* no progress bar; the update still installs */
+  }
   // Re-check every 6 hours while the app is open.
   setInterval(() => webApi.checkForUpdates!().then((i) => i && updateListeners.forEach((cb) => cb(i))), 6 * 3600e3);
 }
