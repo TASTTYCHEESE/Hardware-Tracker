@@ -1,0 +1,100 @@
+{
+  "id": "daily-2026-11-27",
+  "type": "daily",
+  "date": "2026-11-27",
+  "title": "Huawei convicted in US trial; Razor Lake-AX prototype photo leaks",
+  "summary": "A quiet Thanksgiving news day. A US jury convicted Huawei on 10 of 12 counts, including trade secret theft and bank fraud, while clearing it of racketeering. A prototype Intel Razor Lake-AX laptop chip with four on-package LPDDR5X sites showed up for sale in China. Black Friday GPU prices in the US and Bulgaria have not dropped for the cards on your watchlist so far.",
+  "takeaways": [
+    "No real Black Friday drop on RTX 50 cards yet; the cheapest RTX 5070 in Bulgaria is still 749.99 EUR.",
+    "Razor Lake-AX is a 2028 laptop part, so it changes nothing for buyers today."
+  ],
+  "sections": [
+    {
+      "category": "CPU",
+      "items": [
+        {
+          "headline": "Intel Razor Lake-AX prototype photographed with four LPDDR5X sites",
+          "detail": "A scratched engineering sample of Intel's Razor Lake-AX laptop chip was listed on the Chinese site Goofish for about 660 RMB (about $100), with its memory removed. Photos show a large multi-tile die next to four on-package LPDDR5X sites. Intel has said the chip targets 2028 and high-end laptops; the photo itself comes from leakers HXL and yuuki_ans.",
+          "status": "rumor",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/intel-next-gen-razor-lake-ax-soc-huge-die-on-package-memory/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Industry",
+      "items": [
+        {
+          "headline": "US jury convicts Huawei of trade secret theft and bank fraud",
+          "detail": "After a trial of about two months in Brooklyn, a federal jury found Huawei guilty on 10 of 12 counts, including conspiracy to steal US trade secrets, bank fraud and violating Iran sanctions. It was cleared of racketeering conspiracy. The verdict came on 24 November (US time).",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "CNBC",
+              "url": "https://www.cnbc.com/2026/11/25/huawei-fraud-trade-trial.html"
+            },
+            {
+              "title": "Al Jazeera",
+              "url": "https://www.aljazeera.com/economy/2026/11/24/chinese-tech-giant-huawei-found-guilty-of-conspiracy-to-steal-trade-secrets"
+            },
+            {
+              "title": "Android Headlines",
+              "url": "https://www.androidheadlines.com/2026/11/huawei-convicted-trade-secrets-bank-fraud-acquitted-racketeering.html"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Other",
+      "items": [
+        {
+          "headline": "Samsung 990 Pro 4TB at $699.99 on Amazon for Black Friday",
+          "detail": "Two deal posts report the 4TB 990 Pro (PCIe 4.0, 7,450 MB/s) at $699.99 on Amazon US, $400 below list. That is still more than double its 2024 Black Friday low of about $270, because of the NAND shortage.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Wccftech",
+              "url": "https://wccftech.com/samsung-990-pro-4tb-ssd-black-friday-deal/"
+            },
+            {
+              "title": "Technobezz",
+              "url": "https://www.technobezz.com/best/samsung-990-pro-4tb-ssd-price-drops-to-69999"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "trends": [],
+  "alerts": [],
+  "prices": [
+    {
+      "model": "RTX 5070",
+      "category": "GPU",
+      "region": "BG",
+      "currency": "EUR",
+      "price": 749.99,
+      "date": "2026-11-27",
+      "source": "pazaruvaj.com (Plasico, MSI Ventus 3X OC)"
+    }
+  ],
+  "sources": [
+    {
+      "title": "Wccftech",
+      "url": "https://wccftech.com/"
+    },
+    {
+      "title": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/25/huawei-fraud-trade-trial.html"
+    },
+    {
+      "title": "Pazaruvaj RTX 5070 Ventus 3X OC",
+      "url": "https://www.pazaruvaj.com/p/msi-geforce-rtx-5070-ventus-3x-oc-12gb-gddr7-192bit-geforce-rtx-5070-12g-ventus-3x-oc-pP1186016392"
+    }
+  ]
+}
