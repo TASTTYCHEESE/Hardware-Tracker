@@ -1,0 +1,304 @@
+{
+  "id": "daily-2026-11-28",
+  "type": "daily",
+  "date": "2026-11-28",
+  "title": "TrendForce sees DRAM prices levelling off in late 2027; Nvidia settles crypto suit for $290M",
+  "summary": "TrendForce now expects DRAM contract price rises to slow through 2027, level off in the second half and fall in 2028, or from Q4 2027 in its weaker case. Memory stocks bounced about 6-10% on the same day. Nvidia agreed to pay $290 million to settle the 2018 shareholder suit over crypto-mining GeForce sales, and initial RDNA 5 support is queued for Linux 7.5. Black Friday did not bring real GPU discounts: watchlist prices are flat in the US and Bulgaria, and the RTX 5080 costs more than 1,850 EUR in Germany.",
+  "takeaways": [
+    "Black Friday is not the time to buy a GPU this year: the RTX 5070 Ti is still about $1,450 in the US and the RTX 5070 749.99 EUR in Bulgaria.",
+    "TrendForce's forecast is the first clear sign of an end date for the shortage, but cheaper RAM is still a 2028 story; there is no reason to wait a few weeks.",
+    "The cheapest 32GB DDR5-6000 kit in the US is still about $439, unchanged since 25 November."
+  ],
+  "sections": [
+    {
+      "category": "RAM",
+      "items": [
+        {
+          "headline": "TrendForce: DRAM contract price rises to slow through 2027, with declines likely in 2028",
+          "detail": "In a 27 November report, TrendForce's base case has conventional DRAM contract price rises narrowing through 2027, prices levelling off in the second half of 2027 and falling in 2028. In its pessimistic case, prices start falling in Q4 2027. It says buyers have been reassessing their 2027-28 plans and slowing purchases since early Q4 2026, and Chinese cloud providers have cut server DRAM orders. It also points to US midterm and data-centre uncertainty and new BIS export rules. TrendForce gave no percentages and no PC DRAM figure.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "TrendForce press release",
+              "url": "https://www.trendforce.com/presscenter/news/20261127-13327.html"
+            },
+            {
+              "title": "24/7 Wall St.",
+              "url": "https://247wallst.com/investing/2026/11/27/sandisk-jumps-10-as-investors-return-to-beaten-down-memory-stocks-micron-and-sk-hynix-rise-6-despite-trendforce-dram-warning/"
+            },
+            {
+              "title": "PC Games Hardware",
+              "url": "https://www.pcgameshardware.de/RAM-Hardware-154108/News/RAM-prices-Finally-hope-for-cheaper-memory-1561309/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "GPU",
+      "items": [
+        {
+          "headline": "Initial RDNA 5 (GFX13) support queued for Linux 7.5",
+          "detail": "AMD's first GFX13 code for the open-source AMDGPU kernel driver, which the reports link to RDNA 5, is set to land in Linux 7.5, due in early 2027. Phoronix spotted it. The code shows no new RDNA 5 features yet. It is early enablement, not a launch date; RDNA 5 Radeon cards are still not expected before late 2027.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Phoronix",
+              "url": "https://www.phoronix.com/news/AMD-RDNA5-Linux-7.5-Initial"
+            },
+            {
+              "title": "TechPowerUp",
+              "url": "https://www.techpowerup.com/355263/amds-rdna-5-set-for-linux-kernel-7-5-support"
+            },
+            {
+              "title": "TweakTown",
+              "url": "https://www.tweaktown.com/news/114613/amds-next-gen-rdna-5-gpu-architecture-appears-in-linux-graphics-driver/index.html"
+            }
+          ]
+        },
+        {
+          "headline": "Black Friday: no real GPU discounts in the US",
+          "detail": "Tom's Hardware's tracker (updated 27 November) and PC Gamer's live blog list the lowest US prices: RTX 5090 $6,499.99 (Gigabyte Gaming at Newegg), RTX 5080 about $2,093, RTX 5070 Ti $1,450-1,479, RTX 5070 $899 and RX 9070 XT $960-979. Only the RTX 5080 moved, about 7% below the $2,260 seen on 25 November. Every card is still well above MSRP. The real reductions this year are on prebuilt PCs, for example an HP Omen Max 45L with an RX 9070 XT and Ryzen 7 9700X for $1,999.99 (was $3,999.99).",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Tom's Hardware GPU price tracker",
+              "url": "https://www.tomshardware.com/pc-components/gpus/these-are-the-lowest-prices-on-every-black-friday-graphics-card-from-nvidia-amd-and-intel-at-amazon-newegg-best-buy-walmart"
+            },
+            {
+              "title": "PC Gamer Black Friday live",
+              "url": "https://www.pcgamer.com/hardware/live/news/black-friday-the-big-day-live-2026/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Industry",
+      "items": [
+        {
+          "headline": "Nvidia agrees to a $290 million settlement over crypto-mining GeForce sales",
+          "detail": "Nvidia agreed to pay $290 million in cash to settle the 2018 shareholder class action. The suit said the company booked GPU sales to crypto miners as gaming revenue. The settlement covers buyers of Nvidia stock from 10 August 2017 to 15 November 2018 and is about 14% of the roughly $2.06 billion plaintiffs had estimated. Nvidia admits no wrongdoing. The deal still needs court approval, with a final hearing about 130 days after notice goes out. The settlement was filed on 25 November.",
+          "status": "confirmed",
+          "sources": [
+            {
+              "title": "Club386",
+              "url": "https://www.club386.com/nvidia-agrees-290-million-settlement-crypto-lawsuit/"
+            },
+            {
+              "title": "The Block",
+              "url": "https://www.theblock.co/news/regulation/2026-11-25-nvidia-290-million-settlement-crypto-mining-class-action-446709"
+            },
+            {
+              "title": "Cointelegraph",
+              "url": "https://cointelegraph.com/news/nvidia-agrees-290m-settlement-crypto-mining-revenue-disclosures"
+            }
+          ]
+        },
+        {
+          "headline": "Memory stocks rebound 6-10% after a month-long slide",
+          "detail": "On 27 November, SanDisk rose about 10% and Micron and SK hynix about 6% in morning trading. Over the past month SanDisk is still down 48%, Micron 30% and SK hynix 17%. BNP Paribas downgraded Micron on 24 November because it expects DRAM and NAND supply and demand to come close to balance by mid-2027.",
+          "status": "rumor",
+          "sources": [
+            {
+              "title": "24/7 Wall St.",
+              "url": "https://247wallst.com/investing/2026/11/27/sandisk-jumps-10-as-investors-return-to-beaten-down-memory-stocks-micron-and-sk-hynix-rise-6-despite-trendforce-dram-warning/"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "trends": [
+    {
+      "category": "GPU",
+      "region": "US",
+      "direction": "flat",
+      "change": "~0% vs 25 Nov",
+      "note": "Black Friday left RTX 50 and RX 9000 prices almost unchanged; only the RTX 5080 dipped about 7%."
+    },
+    {
+      "category": "RAM",
+      "region": "US",
+      "direction": "flat",
+      "change": "$439 vs $439.99",
+      "note": "The cheapest 32GB DDR5-6000 kit has not moved during Black Friday."
+    }
+  ],
+  "alerts": [],
+  "prices": [
+    {
+      "model": "RTX 5090",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 6499.99,
+      "msrp": 1999,
+      "date": "2026-11-27",
+      "source": "Newegg (Gigabyte Gaming), via Tom's Hardware and PC Gamer"
+    },
+    {
+      "model": "RTX 5080",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 2093,
+      "msrp": 999,
+      "date": "2026-11-27",
+      "source": "Tom's Hardware tracker (PC Gamer: $2,095 at Walmart)"
+    },
+    {
+      "model": "RTX 5070 Ti",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 1450,
+      "msrp": 749,
+      "date": "2026-11-27",
+      "source": "PC Gamer (Walmart); Tom's Hardware tracker $1,479"
+    },
+    {
+      "model": "RTX 5070",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 899,
+      "msrp": 549,
+      "date": "2026-11-27",
+      "source": "Tom's Hardware tracker (PC Gamer: $900 at Amazon)"
+    },
+    {
+      "model": "RX 9070 XT",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 960,
+      "msrp": 599,
+      "date": "2026-11-27",
+      "source": "PC Gamer (Walmart); Tom's Hardware tracker $979"
+    },
+    {
+      "model": "RTX 5060 Ti 16GB",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 799,
+      "msrp": 429,
+      "date": "2026-11-27",
+      "source": "Tom's Hardware tracker"
+    },
+    {
+      "model": "RX 9070",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 899,
+      "msrp": 549,
+      "date": "2026-11-27",
+      "source": "Tom's Hardware tracker"
+    },
+    {
+      "model": "RX 9060 XT 16GB",
+      "category": "GPU",
+      "region": "US",
+      "currency": "USD",
+      "price": 719,
+      "msrp": 349,
+      "date": "2026-11-27",
+      "source": "Tom's Hardware tracker"
+    },
+    {
+      "model": "DDR5-6000 2x16GB (cheapest)",
+      "category": "RAM",
+      "region": "US",
+      "currency": "USD",
+      "price": 439,
+      "date": "2026-11-27",
+      "source": "Tom's Hardware RAM tracker (T-Force Delta RGB CL38)"
+    },
+    {
+      "model": "RTX 5080",
+      "category": "GPU",
+      "region": "DE",
+      "currency": "EUR",
+      "price": 1853.44,
+      "date": "2026-11-27",
+      "source": "hardwaredealz.com / Geizhals (Zotac Solid OC White); ASUS Prime OC 1,959 EUR at Saturn/MediaMarkt"
+    },
+    {
+      "model": "RTX 5070",
+      "category": "GPU",
+      "region": "BG",
+      "currency": "EUR",
+      "price": 749.99,
+      "date": "2026-11-28",
+      "source": "pazaruvaj.com (Plasico, MSI Ventus 3X OC)"
+    }
+  ],
+  "sources": [
+    {
+      "title": "TrendForce press release",
+      "url": "https://www.trendforce.com/presscenter/news/20261127-13327.html"
+    },
+    {
+      "title": "24/7 Wall St.",
+      "url": "https://247wallst.com/investing/2026/11/27/sandisk-jumps-10-as-investors-return-to-beaten-down-memory-stocks-micron-and-sk-hynix-rise-6-despite-trendforce-dram-warning/"
+    },
+    {
+      "title": "PC Games Hardware",
+      "url": "https://www.pcgameshardware.de/RAM-Hardware-154108/News/RAM-prices-Finally-hope-for-cheaper-memory-1561309/"
+    },
+    {
+      "title": "Phoronix",
+      "url": "https://www.phoronix.com/news/AMD-RDNA5-Linux-7.5-Initial"
+    },
+    {
+      "title": "TechPowerUp",
+      "url": "https://www.techpowerup.com/355263/amds-rdna-5-set-for-linux-kernel-7-5-support"
+    },
+    {
+      "title": "TweakTown",
+      "url": "https://www.tweaktown.com/news/114613/amds-next-gen-rdna-5-gpu-architecture-appears-in-linux-graphics-driver/index.html"
+    },
+    {
+      "title": "Club386",
+      "url": "https://www.club386.com/nvidia-agrees-290-million-settlement-crypto-lawsuit/"
+    },
+    {
+      "title": "The Block",
+      "url": "https://www.theblock.co/news/regulation/2026-11-25-nvidia-290-million-settlement-crypto-mining-class-action-446709"
+    },
+    {
+      "title": "Cointelegraph",
+      "url": "https://cointelegraph.com/news/nvidia-agrees-290m-settlement-crypto-mining-revenue-disclosures"
+    },
+    {
+      "title": "Tom's Hardware GPU price tracker",
+      "url": "https://www.tomshardware.com/pc-components/gpus/these-are-the-lowest-prices-on-every-black-friday-graphics-card-from-nvidia-amd-and-intel-at-amazon-newegg-best-buy-walmart"
+    },
+    {
+      "title": "PC Gamer Black Friday live",
+      "url": "https://www.pcgamer.com/hardware/live/news/black-friday-the-big-day-live-2026/"
+    },
+    {
+      "title": "Tom's Hardware RAM price tracker",
+      "url": "https://www.tomshardware.com/gift-guides-seasonal-sales/the-lowest-priced-ram-in-2026-price-tracking-on-ddr5-and-ddr4-memory-of-all-capacities"
+    },
+    {
+      "title": "Tom's Hardware (T-Force Delta RGB deal)",
+      "url": "https://www.tomshardware.com/pc-components/ddr5/the-cheapest-32gb-ddr5-6000-ram-kit-on-the-market-is-on-sale-for-only-usd439-teams-32gb-ddr5-6000-cl38-t-force-delta-rgb-ram-kit-is-usd110-off-with-promo-code-no-bundle-deals-needed"
+    },
+    {
+      "title": "Hardwaredealz RTX 5080 (Geizhals data)",
+      "url": "https://www.hardwaredealz.com/hardware/gpu/nvidia-geforce-rtx-5080-16gb"
+    },
+    {
+      "title": "Hardwaredealz ASUS Prime RTX 5080 OC",
+      "url": "https://www.hardwaredealz.com/hardware/gpu/nvidia-geforce-rtx-5080-16gb/asus-prime-oc-16gb-gddr7-hdmi-3x-dp/preisvergleich.25130"
+    },
+    {
+      "title": "Pazaruvaj RTX 5070 Ventus 3X OC",
+      "url": "https://www.pazaruvaj.com/p/msi-geforce-rtx-5070-ventus-3x-oc-12gb-gddr7-192bit-geforce-rtx-5070-12g-ventus-3x-oc-pP1186016392"
+    }
+  ]
+}

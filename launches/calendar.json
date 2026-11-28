@@ -1,19 +1,13 @@
 {
   "about": "Upcoming launches and events for the Launch calendar. The daily recap adds, moves and removes entries. date is YYYY-MM-DD, or YYYY-MM when only the month is known. status: event, confirmed, rumor, delayed or cancelled.",
-  "updated": "2026-11-27",
+  "updated": "2026-11-28",
   "entries": [
-    {
-      "date": "2026-11-27",
-      "title": "Black Friday sales",
-      "category": "Other",
-      "status": "event",
-      "note": "Few real GPU discounts so far; best deals are the Ryzen 7 9800X3D ($399) and some DDR5 kits."
-    },
     {
       "date": "2026-11-30",
       "title": "Cyber Monday sales",
       "category": "Other",
-      "status": "event"
+      "status": "event",
+      "note": "Black Friday brought almost no real GPU discounts; prebuilt PCs had the biggest cuts."
     },
     {
       "date": "2026-12",
@@ -45,6 +39,15 @@
       "category": "Other",
       "status": "event",
       "note": "The usual stage for new laptop chips and GPU announcements."
+    },
+    {
+      "date": "2027-01",
+      "title": "AMD CES 2027 announcement",
+      "category": "Industry",
+      "maker": "AMD",
+      "status": "event",
+      "note": "Jack Huynh teased 'the next era of computing' for CES 2027; Zen 6 or RDNA 5 news is speculation.",
+      "source": "https://techspot.com/news/114604-amd-teases-mystery-ces-2027-announcement-zen-6.html"
     },
     {
       "date": "2027-01",
@@ -87,19 +90,21 @@
       "note": "Reportedly slipping, possibly past Computex 2027."
     },
     {
+      "date": "2027-07",
+      "title": "Memory prices start to ease",
+      "category": "RAM",
+      "status": "rumor",
+      "note": "TrendForce (27 Nov): DRAM contract price rises slow through 2027 and level off in 2H27, with declines in 2028; in its weaker case, declines start in Q4 2027.",
+      "source": "https://www.trendforce.com/presscenter/news/20261127-13327.html"
+    },
+    {
       "date": "2027-10",
       "title": "AMD RDNA 5 Radeon GPUs",
       "category": "GPU",
       "maker": "AMD",
       "status": "rumor",
-      "note": "Not expected before late 2027."
-    },
-    {
-      "date": "2027-12",
-      "title": "Memory prices start to ease",
-      "category": "RAM",
-      "status": "rumor",
-      "note": "Memory makers are sold out into 2027-28; relief not expected before late 2027 or 2028."
+      "note": "Not expected before late 2027. Initial GFX13 (RDNA 5) driver support is queued for Linux 7.5 (early 2027).",
+      "source": "https://www.phoronix.com/news/AMD-RDNA5-Linux-7.5-Initial"
     }
   ]
 }
